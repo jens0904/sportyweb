@@ -158,6 +158,26 @@ defmodule SportywebWeb.Router do
       live "/locations/:id/fees", LocationLive.FeeNew, :index
       live "/locations/:id/fees/new", LocationLive.FeeNew, :new
 
+      # Category (Each belongs to a club)
+
+      live "/categories", CategoryLive.Index, :index_root
+      live "/clubs/:club_id/categories", CategoryLive.Index, :index
+
+      live "/clubs/:club_id/categories/new", CategoryLive.NewEdit, :new
+      live "/categories/:id/edit", CategoryLive.NewEdit, :edit
+
+      live "/categories/:id", CategoryLive.Show, :show
+
+      # Article (Each belongs to a club)
+
+      live "/articles", ArticleLive.Index, :index_root
+      live "/clubs/:club_id/articles", ArticleLive.Index, :index
+
+      live "/clubs/:club_id/articles/new", ArticleLive.NewEdit, :new
+      live "/articles/:id/edit", ArticleLive.NewEdit, :edit
+
+      live "/articles/:id", ArticleLive.Show, :show
+
       # Equipment (Each belongs to a location)
 
       live "/equipment", EquipmentLive.Index, :index_root

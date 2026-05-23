@@ -1,0 +1,17 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/articles/#{@article}/edit"}>
+      <.button>Artikel bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <.list>
+    <:item title="Name">{@article.name}</:item>
+    <:item title="Description">{@article.description}</:item>
+    <:item title="Reference number">{@article.reference_number}</:item>
+    <:item title="Costs of loss">{@article.costs_of_loss}</:item>
+  </.list>
+</.card>  

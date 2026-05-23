@@ -1,0 +1,19 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/categories/#{@category}/edit"}>
+      <.button>Ausrüstungskategorie bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <.list>
+    <:item title="Name">{@category.name}</:item>
+    <:item title="Description">{@category.description}</:item>
+    <:item title="Loan period">{@category.loan_period}</:item>
+  </.list>
+</.card>
+
+<.back navigate={~p"/categories"}>Back to categories</.back>
+

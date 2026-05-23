@@ -1,0 +1,15 @@
+defmodule Sportyweb.Repo.Migrations.CreateCategories do
+  use Ecto.Migration
+
+  def change do
+    create table(:categories, primary_key: false) do
+      add :id, :binary_id, primary_key: true
+      add :name, :string
+      add :description, :text
+      add :loan_period, :integer
+
+      add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
+      timestamps(type: :utc_datetime)
+    end
+  end
+end

@@ -20,6 +20,7 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Polymorphic.FinancialData
   alias Sportyweb.Polymorphic.Note
   alias Sportyweb.Polymorphic.Phone
+  alias Sportyweb.Rental.Category
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -27,6 +28,7 @@ defmodule Sportyweb.Organization.Club do
     belongs_to :location, Location
     has_many :all_contracts, Contract
     has_many :all_fees, Fee
+    has_many :categories, Category
     has_many :contacts, Contact, preload_order: [asc: :name]
     has_many :contact_groups, ContactGroup
     has_many :departments, Department, preload_order: [asc: :name]
