@@ -40,7 +40,7 @@ defmodule SportywebWeb.ArticleLive.NewEdit do
     article = Rental.get_article!(id, [:club])
 
     socket
-    |> assign(:page_title, "Ausrüstungsart bearbeiten")
+    |> assign(:page_title, "Artikel bearbeiten")
     |> assign(:article, article)
     |> assign(:club, article.club)
   end
@@ -49,7 +49,7 @@ defmodule SportywebWeb.ArticleLive.NewEdit do
     club = Organization.get_club!(club_id, [:articles])
 
     socket
-    |> assign(:page_title, "Ausrüstungsart erstellen")
+    |> assign(:page_title, "Artikel erstellen")
     |> assign(:article, %Article{
       club_id: club.id,
       club: club

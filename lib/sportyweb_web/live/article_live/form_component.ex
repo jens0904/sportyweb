@@ -70,6 +70,11 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
   end
 
   defp save_article(socket, :new, article_params) do
+    article_params =
+      Enum.into(article_params, %{
+        "club_id" => socket.assigns.article.club.id
+      })
+
     case Rental.create_article(article_params) do
       {:ok, article} ->
         {:noreply,
