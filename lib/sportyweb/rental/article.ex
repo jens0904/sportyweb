@@ -9,8 +9,6 @@ defmodule Sportyweb.Rental.Article do
   @foreign_key_type :binary_id
   schema "articles" do
     belongs_to :club, Club
-    belongs_to :category, Category
-    belongs_to :department, Department
     field :name, :string
     field :description, :string
     field :reference_number, :string
