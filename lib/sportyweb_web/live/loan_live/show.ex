@@ -12,7 +12,7 @@ defmodule SportywebWeb.LoanLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     loan =
-      Rental.get_loan!(id, [:club])
+      Rental.get_loan!(id, [:club, :location, :article])
 
     {:noreply,
      socket
