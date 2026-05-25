@@ -178,6 +178,14 @@ defmodule SportywebWeb.Router do
 
       live "/articles/:id", ArticleLive.Show, :show
 
+      live "/units", UnitLive.Index, :index_root
+      live "/articles/:article_id/units", UnitLive.Index, :index
+
+      live "/articles/:article_id/units/new", UnitLive.NewEdit, :new
+      live "/units/:id/edit", UnitLive.NewEdit, :edit
+
+      live "/units/:id", UnitLive.Show, :show
+
       # Equipment (Each belongs to a location)
 
       live "/equipment", EquipmentLive.Index, :index_root

@@ -4,11 +4,13 @@ defmodule Sportyweb.Rental.Article do
   alias Sportyweb.Organization.Club
   alias Sportyweb.Organization.Department
   alias Sportyweb.Rental.Category
+  alias Sportyweb.Rental.Unit
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "articles" do
     belongs_to :club, Club
+    has_many :units, Unit
     field :name, :string
     field :description, :string
     field :reference_number, :string

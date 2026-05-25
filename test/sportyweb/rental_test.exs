@@ -120,4 +120,62 @@ defmodule Sportyweb.RentalTest do
       assert %Ecto.Changeset{} = Rental.change_article(article)
     end
   end
+
+  describe "units" do
+    alias Sportyweb.Rental.Unit
+
+    import Sportyweb.RentalFixtures
+
+    @invalid_attrs %{serial_number: nil, for_lending: nil, for_booking: nil}
+
+    test "list_units/0 returns all units" do
+      unit = unit_fixture()
+      assert Rental.list_units() == [unit]
+    end
+
+    test "get_unit!/1 returns the unit with given id" do
+      unit = unit_fixture()
+      assert Rental.get_unit!(unit.id) == unit
+    end
+
+    test "create_unit/1 with valid data creates a unit" do
+      valid_attrs = %{serial_number: 42, for_lending: true, for_booking: true}
+
+      assert {:ok, %Unit{} = unit} = Rental.create_unit(valid_attrs)
+      assert unit.serial_number == 42
+      assert unit.for_lending == true
+      assert unit.for_booking == true
+    end
+
+    test "create_unit/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Rental.create_unit(@invalid_attrs)
+    end
+
+    test "update_unit/2 with valid data updates the unit" do
+      unit = unit_fixture()
+      update_attrs = %{serial_number: 43, for_lending: false, for_booking: false}
+
+      assert {:ok, %Unit{} = unit} = Rental.update_unit(unit, update_attrs)
+      assert unit.serial_number == 43
+      assert unit.for_lending == false
+      assert unit.for_booking == false
+    end
+
+    test "update_unit/2 with invalid data returns error changeset" do
+      unit = unit_fixture()
+      assert {:error, %Ecto.Changeset{}} = Rental.update_unit(unit, @invalid_attrs)
+      assert unit == Rental.get_unit!(unit.id)
+    end
+
+    test "delete_unit/1 deletes the unit" do
+      unit = unit_fixture()
+      assert {:ok, %Unit{}} = Rental.delete_unit(unit)
+      assert_raise Ecto.NoResultsError, fn -> Rental.get_unit!(unit.id) end
+    end
+
+    test "change_unit/1 returns a unit changeset" do
+      unit = unit_fixture()
+      assert %Ecto.Changeset{} = Rental.change_unit(unit)
+    end
+  end
 end

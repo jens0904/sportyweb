@@ -22,7 +22,7 @@ defmodule SportywebWeb.CategoryLive.Index do
     club = Organization.get_club!(club_id, :categories)
 
     socket
-    |> assign(:page_title, "Ausrüstungsarten")
+    |> assign(:page_title, "Artikelkategorien")
     |> assign(:club, club)
     |> stream(:articles, club.categories)
   end

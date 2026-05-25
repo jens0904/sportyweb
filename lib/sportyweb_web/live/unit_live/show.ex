@@ -1,4 +1,4 @@
-defmodule SportywebWeb.ArticleLive.Show do
+defmodule SportywebWeb.UnitLive.Show do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Rental
@@ -10,14 +10,14 @@ defmodule SportywebWeb.ArticleLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
-    article =
-      Rental.get_article!(id, [:club, :units])
+    unit =
+      Rental.get_unit!(id, article: :club)
 
     {:noreply,
      socket
-     |> assign(:page_title, "Artikel: #{article.name}")
-     |> assign(:article, article)
-     |> assign(:club, article.club)
-     |> stream(:units, article.units)}
+     |> assign(:page_title, "Einheit: #{unit.serial_number}")
+     |> assign(:unit, unit)
+     |> assign(:article, unit.article)
+     |> assign(:club, unit.article.club)}
   end
 end

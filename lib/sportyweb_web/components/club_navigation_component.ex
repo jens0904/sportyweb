@@ -102,7 +102,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
                 if(@club_navigation_current_item == :categories, do: @classes_menu_item_active)
               ]}
             >
-              <span class="truncate">Standorte</span>
+              <span class="truncate">Artikelkategorien</span>
             </.link>
           </li>
           <li>

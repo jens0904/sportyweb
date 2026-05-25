@@ -36,4 +36,20 @@ defmodule Sportyweb.RentalFixtures do
 
     article
   end
+
+  @doc """
+  Generate a unit.
+  """
+  def unit_fixture(attrs \\ %{}) do
+    {:ok, unit} =
+      attrs
+      |> Enum.into(%{
+        for_booking: true,
+        for_lending: true,
+        serial_number: 42
+      })
+      |> Sportyweb.Rental.create_unit()
+
+    unit
+  end
 end
