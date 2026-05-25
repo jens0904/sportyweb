@@ -20,6 +20,30 @@ defmodule SportywebWeb.LoanLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:loan_number]} type="text" label="Loan number" />
+        <.input field={@form[:serial_number]} type="number" label="Anlagennummer" />
+        <%= if Enum.any?(@location_options) do %>
+          <div class="col-span-12">
+            <.input
+              field={@form[:article_id]}
+              type="select"
+              label="Artikel"
+              options={@article_options |> Enum.map(&{&1.name, &1.id})}
+              prompt="Bitte Artikel auswählen"
+            />
+          </div>
+        <% end %>
+        <.input field={@form[:serial_number]} type="number" label="Anlagennummer" />
+        <%= if Enum.any?(@location_options) do %>
+          <div class="col-span-12">
+            <.input
+              field={@form[:location_id]}
+              type="select"
+              label="Standort"
+              options={@location_options |> Enum.map(&{&1.name, &1.id})}
+              prompt="Bitte Standort auswählen"
+            />
+          </div>
+        <% end %>
         <.input field={@form[:return_date]} type="date" label="Return date" />
         <:actions>
           <div>
