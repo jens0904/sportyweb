@@ -44,13 +44,10 @@ defmodule SportywebWeb.UnitLive.FormComponent do
 
   @impl true
   def update(%{unit: unit} = assigns, socket) do
-    location_options = Asset.list_locations(assigns.club.id)
-    IO.inspect(location_options, label: "LOCATION OPTIONS")
-
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:location_options, location_options)
+     |> assign(:location_options, Asset.list_locations(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_unit(unit))
      end)}
@@ -84,8 +81,6 @@ defmodule SportywebWeb.UnitLive.FormComponent do
       Enum.into(unit_params, %{
         "article_id" => socket.assigns.unit.article.id
       })
-
-    IO.inspect(Sportyweb.Repo.config(), label: "WRITE REPO CONFIG")
 
     case Rental.create_unit(unit_params) do
       {:ok, unit} ->
