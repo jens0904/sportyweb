@@ -46,7 +46,7 @@ defmodule SportywebWeb.ArticleLive.NewEdit do
   end
 
   defp apply_action(socket, :new, %{"club_id" => club_id}) do
-    club = Organization.get_club!(club_id, [:articles])
+    club = Organization.get_club!(club_id, [:articles, :departments])
 
     socket
     |> assign(:page_title, "Artikel erstellen")

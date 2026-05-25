@@ -2,6 +2,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
   use SportywebWeb, :live_component
 
   alias Sportyweb.Rental
+  alias Sportyweb.Organization
 
   @impl true
   def render(assigns) do
@@ -20,9 +21,18 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:reference_number]} type="text" label="Reference number" />
-        <.input field={@form[:costs_of_loss]} type="number" label="Costs of loss" />
+        <.input field={@form[:description]} type="text" label="Beschreibung" />
+        <.input field={@form[:reference_number]} type="text" label="Referenznummer" />
+        <.input field={@form[:costs_of_loss]} type="number" label="Wiederbeschaffungskosten" />
+        <div class="col-span-12">
+          <.input
+            field={@form[:department_id]}
+            type="select"
+            label="Abteilung"
+            options={@department_options |> Enum.map(&{&1.name, &1.id})}
+            prompt="Vereinsweit"
+          />
+        </div>
         <:actions>
           <.button phx-disable-with="Saving...">Save Article</.button>
         </:actions>
@@ -36,6 +46,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:department_options, Organization.list_departments(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_article(article))
      end)}

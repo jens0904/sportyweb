@@ -10,6 +10,7 @@ defmodule Sportyweb.Rental.Article do
   @foreign_key_type :binary_id
   schema "articles" do
     belongs_to :club, Club
+    belongs_to :department, Department
     has_many :units, Unit
     field :name, :string
     field :description, :string
@@ -22,7 +23,21 @@ defmodule Sportyweb.Rental.Article do
   @doc false
   def changeset(article, attrs) do
     article
-    |> cast(attrs, [:name, :description, :reference_number, :costs_of_loss, :club_id])
-    |> validate_required([:name, :description, :reference_number, :costs_of_loss, :club_id])
+    |> cast(attrs, [
+      :name,
+      :description,
+      :reference_number,
+      :costs_of_loss,
+      :club_id,
+      :department_id
+    ])
+    |> validate_required([
+      :name,
+      :description,
+      :reference_number,
+      :costs_of_loss,
+      :club_id,
+      :department_id
+    ])
   end
 end
