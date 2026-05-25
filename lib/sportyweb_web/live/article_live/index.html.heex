@@ -18,22 +18,22 @@
       <:col :let={{_id, article}} label="Beschreibung">{article.description}</:col>
       <:col :let={{_id, article}} label="Referenznummer">{article.reference_number}</:col>
       <:col :let={{_id, article}} label="Wiederbeschaffungskosten">{article.costs_of_loss}</:col>
-      <:col :let={{_id, equipmenttype}} label="Abteilung">
+      <:col :let={{_id, article}} label="Abteilung">
         {format_string_field(
-          case equipmenttype.department do
-            nil -> "-"
+          case article.department do
+            nil -> "Vereinsweit"
             department -> department.name
           end
         )}
       </:col>
       <:action :let={{_id, article}}>
-        <.link navigate={~p"/articles/#{article}"}>Show</.link>
+        <.link navigate={~p"/articles/#{article}"}>Anzeigen</.link>
       </:action>
     </.table>
   <% else %>
     <p>
-      Bisher wurde noch keine Ausrüstungsart erstellt.<br />
-      Ausrüstung kann erst angelegt werden, wenn mindestens eine Ausrüstungsart existiert.
+      Bisher wurde noch kein Artikel erstellt.<br />
+      Einzelne Einheiten können erst angelegt werden, wenn ein dazugehöriger Artikel existiert.
     </p>
   <% end %>
 </.card>

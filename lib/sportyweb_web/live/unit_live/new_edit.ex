@@ -14,6 +14,7 @@ defmodule SportywebWeb.UnitLive.NewEdit do
         title={@page_title}
         action={@live_action}
         unit={@unit}
+        club={@club}
         navigate={if @unit.id, do: ~p"/units/#{@unit}", else: ~p"/articles/#{@article}"}
       />
     </div>

@@ -11,6 +11,9 @@ defmodule Sportyweb.Repo.Migrations.CreateUnits do
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false
 
+      add :location_id, references(:locations, on_delete: :delete_all, type: :binary_id),
+        null: false
+
       timestamps(type: :utc_datetime)
     end
   end

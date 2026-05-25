@@ -11,12 +11,13 @@ defmodule SportywebWeb.UnitLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     unit =
-      Rental.get_unit!(id, article: :club)
+      Rental.get_unit!(id, [:location, article: :club])
 
     {:noreply,
      socket
      |> assign(:page_title, "Einheit: #{unit.serial_number}")
      |> assign(:unit, unit)
+     |> assign(:location, unit.location)
      |> assign(:article, unit.article)
      |> assign(:club, unit.article.club)}
   end

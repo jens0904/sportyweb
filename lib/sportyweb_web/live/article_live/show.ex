@@ -11,7 +11,7 @@ defmodule SportywebWeb.ArticleLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     article =
-      Rental.get_article!(id, [:club, :units])
+      Rental.get_article!(id, [:club, units: :location])
 
     {:noreply,
      socket

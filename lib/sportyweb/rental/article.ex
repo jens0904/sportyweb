@@ -36,8 +36,7 @@ defmodule Sportyweb.Rental.Article do
       :description,
       :reference_number,
       :costs_of_loss,
-      :club_id,
-      :department_id
+      :club_id
     ])
   end
 end

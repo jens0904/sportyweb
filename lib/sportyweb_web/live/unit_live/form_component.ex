@@ -1,6 +1,7 @@
 defmodule SportywebWeb.UnitLive.FormComponent do
   use SportywebWeb, :live_component
 
+  alias Sportyweb.Asset
   alias Sportyweb.Rental
 
   @impl true
@@ -19,9 +20,20 @@ defmodule SportywebWeb.UnitLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:serial_number]} type="number" label="Serial number" />
-        <.input field={@form[:for_lending]} type="checkbox" label="For lending" />
-        <.input field={@form[:for_booking]} type="checkbox" label="For booking" />
+        <.input field={@form[:serial_number]} type="number" label="Anlagennummer" />
+        <%= if Enum.any?(@location_options) do %>
+          <div class="col-span-12">
+            <.input
+              field={@form[:location_id]}
+              type="select"
+              label="Standort"
+              options={@location_options |> Enum.map(&{&1.name, &1.id})}
+              prompt="Bitte Standort auswählen"
+            />
+          </div>
+        <% end %>
+        <.input field={@form[:for_lending]} type="checkbox" label="ausleihbar" />
+        <.input field={@form[:for_booking]} type="checkbox" label="reservierbar" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Unit</.button>
         </:actions>
@@ -32,9 +44,13 @@ defmodule SportywebWeb.UnitLive.FormComponent do
 
   @impl true
   def update(%{unit: unit} = assigns, socket) do
+    location_options = Asset.list_locations(assigns.club.id)
+    IO.inspect(location_options, label: "LOCATION OPTIONS")
+
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:location_options, location_options)
      |> assign_new(:form, fn ->
        to_form(Rental.change_unit(unit))
      end)}
@@ -68,6 +84,8 @@ defmodule SportywebWeb.UnitLive.FormComponent do
       Enum.into(unit_params, %{
         "article_id" => socket.assigns.unit.article.id
       })
+
+    IO.inspect(Sportyweb.Repo.config(), label: "WRITE REPO CONFIG")
 
     case Rental.create_unit(unit_params) do
       {:ok, unit} ->
