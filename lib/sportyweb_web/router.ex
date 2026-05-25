@@ -186,6 +186,16 @@ defmodule SportywebWeb.Router do
 
       live "/units/:id", UnitLive.Show, :show
 
+      # Loan (Each belongs to a club)
+
+      live "/loans", LoanLive.Index, :index_root
+      live "/clubs/:club_id/loans", LoanLive.Index, :index
+
+      live "/clubs/:club_id/loans/new", LoanLive.NewEdit, :new
+      live "/loans/:id/edit", LoanLive.NewEdit, :edit
+
+      live "/loans/:id", LoanLive.Show, :show
+
       # Equipment (Each belongs to a location)
 
       live "/equipment", EquipmentLive.Index, :index_root

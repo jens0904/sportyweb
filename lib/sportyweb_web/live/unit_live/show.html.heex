@@ -9,8 +9,12 @@
 
 <.card>
   <.list>
-    <:item title="Serial number">{@unit.serial_number}</:item>
-    <:item title="For lending">{@unit.for_lending}</:item>
-    <:item title="For booking">{@unit.for_booking}</:item>
+    <:item title="Anlagennummer">{@unit.serial_number}</:item>
+    <:item title="ausleihbar">
+      {format_boolean_field(@unit.for_lending)}
+    </:item>
+    <:item title="reservierbar">
+      {format_boolean_field(@unit.for_booking)}
+    </:item>
   </.list>
 </.card>

@@ -1,0 +1,14 @@
+defmodule Sportyweb.Repo.Migrations.CreateLoans do
+  use Ecto.Migration
+
+  def change do
+    create table(:loans, primary_key: false) do
+      add :id, :binary_id, primary_key: true
+      add :loan_number, :string
+      add :return_date, :date
+
+      add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
+      timestamps(type: :utc_datetime)
+    end
+  end
+end

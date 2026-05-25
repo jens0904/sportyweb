@@ -52,4 +52,19 @@ defmodule Sportyweb.RentalFixtures do
 
     unit
   end
+
+  @doc """
+  Generate a loan.
+  """
+  def loan_fixture(attrs \\ %{}) do
+    {:ok, loan} =
+      attrs
+      |> Enum.into(%{
+        loan_number: "some loan_number",
+        return_date: ~D[2026-05-24]
+      })
+      |> Sportyweb.Rental.create_loan()
+
+    loan
+  end
 end

@@ -1,0 +1,15 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/loans/#{@loan}/edit"}>
+      <.button>Ausleihe bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Loan number">{@loan.loan_number}</:item>
+  <:item title="Return date">{@loan.return_date}</:item>
+</.list>
+
+<.back navigate={~p"/clubs/#{@club}/loans"}>Zurück zur Ausleihübersicht</.back>

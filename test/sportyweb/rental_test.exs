@@ -178,4 +178,60 @@ defmodule Sportyweb.RentalTest do
       assert %Ecto.Changeset{} = Rental.change_unit(unit)
     end
   end
+
+  describe "loans" do
+    alias Sportyweb.Rental.Loan
+
+    import Sportyweb.RentalFixtures
+
+    @invalid_attrs %{loan_number: nil, return_date: nil}
+
+    test "list_loans/0 returns all loans" do
+      loan = loan_fixture()
+      assert Rental.list_loans() == [loan]
+    end
+
+    test "get_loan!/1 returns the loan with given id" do
+      loan = loan_fixture()
+      assert Rental.get_loan!(loan.id) == loan
+    end
+
+    test "create_loan/1 with valid data creates a loan" do
+      valid_attrs = %{loan_number: "some loan_number", return_date: ~D[2026-05-24]}
+
+      assert {:ok, %Loan{} = loan} = Rental.create_loan(valid_attrs)
+      assert loan.loan_number == "some loan_number"
+      assert loan.return_date == ~D[2026-05-24]
+    end
+
+    test "create_loan/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Rental.create_loan(@invalid_attrs)
+    end
+
+    test "update_loan/2 with valid data updates the loan" do
+      loan = loan_fixture()
+      update_attrs = %{loan_number: "some updated loan_number", return_date: ~D[2026-05-25]}
+
+      assert {:ok, %Loan{} = loan} = Rental.update_loan(loan, update_attrs)
+      assert loan.loan_number == "some updated loan_number"
+      assert loan.return_date == ~D[2026-05-25]
+    end
+
+    test "update_loan/2 with invalid data returns error changeset" do
+      loan = loan_fixture()
+      assert {:error, %Ecto.Changeset{}} = Rental.update_loan(loan, @invalid_attrs)
+      assert loan == Rental.get_loan!(loan.id)
+    end
+
+    test "delete_loan/1 deletes the loan" do
+      loan = loan_fixture()
+      assert {:ok, %Loan{}} = Rental.delete_loan(loan)
+      assert_raise Ecto.NoResultsError, fn -> Rental.get_loan!(loan.id) end
+    end
+
+    test "change_loan/1 returns a loan changeset" do
+      loan = loan_fixture()
+      assert %Ecto.Changeset{} = Rental.change_loan(loan)
+    end
+  end
 end
