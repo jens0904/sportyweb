@@ -133,8 +133,14 @@ defmodule Sportyweb.Rental do
       [%Article{}, ...]
 
   """
-  def list_articles do
-    Repo.all(Article)
+
+  # def list_articles do
+  # Repo.all(Article)
+  # end
+
+  def list_articles(club_id) do
+    query = from(v in Article, where: v.club_id == ^club_id, order_by: v.name)
+    Repo.all(query)
   end
 
   @doc """

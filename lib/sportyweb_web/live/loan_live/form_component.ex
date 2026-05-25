@@ -2,6 +2,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
   use SportywebWeb, :live_component
 
   alias Sportyweb.Rental
+  alias Sportyweb.Asset
 
   @impl true
   def render(assigns) do
@@ -20,7 +21,6 @@ defmodule SportywebWeb.LoanLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:loan_number]} type="text" label="Loan number" />
-        <.input field={@form[:serial_number]} type="number" label="Anlagennummer" />
         <%= if Enum.any?(@location_options) do %>
           <div class="col-span-12">
             <.input
@@ -32,7 +32,6 @@ defmodule SportywebWeb.LoanLive.FormComponent do
             />
           </div>
         <% end %>
-        <.input field={@form[:serial_number]} type="number" label="Anlagennummer" />
         <%= if Enum.any?(@location_options) do %>
           <div class="col-span-12">
             <.input
@@ -69,6 +68,8 @@ defmodule SportywebWeb.LoanLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:location_options, Asset.list_locations(assigns.club.id))
+     |> assign(:article_options, Rental.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_loan(loan))
      end)}

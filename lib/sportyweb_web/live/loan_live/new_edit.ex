@@ -15,6 +15,7 @@ defmodule SportywebWeb.LoanLive.NewEdit do
         title={@page_title}
         action={@live_action}
         loan={@loan}
+        club={@club}
         navigate={if @loan.id, do: ~p"/loans/#{@loan}", else: ~p"/clubs/#{@club}/loans"}
       />
     </div>
@@ -44,7 +45,7 @@ defmodule SportywebWeb.LoanLive.NewEdit do
     club = Organization.get_club!(club_id)
 
     socket
-    |> assign(:page_title, "Standort erstellen")
+    |> assign(:page_title, "Ausleihe anlegen")
     |> assign(:loan, %Loan{
       club_id: club.id,
       club: club

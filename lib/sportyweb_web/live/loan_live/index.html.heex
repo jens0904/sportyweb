@@ -14,7 +14,9 @@
       rows={@streams.loans}
       row_click={fn {_id, loan} -> JS.navigate(~p"/loans/#{loan}") end}
     >
-      <:col :let={{_id, loan}} label="Loan number">{loan.loan_number}</:col>
+      <:col :let={{_id, loan}} label="Leihnummer">{loan.loan_number}</:col>
+      <:col :let={{_id, loan}} label="Artikel">{loan.article.name}</:col>
+      <:col :let={{_id, loan}} label="Standort">{loan.location.name}</:col>
       <:col :let={{_id, loan}} label="Return date">{loan.return_date}</:col>
       <:action :let={{_id, loan}}>
         <div class="sr-only">
