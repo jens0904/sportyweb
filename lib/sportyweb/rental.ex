@@ -259,6 +259,11 @@ defmodule Sportyweb.Rental do
     Repo.all(Unit)
   end
 
+  def list_units(article_id) do
+    query = from(u in Unit, where: u.article_id == ^article_id, order_by: u.serial_number)
+    Repo.all(query)
+  end
+
   @doc """
   Gets a single unit.
 

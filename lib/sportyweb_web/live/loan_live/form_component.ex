@@ -29,16 +29,17 @@ defmodule SportywebWeb.LoanLive.FormComponent do
               label="Artikel"
               options={@article_options |> Enum.map(&{&1.name, &1.id})}
               prompt="Bitte Artikel auswählen"
+              phx-change="update_unit_options"
             />
           </div>
         <% end %>
-        <%= if Enum.any?(@location_options) do %>
+        <%= if Enum.any?(@unit_options) do %>
           <div class="col-span-12">
             <.input
-              field={@form[:location_id]}
+              field={@form[:unit_id]}
               type="select"
               label="Standort"
-              options={@location_options |> Enum.map(&{&1.name, &1.id})}
+              options={@unit_options |> Enum.map(&{&1.name, &1.id})}
               prompt="Bitte Standort auswählen"
             />
           </div>
@@ -68,10 +69,10 @@ defmodule SportywebWeb.LoanLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:location_options, Asset.list_locations(assigns.club.id))
      |> assign(:article_options, Rental.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_loan(loan))
+       |> assign(:unit_options, nil)
      end)}
   end
 
@@ -79,6 +80,10 @@ defmodule SportywebWeb.LoanLive.FormComponent do
   def handle_event("validate", %{"loan" => loan_params}, socket) do
     changeset = Rental.change_loan(socket.assigns.loan, loan_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("update_unit_options", %{"loan" => %{"article_id" => article_id}}, socket) do
+    {:noreply, assign_unit_options(socket, article_id)}
   end
 
   def handle_event("save", %{"loan" => loan_params}, socket) do
@@ -114,5 +119,9 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  defp assign_unit_options(socket, article_id) do
+    assign(socket, :unit_options, Rental.list_units(article_id))
   end
 end

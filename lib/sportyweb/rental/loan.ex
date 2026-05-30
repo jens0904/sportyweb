@@ -12,6 +12,7 @@ defmodule Sportyweb.Rental.Loan do
     belongs_to :club, Club
     belongs_to :article, Article
     belongs_to :location, Location
+    belongs_to :unit, Unit
     field :loan_number, :string
     field :return_date, :date
 
@@ -21,7 +22,7 @@ defmodule Sportyweb.Rental.Loan do
   @doc false
   def changeset(loan, attrs) do
     loan
-    |> cast(attrs, [:loan_number, :return_date, :club_id, :location_id, :article_id])
-    |> validate_required([:loan_number, :return_date, :club_id, :location_id, :article_id])
+    |> cast(attrs, [:loan_number, :return_date, :club_id, :article_id, :unit_id])
+    |> validate_required([:loan_number, :return_date, :club_id, :article_id, :unit_id])
   end
 end
