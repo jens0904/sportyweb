@@ -1,6 +1,11 @@
 <.header>
   {@page_title}
   <:actions>
+    <.link navigate={~p"/articles/#{@article}/loans/new"}>
+      <.button>Artikeleinheit ausleihen</.button>
+    </.link>
+  </:actions>
+  <:actions>
     <.link navigate={~p"/articles/#{@article}/edit"}>
       <.button>Artikel bearbeiten</.button>
     </.link>
@@ -14,6 +19,41 @@
     <:item title="Referenznummer">{@article.reference_number}</:item>
     <:item title="Wiederbeschaffungskosten">{@article.costs_of_loss}</:item>
   </.list>
+</.card>
+
+<.header level="2" class="mt-12">
+  Ausleihen
+  <:actions>
+    <.link navigate={~p"/articles/#{@article}/loans/new"}>
+      <.button>Ausleihe anlegen</.button>
+    </.link>
+  </:actions>
+</.header>
+<.card>
+  <%= if Enum.any?(@streams.loans.inserts) do %>
+    <.table
+      id="loan"
+      rows={@streams.loans}
+      row_click={fn {_id, loan} -> JS.navigate(~p"/loans/#{loan}") end}
+    >
+      <:col :let={{_id, loan}} label="Standort">
+        {format_string_field(loan.location.name)}
+      </:col>
+      <:col :let={{_id, loan}} label="Einheit">
+        {format_integer_field(loan.unit.serial_number)}
+      </:col>
+      <:col :let={{_id, loan}} label="Rückgabedatum">
+        <div class="max-w-[200px] truncate overflow-hidden">
+          {format_date_field_dmy(loan.return_date)}
+        </div>
+      </:col>
+      <:action :let={{_id, loan}}>
+        <.link navigate={~p"/loans/#{loan}"}>Anzeigen</.link>
+      </:action>
+    </.table>
+  <% else %>
+    <p>Bisher wurde noch keine Ausleihe angelegt.</p>
+  <% end %>
 </.card>
 
 <.header level="2" class="mt-12">
@@ -55,3 +95,8 @@
     <p>Bisher wurde noch keine Einheit angelegt.</p>
   <% end %>
 </.card>
+
+
+
+
+

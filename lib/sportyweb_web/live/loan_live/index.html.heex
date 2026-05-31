@@ -1,7 +1,7 @@
 <.header>
   {@page_title}
   <:actions>
-    <.link navigate={~p"/clubs/#{@club}/loans/new"}>
+    <.link navigate={~p"/articles/#{@article}/loans/new"}>
       <.button>Ausleihübergabe anlegen</.button>
     </.link>
   </:actions>
@@ -14,7 +14,6 @@
       rows={@streams.loans}
       row_click={fn {_id, loan} -> JS.navigate(~p"/loans/#{loan}") end}
     >
-      <:col :let={{_id, loan}} label="Leihnummer">{loan.loan_number}</:col>
       <:col :let={{_id, loan}} label="Artikel">{loan.article.name}</:col>
       <:col :let={{_id, loan}} label="Standort">{loan.location.name}</:col>
       <:col :let={{_id, loan}} label="Return date">{loan.return_date}</:col>

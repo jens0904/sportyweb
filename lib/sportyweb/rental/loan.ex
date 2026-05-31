@@ -5,11 +5,11 @@ defmodule Sportyweb.Rental.Loan do
   alias Sportyweb.Asset.Location
   alias Sportyweb.Organization.Club
   alias Sportyweb.Rental.Article
+  alias Sportyweb.Rental.Unit
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "loans" do
-    belongs_to :club, Club
     belongs_to :article, Article
     belongs_to :location, Location
     belongs_to :unit, Unit
@@ -22,7 +22,7 @@ defmodule Sportyweb.Rental.Loan do
   @doc false
   def changeset(loan, attrs) do
     loan
-    |> cast(attrs, [:loan_number, :return_date, :club_id, :article_id, :unit_id])
-    |> validate_required([:loan_number, :return_date, :club_id, :article_id, :unit_id])
+    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id])
+    |> validate_required([:return_date, :location_id, :article_id, :unit_id])
   end
 end

@@ -5,7 +5,7 @@ defmodule Sportyweb.Rental do
 
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
-
+  alias Sportyweb.Asset
   alias Sportyweb.Rental.Category
 
   @doc """
@@ -259,9 +259,18 @@ defmodule Sportyweb.Rental do
     Repo.all(Unit)
   end
 
-  def list_units(article_id) do
-    query = from(u in Unit, where: u.article_id == ^article_id, order_by: u.serial_number)
-    Repo.all(query)
+  def list_available_units(loan_object, location_id) do
+    if is_nil(location_id) || (is_binary(location_id) && String.trim(location_id) == "") do
+      []
+    else
+      query =
+        from(u in Unit,
+          where: u.location_id == ^location_id,
+          order_by: u.serial_number
+        )
+
+      Repo.all(query)
+    end
   end
 
   @doc """

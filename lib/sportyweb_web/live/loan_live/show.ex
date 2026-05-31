@@ -6,18 +6,18 @@ defmodule SportywebWeb.LoanLive.Show do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :loans)}
+    {:ok, assign(socket, :club_navigation_current_item, :articles)}
   end
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     loan =
-      Rental.get_loan!(id, [:club, :location, :article])
+      Rental.get_loan!(id, [:location, :article, :unit])
 
     {:noreply,
      socket
      |> assign(:page_title, "Ausleihe: #{loan.loan_number}")
      |> assign(:loan, loan)
-     |> assign(:club, loan.club)}
+     |> assign(:article, loan.article)}
   end
 end

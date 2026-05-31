@@ -117,18 +117,6 @@ defmodule SportywebWeb.ClubNavigationComponent do
               <span class="truncate">Artikel</span>
             </.link>
           </li>
-          <li>
-            <.link
-              navigate={~p"/clubs/#{@club}/loans"}
-              class={[
-                @classes_menu_item,
-                @classes_submenu_item,
-                if(@club_navigation_current_item == :loans, do: @classes_menu_item_active)
-              ]}
-            >
-              <span class="truncate">Ausleihen</span>
-            </.link>
-          </li>
         </ul>
 
         <.link

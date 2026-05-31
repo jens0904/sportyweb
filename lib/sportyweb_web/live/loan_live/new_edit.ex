@@ -15,7 +15,9 @@ defmodule SportywebWeb.LoanLive.NewEdit do
         title={@page_title}
         action={@live_action}
         loan={@loan}
-        navigate={if @loan.id, do: ~p"/loans/#{@loan}", else: ~p"/clubs/#{@club}/loans"}
+        loan_object={@article}
+        club={@club}
+        navigate={if @loan.id, do: ~p"/loans/#{@loan}", else: ~p"/articles/#{@article}"}
       />
     </div>
     """
@@ -23,7 +25,7 @@ defmodule SportywebWeb.LoanLive.NewEdit do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :loans)}
+    {:ok, assign(socket, :club_navigation_current_item, :articles)}
   end
 
   @impl true
@@ -32,24 +34,25 @@ defmodule SportywebWeb.LoanLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    loan = Rental.get_loan!(id, [:club])
+    loan = Rental.get_loan!(id, [:article])
 
     socket
     |> assign(:page_title, "Ausleihe bearbeiten")
     |> assign(:loan, loan)
-    |> assign(:club, loan.club)
+    |> assign(:article, loan.article)
   end
 
-  defp apply_action(socket, :new, %{"club_id" => club_id}) do
-    club = Organization.get_club!(club_id)
+  defp apply_action(socket, :new, %{"article_id" => article_id}) do
+    article = Rental.get_article!(article_id, [:club])
 
     socket
     |> assign(:page_title, "Ausleihe anlegen")
     |> assign(:loan, %Loan{
-      club_id: club.id,
-      club: club
+      article_id: article.id,
+      article: article
     })
-    |> assign(:club, club)
+    |> assign(:article, article)
+    |> assign(:club, article.club)
   end
 
   @impl true
@@ -60,6 +63,6 @@ defmodule SportywebWeb.LoanLive.NewEdit do
     {:noreply,
      socket
      |> put_flash(:info, "Ausleihe erfolgreich gelöscht")
-     |> push_navigate(to: "/clubs/#{loan.club_id}/loans")}
+     |> push_navigate(to: "/article/#{loan.article_id}/loans")}
   end
 end

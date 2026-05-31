@@ -13,6 +13,7 @@ defmodule Sportyweb.Rental.Article do
     belongs_to :club, Club
     belongs_to :department, Department
     has_many :units, Unit
+    has_many :loans, Loan
     field :name, :string
     field :description, :string
     field :reference_number, :string

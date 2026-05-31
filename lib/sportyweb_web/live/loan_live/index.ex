@@ -7,7 +7,7 @@ defmodule SportywebWeb.LoanLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :loans)}
+    {:ok, assign(socket, :club_navigation_current_item, :articles)}
   end
 
   @impl true
@@ -20,12 +20,8 @@ defmodule SportywebWeb.LoanLive.Index do
     |> redirect(to: "/clubs")
   end
 
-  defp apply_action(socket, :index, %{"club_id" => club_id}) do
-    club = Organization.get_club!(club_id, loans: :article, loans: :location)
-
+  defp apply_action(socket, :index, %{"article_id" => article_id}) do
     socket
-    |> assign(:page_title, "Ausleihen")
-    |> assign(:club, club)
-    |> stream(:loans, club.loans)
+    |> redirect(to: "/articles/#{article_id}")
   end
 end

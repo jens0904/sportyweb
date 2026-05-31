@@ -8,10 +8,9 @@
 </.header>
 
 <.list>
-  <:item title="Loan number">{@loan.loan_number}</:item>
-  <:item title="Artikel">{@loan.article.name}</:item>
   <:item title="Standort">{@loan.location.name}</:item>
+  <:item title="Einheit">{@loan.unit.serial_number}</:item>
   <:item title="Return date">{@loan.return_date}</:item>
 </.list>
 
-<.back navigate={~p"/clubs/#{@club}/loans"}>Zurück zur Ausleihübersicht</.back>
+<.back navigate={~p"/articles/#{@article}/loans"}>Zurück zur Ausleihübersicht</.back>

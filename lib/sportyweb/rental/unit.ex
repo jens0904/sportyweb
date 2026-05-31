@@ -10,6 +10,7 @@ defmodule Sportyweb.Rental.Unit do
   schema "units" do
     belongs_to :article, Article
     belongs_to :location, Location
+    has_many :loans, Loan
     field :serial_number, :integer
     field :for_lending, :boolean, default: false
     field :for_booking, :boolean, default: false
