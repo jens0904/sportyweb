@@ -34,12 +34,13 @@ defmodule SportywebWeb.LoanLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    loan = Rental.get_loan!(id, [:article])
+    loan = Rental.get_loan!(id, article: :club)
 
     socket
     |> assign(:page_title, "Ausleihe bearbeiten")
     |> assign(:loan, loan)
     |> assign(:article, loan.article)
+    |> assign(:club, loan.article.club)
   end
 
   defp apply_action(socket, :new, %{"article_id" => article_id}) do
