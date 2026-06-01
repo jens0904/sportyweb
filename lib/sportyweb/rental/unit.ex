@@ -4,6 +4,7 @@ defmodule Sportyweb.Rental.Unit do
 
   alias Sportyweb.Asset.Location
   alias Sportyweb.Rental.Article
+  alias Sportyweb.Rental.Loan
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -22,6 +23,6 @@ defmodule Sportyweb.Rental.Unit do
   def changeset(unit, attrs) do
     unit
     |> cast(attrs, [:serial_number, :for_lending, :for_booking, :article_id, :location_id])
-    |> validate_required([:serial_number, :for_lending, :for_booking, :article_id, :location_id])
+    |> validate_required([:serial_number, :article_id, :location_id])
   end
 end
