@@ -33,7 +33,18 @@ defmodule SportywebWeb.UnitLive.FormComponent do
           </div>
         <% end %>
         <.input field={@form[:for_lending]} type="checkbox" label="ausleihbar" />
-        <.input field={@form[:for_booking]} type="checkbox" label="reservierbar" />
+        <.input field={@form[:occupied]} type="checkbox" label="reservierbar" />
+        <div class="col-span-12 md:col-span-4">
+          <.input field={@form[:purchase_date]} type="date" label="Gekauft am (optional)" />
+        </div>
+
+        <div class="col-span-12 md:col-span-4">
+          <.input field={@form[:commission_date]} type="date" label="Nutzung ab (optional)" />
+        </div>
+
+        <div class="col-span-12 md:col-span-4">
+          <.input field={@form[:decommission_date]} type="date" label="Nutzung bis (optional)" />
+        </div>
         <:actions>
           <.button phx-disable-with="Saving...">Save Unit</.button>
         </:actions>

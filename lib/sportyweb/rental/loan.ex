@@ -3,7 +3,6 @@ defmodule Sportyweb.Rental.Loan do
   import Ecto.Changeset
 
   alias Sportyweb.Asset.Location
-  alias Sportyweb.Organization.Club
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Unit
 

@@ -17,7 +17,7 @@ defmodule Sportyweb.Rental.Article do
     field :name, :string
     field :description, :string
     field :reference_number, :string
-    field :costs_of_loss, :integer
+    field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
 
     timestamps(type: :utc_datetime)
   end
@@ -40,5 +40,8 @@ defmodule Sportyweb.Rental.Article do
       :costs_of_loss,
       :club_id
     ])
+    |> validate_length(:name, max: 250)
+    |> validate_length(:reference_number, max: 250)
+    |> validate_length(:description, max: 20_000)
   end
 end

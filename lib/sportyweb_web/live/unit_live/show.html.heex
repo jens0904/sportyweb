@@ -9,12 +9,26 @@
 
 <.card>
   <.list>
-    <:item title="Anlagennummer">{@unit.serial_number}</:item>
+    <:item title="Anlagennummer">
+      {format_integer_field(@unit.serial_number)}
+    </:item>
     <:item title="ausleihbar">
       {format_boolean_field(@unit.for_lending)}
     </:item>
-    <:item title="reservierbar">
-      {format_boolean_field(@unit.for_booking)}
+    <:item title="belegt">
+      {format_boolean_field(@unit.occupied)}
+    </:item>
+    <:item title="Standort">
+      {format_string_field(@unit.location.name)}
+    </:item>
+    <:item title="Erwerbsdatum">
+      {format_date_field_dmy(@unit.purchase_date)}
+    </:item>
+    <:item title="Inbetriebnahme">
+      {format_date_field_dmy(@unit.commission_date)}
+    </:item>
+    <:item title="Außerbetriebnahme">
+      {format_date_field_dmy(@unit.decommission_date)}
     </:item>
   </.list>
 </.card>

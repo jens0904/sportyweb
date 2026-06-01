@@ -75,8 +75,8 @@
       <:col :let={{_id, unit}} label="Anlagennummer">
         {format_integer_field(unit.serial_number)}
       </:col>
-      <:col :let={{_id, unit}} label="buchbar">
-        {format_boolean_field(unit.for_booking)}
+      <:col :let={{_id, unit}} label="belegt">
+        {format_boolean_field(unit.occupied)}
       </:col>
       <:col :let={{_id, unit}} label="ausleihbar">
         <div class="max-w-[200px] truncate overflow-hidden">
@@ -86,7 +86,15 @@
       <:col :let={{_id, unit}} label="Standort">
         {format_string_field(unit.location.name)}
       </:col>
-
+      <:col :let={{_id, unit}} label="Erwerbsdatum">
+        {format_date_field_dmy(unit.purchase_date)}
+      </:col>
+      <:col :let={{_id, unit}} label="Inbetriebnahme">
+        {format_date_field_dmy(unit.commission_date)}
+      </:col>
+      <:col :let={{_id, unit}} label="Außerbetriebnahme">
+        {format_date_field_dmy(unit.decommission_date)}
+      </:col>
       <:action :let={{_id, unit}}>
         <.link navigate={~p"/units/#{unit}"}>Anzeigen</.link>
       </:action>
@@ -95,8 +103,3 @@
     <p>Bisher wurde noch keine Einheit angelegt.</p>
   <% end %>
 </.card>
-
-
-
-
-

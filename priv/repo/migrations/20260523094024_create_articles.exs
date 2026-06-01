@@ -7,7 +7,7 @@ defmodule Sportyweb.Repo.Migrations.CreateArticles do
       add :name, :string
       add :description, :text
       add :reference_number, :string
-      add :costs_of_loss, :integer
+      add :costs_of_loss, :money_with_currency
 
       add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
 
