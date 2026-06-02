@@ -17,8 +17,9 @@ defmodule Sportyweb.Rental do
       [%Category{}, ...]
 
   """
-  def list_categories do
-    Repo.all(Category)
+  def list_categories(club_id) do
+    query = from(c in Category, where: c.club_id == ^club_id, order_by: c.name)
+    Repo.all(query)
   end
 
   @doc """
@@ -266,6 +267,7 @@ defmodule Sportyweb.Rental do
       query =
         from(u in Unit,
           where: u.location_id == ^location_id,
+          where: u.occupied == false,
           order_by: u.serial_number
         )
 

@@ -7,10 +7,18 @@
   </:actions>
 </.header>
 
-<.list>
-  <:item title="Standort">{@loan.location.name}</:item>
-  <:item title="Einheit">{@loan.unit.serial_number}</:item>
-  <:item title="Return date">{@loan.return_date}</:item>
-</.list>
+<.card>
+  <.list>
+    <:item title="Standort">
+      {format_string_field(@loan.location.name)}
+    </:item>
+    <:item title="Standort">
+      {format_string_field(@loan.unit.serial_number)}
+    </:item>
+    <:item title="Rückgabedatum">
+      {format_date_field_dmy(@loan.return_date)}
+    </:item>
+  </.list>
+</.card>
 
-<.back navigate={~p"/articles/#{@article}/loans"}>Zurück zur Ausleihübersicht</.back>
+<.back navigate={~p"/articles/#{@article}"}>Zurück zur Artikelansicht</.back>

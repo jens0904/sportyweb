@@ -24,6 +24,6 @@ defmodule SportywebWeb.CategoryLive.Index do
     socket
     |> assign(:page_title, "Artikelkategorien")
     |> assign(:club, club)
-    |> stream(:articles, club.categories)
+    |> stream(:categories, club.categories)
   end
 end

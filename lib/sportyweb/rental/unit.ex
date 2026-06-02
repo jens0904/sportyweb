@@ -13,7 +13,7 @@ defmodule Sportyweb.Rental.Unit do
     belongs_to :article, Article
     belongs_to :location, Location
     has_many :loans, Loan
-    field :serial_number, :integer
+    field :serial_number, :string
     field :for_lending, :boolean, default: true
     field :occupied, :boolean, default: false
     field :purchase_date, :date, default: nil

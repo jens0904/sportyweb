@@ -33,7 +33,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
           </div>
         <% end %>
         <.input field={@form[:for_lending]} type="checkbox" label="ausleihbar" />
-        <.input field={@form[:occupied]} type="checkbox" label="reservierbar" />
+        <.input field={@form[:occupied]} type="checkbox" label="belegt" />
         <div class="col-span-12 md:col-span-4">
           <.input field={@form[:purchase_date]} type="date" label="Gekauft am (optional)" />
         </div>

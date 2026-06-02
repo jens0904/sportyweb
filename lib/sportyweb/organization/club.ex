@@ -36,7 +36,6 @@ defmodule Sportyweb.Organization.Club do
     has_many :contact_groups, ContactGroup
     has_many :departments, Department, preload_order: [asc: :name]
     has_many :events, Event
-    has_many :loans, Loan
     has_many :subsidies, Subsidy, preload_order: [asc: :name]
     # This line has to be below "has_many :all_contracts"!
     has_many :transactions, through: [:all_contracts, :transactions]

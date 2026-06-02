@@ -26,6 +26,14 @@
           end
         )}
       </:col>
+      <:col :let={{_id, article}} label="Kategorie">
+        {format_string_field(
+          case article.category do
+            nil -> "-"
+            category -> category.name
+          end
+        )}
+      </:col>
       <:action :let={{_id, article}}>
         <.link navigate={~p"/articles/#{article}"}>Anzeigen</.link>
       </:action>

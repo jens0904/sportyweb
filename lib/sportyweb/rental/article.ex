@@ -12,6 +12,7 @@ defmodule Sportyweb.Rental.Article do
   schema "articles" do
     belongs_to :club, Club
     belongs_to :department, Department
+    belongs_to :category, Category
     has_many :units, Unit
     has_many :loans, Loan
     field :name, :string
@@ -31,7 +32,8 @@ defmodule Sportyweb.Rental.Article do
       :reference_number,
       :costs_of_loss,
       :club_id,
-      :department_id
+      :department_id,
+      :category_id
     ])
     |> validate_required([
       :name,

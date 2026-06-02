@@ -33,6 +33,15 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
             prompt="Vereinsweit"
           />
         </div>
+        <div class="col-span-12">
+          <.input
+            field={@form[:category_id]}
+            type="select"
+            label="Kategorie"
+            options={@category_options |> Enum.map(&{&1.name, &1.id})}
+            prompt="---"
+          />
+        </div>
         <:actions>
           <.button phx-disable-with="Saving...">Save Article</.button>
         </:actions>
@@ -47,6 +56,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:department_options, Organization.list_departments(assigns.club.id))
+     |> assign(:category_options, Rental.list_categories(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_article(article))
      end)}

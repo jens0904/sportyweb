@@ -14,6 +14,9 @@ defmodule Sportyweb.Repo.Migrations.CreateArticles do
       add :department_id, references(:departments, on_delete: :nilify_all, type: :binary_id),
         null: true
 
+      add :category_id, references(:categories, on_delete: :nilify_all, type: :binary_id),
+        null: true
+
       timestamps(type: :utc_datetime)
     end
   end

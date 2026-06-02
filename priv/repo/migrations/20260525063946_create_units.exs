@@ -4,12 +4,12 @@ defmodule Sportyweb.Repo.Migrations.CreateUnits do
   def change do
     create table(:units, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :serial_number, :integer, null: false
+      add :serial_number, :string, null: false
       add :for_lending, :boolean, default: true, null: false
       add :occupied, :boolean, default: false, null: false
-      add :purchase_date, :date, null: false
-      add :commission_date, :date, null: false
-      add :decommission_date, :date, null: false
+      add :purchase_date, :date, null: true
+      add :commission_date, :date, null: true
+      add :decommission_date, :date, null: true
 
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false

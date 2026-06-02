@@ -24,6 +24,14 @@ defmodule SportywebWeb.CategoryLive.FormComponent do
         <.input field={@form[:loan_period]} type="number" label="Loan period" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Category</.button>
+          <.button
+            :if={@category.id}
+            class="bg-rose-700 hover:bg-rose-800"
+            phx-click={JS.push("delete", value: %{id: @category.id})}
+            data-confirm="Unwiderruflich löschen?"
+          >
+            Löschen
+          </.button>
         </:actions>
       </.simple_form>
     </div>

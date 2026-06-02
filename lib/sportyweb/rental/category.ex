@@ -2,11 +2,13 @@ defmodule Sportyweb.Rental.Category do
   use Ecto.Schema
   import Ecto.Changeset
   alias Sportyweb.Organization.Club
+  alias Sportyweb.Rental.Article
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "categories" do
     belongs_to :club, Club
+    has_many :articles, Article
     field :name, :string
     field :description, :string
     field :loan_period, :integer
