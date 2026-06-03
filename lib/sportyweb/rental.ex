@@ -268,6 +268,7 @@ defmodule Sportyweb.Rental do
         from(u in Unit,
           where: u.location_id == ^location_id,
           where: u.occupied == false,
+          where: u.for_lending == true,
           order_by: u.serial_number
         )
 
