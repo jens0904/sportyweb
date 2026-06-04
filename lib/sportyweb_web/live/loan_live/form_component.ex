@@ -76,7 +76,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:contact_options, Personal.list_contracts(assigns.loan_object, assigns.club.id))
+     |> assign(:contact_options, Personal.list_contracts(assigns.article.id, assigns.club.id))
      |> assign(:location_options, Asset.list_locations(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_loan(loan))
@@ -142,7 +142,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
     assign(
       socket,
       :unit_options,
-      Rental.list_available_units(socket.assigns.loan_object, location_id)
+      Rental.list_available_units(socket.assigns.loan.article_id, location_id)
     )
   end
 end

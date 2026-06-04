@@ -10,6 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
+import Ecto.Query
 alias Sportyweb.Repo
 
 alias Sportyweb.Accounts
@@ -34,6 +35,9 @@ alias Sportyweb.Polymorphic.InternalEvent
 alias Sportyweb.Polymorphic.Note
 alias Sportyweb.Polymorphic.Phone
 alias Sportyweb.Polymorphic.PostalAddress
+alias Sportyweb.Rental.Article
+alias Sportyweb.Rental.Category
+alias Sportyweb.Rental.Unit
 
 alias Sportyweb.RBAC.Role.ApplicationRole
 alias Sportyweb.RBAC.Role.ClubRole
@@ -1023,6 +1027,8 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
             notes: [Sportyweb.SeedHelper.get_random_note()]
           })
 
+
+
         # Fees: Specific - Equipment
 
         Repo.insert!(%Fee{
@@ -1043,6 +1049,93 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
         })
       end
     end
+
+    # Category
+
+      for k <- 0..Enum.random(1..10) do
+        category =
+          Repo.insert!(%Category{
+            club_id: club.id,
+            name: Faker.Commerce.department(),
+            description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
+            loan_period: Enum.random(1..30)
+          })
+        if k == 0, do: Organization.update_club(club, %{category_id: category.id})
+      end
+
+      # Article
+      # Before loop: Getting departments and categories for random association
+
+    departments =
+      Repo.all(
+        from d in Department,
+          where: d.club_id == ^club.id
+      )
+
+    categories =
+      Repo.all(
+        from c in Category,
+          where: c.club_id == ^club.id
+      )
+
+    locations =
+      Repo.all(
+        from l in Location,
+          where: l.club_id == ^club.id
+      )
+
+    # Article
+
+    for l <- 0..Enum.random(1..20) do
+      department_id =
+        Enum.random([nil | Enum.map(departments, & &1.id)])
+
+      category_id =
+        Enum.random([nil | Enum.map(categories, & &1.id)])
+
+      article =
+      Repo.insert!(%Article{
+        club_id: club.id,
+        department_id: department_id,
+        category_id: category_id,
+        name: Faker.Commerce.product_name(),
+        reference_number: Sportyweb.SeedHelper.get_random_string(5),
+        description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
+        costs_of_loss: Money.new(:EUR, Enum.random(10..500))
+      })
+
+
+      # Units
+
+
+
+
+      for _m <- 0..Enum.random(1..5) do
+        location_id =
+        Enum.random(locations).id
+
+        Repo.insert!(%Unit{
+          article_id: article.id,
+          location_id: location_id,
+          serial_number: Sportyweb.SeedHelper.get_random_string(3),
+          purchase_date: Faker.Date.backward(Enum.random(300..2000)),
+            commission_date: Faker.Date.backward(Enum.random(0..299)),
+            decommission_date:
+              if(:rand.uniform() < 0.65,
+                do: Faker.Date.forward(Enum.random(100..2000)),
+                else: nil
+              ),
+          for_lending: Enum.random([true, false]),
+          occupied: false
+        })
+      end
+
+    if l == 0, do: Organization.update_club(club, %{article_id: article.id})
+
+    end
+
+
+
 
     # Events
 

@@ -260,13 +260,14 @@ defmodule Sportyweb.Rental do
     Repo.all(Unit)
   end
 
-  def list_available_units(loan_object, location_id) do
+  def list_available_units(article_id, location_id) do
     if is_nil(location_id) || (is_binary(location_id) && String.trim(location_id) == "") do
       []
     else
       query =
         from(u in Unit,
           where: u.location_id == ^location_id,
+          where: u.article_id == ^article_id,
           where: u.occupied == false,
           where: u.for_lending == true,
           order_by: u.serial_number

@@ -15,7 +15,7 @@ defmodule SportywebWeb.LoanLive.NewEdit do
         title={@page_title}
         action={@live_action}
         loan={@loan}
-        loan_object={@article}
+        article={@article}
         club={@club}
         navigate={if @loan.id, do: ~p"/loans/#{@loan}", else: ~p"/articles/#{@article}"}
       />

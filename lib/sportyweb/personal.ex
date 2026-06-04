@@ -5,6 +5,7 @@ defmodule Sportyweb.Personal do
 
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
+  alias Sportyweb.Rental
 
   alias Sportyweb.Legal.Contract
   alias Sportyweb.Personal.Contact
@@ -36,8 +37,9 @@ defmodule Sportyweb.Personal do
     Repo.preload(list_contacts(club_id), preloads)
   end
 
-  def list_contracts(contract_object, club_id) do
-    if is_nil(contract_object.department) do
+  def list_contracts(article_id, club_id) do
+    article = Rental.get_article!(article_id)
+    if is_nil(article.department_id) do
       query =
         from(
           c in Contact,
@@ -54,7 +56,7 @@ defmodule Sportyweb.Personal do
           join: co in assoc(c, :contracts),
           join: d in assoc(co, :departments),
           where: c.club_id == ^club_id,
-          where: d.id == ^contract_object.department_id,
+          where: d.id == ^article.department_id,
           distinct: true,
           order_by: c.name
         )
