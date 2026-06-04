@@ -36,6 +36,32 @@ defmodule Sportyweb.Personal do
     Repo.preload(list_contacts(club_id), preloads)
   end
 
+  def list_contracts(contract_object, club_id) do
+    if is_nil(contract_object.department) do
+      query =
+        from(
+          c in Contact,
+          join: co in assoc(c, :contracts),
+          where: c.club_id == ^club_id,
+          distinct: true,
+          order_by: c.name
+        )
+      Repo.all(query)
+    else
+      query =
+        from(
+          c in Contact,
+          join: co in assoc(c, :contracts),
+          join: d in assoc(co, :departments),
+          where: c.club_id == ^club_id,
+          where: d.id == ^contract_object.department_id,
+          distinct: true,
+          order_by: c.name
+        )
+      Repo.all(query)
+    end
+  end
+
   @doc """
   Returns a list of contacts that are possible options for the given contract.
   The list won't include contacts that have an active (non-archived) contract

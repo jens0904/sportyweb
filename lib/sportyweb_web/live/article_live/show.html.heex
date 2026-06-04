@@ -36,6 +36,9 @@
       rows={@streams.loans}
       row_click={fn {_id, loan} -> JS.navigate(~p"/loans/#{loan}") end}
     >
+      <:col :let={{_id, loan}} label="Kontakt">
+        {format_string_field(loan.contact.name)}
+      </:col>
       <:col :let={{_id, loan}} label="Standort">
         {format_string_field(loan.location.name)}
       </:col>

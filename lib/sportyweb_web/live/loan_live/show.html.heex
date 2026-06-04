@@ -9,10 +9,13 @@
 
 <.card>
   <.list>
+    <:item title="Kontakt">
+      {format_string_field(@loan.contact.name)}
+    </:item>
     <:item title="Standort">
       {format_string_field(@loan.location.name)}
     </:item>
-    <:item title="Standort">
+    <:item title="Einheit">
       {format_string_field(@loan.unit.serial_number)}
     </:item>
     <:item title="Rückgabedatum">

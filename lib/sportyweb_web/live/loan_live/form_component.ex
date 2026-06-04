@@ -3,6 +3,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
 
   alias Sportyweb.Rental
   alias Sportyweb.Asset
+  alias Sportyweb.Personal
 
   @impl true
   def render(assigns) do
@@ -22,6 +23,15 @@ defmodule SportywebWeb.LoanLive.FormComponent do
         >
           <.input_grids>
             <.input_grid>
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:contact_id]}
+                  type="select"
+                  label="Kontakt"
+                  options={@contact_options |> Enum.map(&{&1.name, &1.id})}
+                  prompt="Bitte auswählen"
+                />
+              </div>
               <div class="col-span-12 md:col-span-6">
                 <.input
                   field={@form[:location_id]}
@@ -66,6 +76,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:contact_options, Personal.list_contracts(assigns.loan_object, assigns.club.id))
      |> assign(:location_options, Asset.list_locations(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_loan(loan))

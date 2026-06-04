@@ -15,7 +15,7 @@ defmodule SportywebWeb.ArticleLive.Show do
       Rental.get_article!(id, [
         :club,
         loans: [:unit, :location],
-        units: :location
+        units: :location, loans: :contact
       ])
 
     {:noreply,
