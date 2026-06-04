@@ -15,8 +15,8 @@
       row_click={fn {_id, category} -> JS.navigate(~p"/categories/#{category}") end}
     >
       <:col :let={{_id, category}} label="Name">{category.name}</:col>
-      <:col :let={{_id, category}} label="Description">{category.description}</:col>
-      <:col :let={{_id, category}} label="Loan period">{category.loan_period}</:col>
+      <:col :let={{_id, category}} label="Beschreibung">{category.description}</:col>
+      <:col :let={{_id, category}} label="Ausleihzeitraum">{category.loan_period}</:col>
       <:action :let={{_id, category}}>
         <.link navigate={~p"/categories/#{category}"}>Show</.link>
       </:action>

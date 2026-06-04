@@ -122,14 +122,19 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       })
 
     case Rental.create_loan(loan_params) do
-      {:ok, loan} ->
+      {:ok, %{loan: _loan}} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Loan created successfully")
+         |> put_flash(:info, "Die Ausleihe wurde erfolgreich angelegt.")
          |> push_navigate(to: socket.assigns.navigate)}
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, :loan, %Ecto.Changeset{} = changeset, _changes} ->
         {:noreply, assign(socket, form: to_form(changeset))}
+
+      {:errror, :unit, %Ecto.Changeset{} = _changeset, _changes} ->
+        {:noreply,
+        socket
+        |> put_flash(:error, "Die ausgewählte Einheit konnte nicht als belegt markiert werden.")}
     end
   end
 

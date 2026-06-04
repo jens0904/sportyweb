@@ -20,8 +20,8 @@ defmodule SportywebWeb.CategoryLive.FormComponent do
         phx-submit="save"
       >
         <.input field={@form[:name]} type="text" label="Name" />
-        <.input field={@form[:description]} type="text" label="Description" />
-        <.input field={@form[:loan_period]} type="number" label="Loan period" />
+        <.input field={@form[:description]} type="text" label="Beschreibung" />
+        <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum" />
         <:actions>
           <.button phx-disable-with="Saving...">Save Category</.button>
           <.button

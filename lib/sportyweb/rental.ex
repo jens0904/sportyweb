@@ -430,11 +430,11 @@ defmodule Sportyweb.Rental do
   end
 
   @doc """
-  Creates a loan.
+  Creates a loan under a transaction. Also updates the occupied status of the unit.
 
   ## Examples
 
-      iex> create_loan(%{field: value})
+      iex> c reate_loan(%{field: value})
       {:ok, %Loan{}}
 
       iex> create_loan(%{field: bad_value})
@@ -442,9 +442,17 @@ defmodule Sportyweb.Rental do
 
   """
   def create_loan(attrs \\ %{}) do
-    %Loan{}
-    |> Loan.changeset(attrs)
-    |> Repo.insert()
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:loan, Loan.changeset(%Loan{}, attrs))
+    |> Ecto.Multi.update(:unit, fn %{loan: loan} ->
+      Unit.changeset(
+        get_unit!(loan.unit_id),
+        %{
+          occupied: true
+        }
+      )
+    end)
+    |> Repo.transaction()
   end
 
   @doc """
