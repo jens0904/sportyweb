@@ -502,4 +502,21 @@ defmodule Sportyweb.Rental do
   def change_loan(%Loan{} = loan, attrs \\ %{}) do
     Loan.changeset(loan, attrs)
   end
+
+
+  def calculate_return_date(article_id) do
+    article = get_article!(article_id, :category)
+
+    case article.category do
+      nil ->
+        nil
+
+      category ->
+        if category.loan_period do
+          Date.add(Date.utc_today(), category.loan_period)
+        else
+          nil
+        end
+    end
+  end
 end

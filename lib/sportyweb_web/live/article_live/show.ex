@@ -13,7 +13,7 @@ defmodule SportywebWeb.ArticleLive.Show do
   def handle_params(%{"id" => id}, _, socket) do
     article =
       Rental.get_article!(id, [
-        :club,
+        :club, :department, :category,
         loans: [:unit, :location],
         units: :location, loans: :contact
       ])

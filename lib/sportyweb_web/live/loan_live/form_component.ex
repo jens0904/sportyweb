@@ -54,7 +54,20 @@ defmodule SportywebWeb.LoanLive.FormComponent do
               </div>
 
               <div class="col-span-12 md:col-span-6">
-                <.input field={@form[:return_date]} type="date" label="Rückgabedatum" />
+                <.input
+                field={@form[:return_date]}
+                type="date"
+                label="Rückgabedatum"
+                disabled={@return_date_locked?}
+                />
+
+                <%= if @return_date_locked? do %>
+                  <input
+                    type="hidden"
+                    name={@form[:return_date].name}
+                    value={@form[:return_date].value}
+                  />
+                <% end %>
               </div>
             </.input_grid>
           </.input_grids>
@@ -73,9 +86,19 @@ defmodule SportywebWeb.LoanLive.FormComponent do
 
   @impl true
   def update(%{loan: loan} = assigns, socket) do
+    return_date=Rental.calculate_return_date(assigns.article.id)
+
+    loan =
+      if return_date do
+        %{loan | return_date: return_date}
+      else
+        loan
+      end
+
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:return_date_locked?, not is_nil(return_date))
      |> assign(:contact_options, Personal.list_contracts(assigns.article.id, assigns.club.id))
      |> assign(:location_options, Asset.list_locations(assigns.club.id))
      |> assign_new(:form, fn ->
@@ -104,7 +127,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
 
   defp save_loan(socket, :edit, loan_params) do
     case Rental.update_loan(socket.assigns.loan, loan_params) do
-      {:ok, loan} ->
+      {:ok, _loan} ->
         {:noreply,
          socket
          |> put_flash(:info, "Loan updated successfully")

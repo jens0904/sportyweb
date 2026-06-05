@@ -18,6 +18,12 @@
     <:item title="Beschreibung">{@article.description}</:item>
     <:item title="Referenznummer">{@article.reference_number}</:item>
     <:item title="Wiederbeschaffungskosten">{@article.costs_of_loss}</:item>
+    <:item title="Abteilung">
+      {if @article.department, do: @article.department.name, else: "-"}
+    </:item>
+    <:item title="Kategorie">
+      {if @article.category, do: @article.category.name, else: "-"}
+    </:item>
   </.list>
 </.card>
 

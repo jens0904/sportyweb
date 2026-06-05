@@ -22,7 +22,7 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Polymorphic.Phone
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Loan
+
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

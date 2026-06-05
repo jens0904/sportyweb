@@ -212,8 +212,8 @@ defmodule SportywebWeb.ClubNavigationComponent do
 
     show_submenu_rentals =
       assigns.club_navigation_current_item == :categories ||
-        assigns.club_navigation_current_item == :articles ||
-        assigns.club_navigation_current_item == :loans
+        assigns.club_navigation_current_item == :articles
+
 
     {:ok,
      socket
