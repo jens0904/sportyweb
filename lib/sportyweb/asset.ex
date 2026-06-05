@@ -11,6 +11,7 @@ defmodule Sportyweb.Asset do
   alias Sportyweb.Asset.Location
   alias Sportyweb.Asset.LocationFee
   alias Sportyweb.Finance.Fee
+  alias Sportyweb.Rental.Article
 
   @doc """
   Returns a clubs list of locations.
@@ -23,6 +24,20 @@ defmodule Sportyweb.Asset do
   """
   def list_locations(club_id) do
     query = from(v in Location, where: v.club_id == ^club_id, order_by: v.name)
+    Repo.all(query)
+  end
+
+  def list_locations_with_units(club_id, article_id) do
+
+    query =
+      from v in Location,
+      join: u in assoc(v, :units),
+      where: v.club_id == ^club_id,
+      where: u.article_id == ^article_id,
+      where: u.occupied == false,
+      where: u.for_lending == true,
+      order_by: v.name,
+      distinct: v.id
     Repo.all(query)
   end
 

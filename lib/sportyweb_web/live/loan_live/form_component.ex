@@ -100,7 +100,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
      |> assign(assigns)
      |> assign(:return_date_locked?, not is_nil(return_date))
      |> assign(:contact_options, Personal.list_contracts(assigns.article.id, assigns.club.id))
-     |> assign(:location_options, Asset.list_locations(assigns.club.id))
+     |> assign(:location_options, Asset.list_locations_with_units(assigns.club.id, assigns.article.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_loan(loan))
      end)

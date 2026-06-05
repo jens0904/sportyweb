@@ -10,7 +10,6 @@ defmodule SportywebWeb.UnitLive.FormComponent do
     <div>
       <.header>
         {@title}
-        <:subtitle>Use this form to manage unit records in your database.</:subtitle>
       </.header>
 
       <.simple_form
