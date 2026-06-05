@@ -42,6 +42,14 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
             prompt="---"
           />
         </div>
+        <.input
+          field={@form[:show_loan_period]}
+          type="checkbox"
+          label="festen Ausleihzeitraum hinzufügen"
+        />
+        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:show_loan_period].value) do %>
+          <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum in Tagen" />
+        <% end %>
         <:actions>
           <.button phx-disable-with="Saving...">Save Article</.button>
         </:actions>

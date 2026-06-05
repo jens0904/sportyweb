@@ -20,7 +20,7 @@ defmodule Sportyweb.Rental.Category do
   def changeset(category, attrs) do
     category
     |> cast(attrs, [:name, :description, :loan_period, :club_id])
-    |> validate_required([:name, :description, :loan_period, :club_id])
+    |> validate_required([:name, :description, :club_id])
     |> unique_constraint(
       :name,
       name: "categories_club_id_name_index",

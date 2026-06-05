@@ -24,6 +24,9 @@
     <:item title="Kategorie">
       {if @article.category, do: @article.category.name, else: "-"}
     </:item>
+    <:item title="Definierter Ausleihzeitraum in Tagen">
+      {format_integer_field(@article.loan_period)}
+    </:item>
   </.list>
 </.card>
 

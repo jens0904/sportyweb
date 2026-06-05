@@ -4,9 +4,9 @@ defmodule Sportyweb.Repo.Migrations.CreateCategories do
   def change do
     create table(:categories, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :name, :string
-      add :description, :text
-      add :loan_period, :integer
+      add :name, :string, null: false
+      add :description, :text, null: true
+      add :loan_period, :integer, null: true
 
       add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
       timestamps(type: :utc_datetime)

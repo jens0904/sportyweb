@@ -503,20 +503,36 @@ defmodule Sportyweb.Rental do
     Loan.changeset(loan, attrs)
   end
 
+  @doc """
+  Calculates the return date for a given article based on the loan period defined in the article or its category.
+  ## Examples
+
+      iex> calculate_return_date(article_id)
+      ~D[2024-07-01]
+
+      iex> calculate_return_date(article_id_with_no_loan_period)
+      nil
+  """
 
   def calculate_return_date(article_id) do
     article = get_article!(article_id, :category)
 
-    case article.category do
+    case article.loan_period do
       nil ->
-        nil
-
-      category ->
-        if category.loan_period do
-          Date.add(Date.utc_today(), category.loan_period)
-        else
+        case article.category do
+          nil ->
           nil
+
+        category ->
+          if category.loan_period do
+            Date.add(Date.utc_today(), category.loan_period)
+          else
+            nil
+          end
         end
+
+      loan_period ->
+        Date.add(Date.utc_today(), loan_period)
     end
   end
 end

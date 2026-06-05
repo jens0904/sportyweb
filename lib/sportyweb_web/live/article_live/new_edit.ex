@@ -1,7 +1,7 @@
 defmodule SportywebWeb.ArticleLive.NewEdit do
   use SportywebWeb, :live_view
 
-
+  alias Sportyweb.Organization
   alias Sportyweb.Rental
   alias Sportyweb.Rental.Article
 

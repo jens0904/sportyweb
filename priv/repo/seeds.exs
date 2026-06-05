@@ -1164,6 +1164,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
         department_id: department_id,
         category_id: category_id,
         name: Faker.Commerce.product_name(),
+        loan_period: Enum.random([nil, Enum.random(7..180)]),
         reference_number: Sportyweb.SeedHelper.get_random_string(5),
         description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
         costs_of_loss: Money.new(:EUR, Enum.random(10..500))

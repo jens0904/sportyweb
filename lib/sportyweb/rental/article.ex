@@ -19,6 +19,7 @@ defmodule Sportyweb.Rental.Article do
     field :description, :string
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
+    field :loan_period, :integer
 
     timestamps(type: :utc_datetime)
   end
@@ -33,7 +34,8 @@ defmodule Sportyweb.Rental.Article do
       :costs_of_loss,
       :club_id,
       :department_id,
-      :category_id
+      :category_id,
+      :loan_period
     ])
     |> validate_required([
       :name,

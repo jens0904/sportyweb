@@ -21,7 +21,14 @@ defmodule SportywebWeb.CategoryLive.FormComponent do
       >
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:description]} type="text" label="Beschreibung" />
-        <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum" />
+        <.input
+          field={@form[:show_loan_period]}
+          type="checkbox"
+          label="festen Ausleihzeitraum hinzufügen"
+        />
+        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:show_loan_period].value) do %>
+          <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum in Tagen" />
+        <% end %>
         <:actions>
           <.button phx-disable-with="Saving...">Save Category</.button>
           <.button

@@ -11,7 +11,9 @@
   <.list>
     <:item title="Name">{@category.name}</:item>
     <:item title="Beschreibung">{@category.description}</:item>
-    <:item title="Ausleihzeitraum">{@category.loan_period}</:item>
+    <:item title="Definierter Ausleihzeitraum in Tagen">
+      {format_integer_field(@category.loan_period)}
+    </:item>
   </.list>
 </.card>
 

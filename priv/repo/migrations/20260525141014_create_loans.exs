@@ -5,7 +5,7 @@ defmodule Sportyweb.Repo.Migrations.CreateLoans do
     create table(:loans, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :loan_number, :string
-      add :return_date, :date
+      add :return_date, :date, null: false
 
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false

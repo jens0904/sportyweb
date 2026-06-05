@@ -16,7 +16,9 @@
     >
       <:col :let={{_id, category}} label="Name">{category.name}</:col>
       <:col :let={{_id, category}} label="Beschreibung">{category.description}</:col>
-      <:col :let={{_id, category}} label="Ausleihzeitraum">{category.loan_period}</:col>
+      <:col :let={{_id, category}} label="Definierter Ausleihzeitraum in Tagen">
+        {format_integer_field(category.loan_period)}
+      </:col>
       <:action :let={{_id, category}}>
         <.link navigate={~p"/categories/#{category}"}>Anzeigen</.link>
       </:action>
