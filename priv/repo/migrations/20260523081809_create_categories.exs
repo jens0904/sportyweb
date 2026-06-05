@@ -11,5 +11,7 @@ defmodule Sportyweb.Repo.Migrations.CreateCategories do
       add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
       timestamps(type: :utc_datetime)
     end
+    create index(:categories, [:club_id])
+    create unique_index(:categories, [:club_id, :name])
   end
 end

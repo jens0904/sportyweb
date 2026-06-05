@@ -44,7 +44,7 @@ defmodule SportywebWeb.LoanLive.NewEdit do
   end
 
   defp apply_action(socket, :new, %{"article_id" => article_id}) do
-    article = Rental.get_article!(article_id, [:club])
+    article = Rental.get_article!(article_id, [:club, :category])
 
     socket
     |> assign(:page_title, "Ausleihe anlegen")

@@ -305,6 +305,27 @@ Repo.insert!(%Department{
   notes: [Sportyweb.SeedHelper.get_random_note()]
 })
 
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Bälle",
+  description: "Alle Arten von Bällen",
+  loan_period: 30
+})
+
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Trikots",
+  description: "Verschiedene Trikots in verschiedenen Größen",
+  loan_period: 14
+})
+
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Schläger",
+  description: "Tennis- und Badmintonschläger",
+  loan_period: 21
+})
+
 ###################################
 # Add Club 2
 
@@ -450,10 +471,30 @@ Repo.insert!(%Department{
   notes: [Sportyweb.SeedHelper.get_random_note()]
 })
 
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Bälle",
+  description: "Alle Arten von Bällen",
+  loan_period: 30
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Trikots",
+  description: "Verschiedene Trikots in verschiedenen Größen",
+  loan_period: 14
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Schläger",
+  description: "Tennis- und Badmintonschläger",
+  loan_period: 21
+})
 ###################################
 # Add Club 3
 
-_club_3 =
+club_3 =
   Repo.insert!(%Club{
     name: "FC St. Pauli",
     reference_number: "-",
@@ -466,6 +507,27 @@ _club_3 =
     financial_data: [Sportyweb.SeedHelper.get_random_financial_data()],
     notes: [Sportyweb.SeedHelper.get_random_note()]
   })
+
+  Repo.insert!(%Category{
+  club: club_3,
+  name: "Bälle",
+  description: "Alle Arten von Bällen",
+  loan_period: 30
+})
+
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Trikots",
+  description: "Verschiedene Trikots in verschiedenen Größen",
+  loan_period: 14
+})
+
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Schläger",
+  description: "Tennis- und Badmintonschläger",
+  loan_period: 21
+})
 
 ###################################
 # Add Club 4
@@ -514,6 +576,22 @@ Repo.insert!(%Department{
   emails: [Sportyweb.SeedHelper.get_random_email()],
   phones: [Sportyweb.SeedHelper.get_random_phone()],
   notes: [Sportyweb.SeedHelper.get_random_note()]
+})
+
+
+###################################
+# Add Categories
+Repo.insert!(%Category{
+  club: testclub,
+  name: "Bälle",
+  description: "Alle Arten von Bällen",
+  loan_period: 35
+})
+Repo.insert!(%Category{
+  club: testclub,
+  name: "Trikots",
+  description: "Verschiedene Trikots in verschiedenen Größen",
+  loan_period: 14
 })
 
 ###################################
@@ -1050,21 +1128,8 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
       end
     end
 
-    # Category
-
-      for k <- 0..Enum.random(1..10) do
-        category =
-          Repo.insert!(%Category{
-            club_id: club.id,
-            name: Faker.Commerce.department(),
-            description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
-            loan_period: Enum.random(1..30)
-          })
-        if k == 0, do: Organization.update_club(club, %{category_id: category.id})
-      end
-
-      # Article
-      # Before loop: Getting departments and categories for random association
+    # Article
+    # Before loop: Getting departments and categories for random association
 
     departments =
       Repo.all(

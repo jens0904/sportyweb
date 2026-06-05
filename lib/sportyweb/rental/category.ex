@@ -21,5 +21,10 @@ defmodule Sportyweb.Rental.Category do
     category
     |> cast(attrs, [:name, :description, :loan_period, :club_id])
     |> validate_required([:name, :description, :loan_period, :club_id])
+    |> unique_constraint(
+      :name,
+      name: "categories_club_id_name_index",
+      message: "Name bereits vergeben!"
+    )
   end
 end

@@ -85,7 +85,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
             if(@club_navigation_current_item == :rentals, do: @classes_menu_item_active)
           ]}
         >
-          <.icon name="hero-building-office-2" class={@classes_icon} />
+          <.icon name="hero-shopping-bag" class={@classes_icon} />
           <span class="truncate">Artikel & Verleih</span>
           <.icon
             name="hero-chevron-right"
