@@ -194,7 +194,9 @@ defmodule SportywebWeb.Router do
       live "/articles/:article_id/loans/new", LoanLive.NewEdit, :new
       live "/loans/:id/edit", LoanLive.NewEdit, :edit
 
+      live "/loans/:id/renew", LoanLive.Renew, :renew
       live "/loans/:id", LoanLive.Show, :show
+
 
       # Equipment (Each belongs to a location)
 

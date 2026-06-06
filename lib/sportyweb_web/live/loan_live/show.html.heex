@@ -1,8 +1,11 @@
 <.header>
   {@page_title}
   <:actions>
-    <.link navigate={~p"/loans/#{@loan}/edit"}>
-      <.button>Ausleihe bearbeiten</.button>
+    <.link navigate={~p"/loans/#{@loan}/delete"}>
+      <.button color="danger">Ausleihe löschen</.button>
+    </.link>
+    <.link navigate={~p"/loans/#{@loan}/renew"}>
+      <.button>Ausleihe verlängern</.button>
     </.link>
   </:actions>
 </.header>

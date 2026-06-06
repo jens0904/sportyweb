@@ -21,6 +21,7 @@ defmodule Sportyweb.Finance.Fee do
   alias Sportyweb.Organization.GroupFee
   alias Sportyweb.Polymorphic.InternalEvent
   alias Sportyweb.Polymorphic.Note
+  alias Sportyweb.Rental.Category
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -37,6 +38,7 @@ defmodule Sportyweb.Finance.Fee do
     many_to_many :internal_events, InternalEvent, join_through: FeeInternalEvent
     many_to_many :notes, Note, join_through: FeeNote
     many_to_many :locations, Location, join_through: LocationFee
+    many_to_many :categories, Category, join_through: CategoryFee
 
     field :is_general, :boolean, default: false
     field :type, :string, default: ""

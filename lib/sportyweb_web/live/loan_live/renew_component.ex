@@ -1,0 +1,67 @@
+defmodule SportywebWeb.LoanLive.RenewComponent do
+  use SportywebWeb, :live_component
+
+  alias Sportyweb.Rental
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <div>
+      <.header>
+        {@title}
+      </.header>
+
+      <.card>
+        <.simple_form
+          for={@form}
+          id="loan-renew-form"
+          phx-target={@myself}
+          phx-change="validate"
+          phx-submit="save"
+        >
+          <.input
+            field={@form[:return_date]}
+            type="date"
+            label="Neues Rückgabedatum"
+          />
+
+          <.button type="submit" class="mt-4">
+            Verlängern
+          </.button>
+        </.simple_form>
+      </.card>
+    </div>
+    """
+  end
+
+  @impl true
+  def update(%{loan: loan} = assigns, socket) do
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(:form, to_form(Rental.change_loan(loan)))}
+  end
+
+  @impl true
+  def handle_event("validate", %{"loan" => loan_params}, socket) do
+    {:noreply,
+     socket
+     |> assign(:form, to_form(Rental.change_loan(socket.assigns.loan, loan_params)))}
+  end
+
+  @impl true
+  def handle_event("save", %{"loan" => loan_params}, socket) do
+    case Rental.renew_loan(socket.assigns.loan, loan_params) do
+      {:ok, loan} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Ausleihe erfolgreich verlängert.")
+         |> push_navigate(to: ~p"/loans/#{loan}")}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, :form, changeset)}
+    end
+  end
+
+
+end

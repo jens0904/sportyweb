@@ -535,4 +535,11 @@ defmodule Sportyweb.Rental do
         Date.add(Date.utc_today(), loan_period)
     end
   end
+
+  def renew_loan(%Loan{} = loan, attrs) do
+    loan
+    |> Loan.changeset(attrs)
+    |> Repo.update()
+  end
+
 end

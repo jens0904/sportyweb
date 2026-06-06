@@ -326,6 +326,27 @@ Repo.insert!(%Category{
   loan_period: 21
 })
 
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Tauchausrüstung",
+  description: "Alles was zum Tauchen benötigt wird",
+  loan_period: nil
+})
+
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Wanderausrüstung",
+  description: "Alles was zum Wandern benötigt wird",
+  loan_period: 14
+})
+
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Ruderausrüstung",
+  description: "Alles was zum Rudern benötigt wird",
+  loan_period: 7
+})
+
 ###################################
 # Add Club 2
 
@@ -490,6 +511,27 @@ Repo.insert!(%Category{
   name: "Schläger",
   description: "Tennis- und Badmintonschläger",
   loan_period: 21
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Tauchausrüstung",
+  description: "Alles was zum Tauchen benötigt wird",
+  loan_period: nil
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Wanderausrüstung",
+  description: "Alles was zum Wandern benötigt wird",
+  loan_period: 14
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Ruderausrüstung",
+  description: "Alles was zum Rudern benötigt wird",
+  loan_period: 7
 })
 ###################################
 # Add Club 3
