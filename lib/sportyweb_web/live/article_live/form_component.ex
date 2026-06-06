@@ -42,6 +42,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
             prompt="---"
           />
         </div>
+        <.input field={@form[:allow_renewal]} type="checkbox" label="Verlängerung erlauben" />
         <.input
           field={@form[:show_loan_period]}
           type="checkbox"

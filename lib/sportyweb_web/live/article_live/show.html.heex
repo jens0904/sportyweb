@@ -22,6 +22,9 @@
     <:item title="Definierter Ausleihzeitraum in Tagen">
       {format_integer_field(@article.loan_period)}
     </:item>
+    <:item title="Verlängerung erlauben">
+      {if @article.allow_renewal, do: "Ja", else: "Nein"} 
+    </:item>
   </.list>
 </.card>
 

@@ -16,7 +16,6 @@
     >
       <:col :let={{_id, article}} label="Name">{article.name}</:col>
       <:col :let={{_id, article}} label="Referenznummer">{article.reference_number}</:col>
-      <:col :let={{_id, article}} label="Wiederbeschaffungskosten">{article.costs_of_loss}</:col>
       <:col :let={{_id, article}} label="Abteilung">
         {format_string_field(
           case article.department do
@@ -35,6 +34,9 @@
       </:col>
       <:col :let={{_id, article}} label="Definierter Ausleihzeitraum in Tagen">
         {format_integer_field(article.loan_period)}
+      </:col>
+      <:col :let={{_id, article}} label="Verlängerung erlauben">
+        {if article.allow_renewal, do: "Ja", else: "Nein"}
       </:col>
       <:action :let={{_id, article}}>
         <.link navigate={~p"/articles/#{article}"}>Anzeigen</.link>

@@ -20,6 +20,7 @@ defmodule Sportyweb.Rental.Article do
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
     field :loan_period, :integer
+    field :allow_renewal, :boolean, default: false
 
     timestamps(type: :utc_datetime)
   end
@@ -35,14 +36,16 @@ defmodule Sportyweb.Rental.Article do
       :club_id,
       :department_id,
       :category_id,
-      :loan_period
+      :loan_period,
+      :allow_renewal
     ])
     |> validate_required([
       :name,
       :description,
       :reference_number,
       :costs_of_loss,
-      :club_id
+      :club_id,
+      :allow_renewal
     ])
     |> validate_length(:name, max: 250)
     |> validate_length(:reference_number, max: 250)

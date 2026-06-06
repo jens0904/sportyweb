@@ -10,8 +10,8 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
       <.header>
         {@title}
       </.header>
-
       <.card>
+      <%= if @article.allow_renewal do %>
         <.simple_form
           for={@form}
           id="loan-renew-form"
@@ -29,6 +29,9 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
             Verlängern
           </.button>
         </.simple_form>
+      <% else %>
+        <p>Eine Verlängerung für den Artikel ist nicht erlaubt.</p>
+      <% end %>
       </.card>
     </div>
     """
