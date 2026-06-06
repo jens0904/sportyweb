@@ -78,4 +78,16 @@ defmodule SportywebWeb.CommonValidations do
       changeset
     end
   end
+
+  def validate_max_loan_duration(changeset, days) do
+    loan_date = get_field(changeset, :loan_date)
+    return_date = get_field(changeset, :return_date)
+
+    if loan_date && return_date && Date.diff(return_date, loan_date) > days do
+      changeset
+      |> add_error(:return_date, "Das Rückgabedatum darf nicht länger als #{days} Tage nach dem Ausleihdatum liegen.")
+    else
+      changeset
+    end
+  end
 end

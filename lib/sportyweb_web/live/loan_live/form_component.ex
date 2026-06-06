@@ -55,6 +55,14 @@ defmodule SportywebWeb.LoanLive.FormComponent do
 
               <div class="col-span-12 md:col-span-6">
                 <.input
+                  field={@form[:loan_date]}
+                  type="date"
+                  label="Ausleihdatum"
+                />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
                 field={@form[:return_date]}
                 type="date"
                 label="Rückgabedatum"

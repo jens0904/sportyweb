@@ -21,6 +21,9 @@
     <:item title="Einheit">
       {format_string_field(@loan.unit.serial_number)}
     </:item>
+    <:item title="Ausleihdatum">
+      {format_date_field_dmy(@loan.loan_date)}
+    </:item>
     <:item title="Rückgabedatum">
       {format_date_field_dmy(@loan.return_date)}
     </:item>

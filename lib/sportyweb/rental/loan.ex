@@ -1,6 +1,7 @@
 defmodule Sportyweb.Rental.Loan do
   use Ecto.Schema
   import Ecto.Changeset
+  import SportywebWeb.CommonValidations
 
   alias Sportyweb.Asset.Location
   alias Sportyweb.Personal.Contact
@@ -15,6 +16,7 @@ defmodule Sportyweb.Rental.Loan do
     belongs_to :location, Location
     belongs_to :unit, Unit
     field :loan_number, :string
+    field :loan_date, :date, default: Date.utc_today()
     field :return_date, :date
 
     timestamps(type: :utc_datetime)
@@ -23,7 +25,12 @@ defmodule Sportyweb.Rental.Loan do
   @doc false
   def changeset(loan, attrs) do
     loan
-    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id])
-    |> validate_required([:return_date, :location_id, :article_id, :unit_id, :contact_id])
+    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date])
+    |> validate_required([:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date])
+    |> validate_dates_order(:loan_date, :return_date, "Das Rückgabedatum muss nach dem Ausleihdatum liegen.")
+    |> validate_max_loan_duration(180)
+
   end
+
+
 end

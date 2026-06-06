@@ -16,6 +16,7 @@
     >
       <:col :let={{_id, loan}} label="Artikel">{loan.article.name}</:col>
       <:col :let={{_id, loan}} label="Standort">{loan.location.name}</:col>
+      <:col :let={{_id, loan}} label="Einheit">{loan.loan_date}</:col>
       <:col :let={{_id, loan}} label="Return date">{loan.return_date}</:col>
       <:action :let={{_id, loan}}>
         <div class="sr-only">

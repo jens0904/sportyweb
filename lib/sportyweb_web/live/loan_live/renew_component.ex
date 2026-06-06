@@ -47,9 +47,9 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
 
   @impl true
   def handle_event("validate", %{"loan" => loan_params}, socket) do
-    {:noreply,
-     socket
-     |> assign(:form, to_form(Rental.change_loan(socket.assigns.loan, loan_params)))}
+    changeset = Rental.change_loan(socket.assigns.loan, loan_params)
+
+      {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
   @impl true
