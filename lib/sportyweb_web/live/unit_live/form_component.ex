@@ -45,7 +45,16 @@ defmodule SportywebWeb.UnitLive.FormComponent do
           <.input field={@form[:decommission_date]} type="date" label="Nutzung bis (optional)" />
         </div>
         <:actions>
-          <.button phx-disable-with="Saving...">Save Unit</.button>
+          <.button phx-disable-with="Saving...">Speichern</.button>
+          <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
+          <.button
+            :if={@unit.id}
+            class="bg-rose-700 hover:bg-rose-800"
+            phx-click={JS.push("delete", value: %{id: @unit.id})}
+            data-confirm="Unwiderruflich löschen?"
+          >
+            Löschen
+          </.button>
         </:actions>
       </.simple_form>
     </div>
@@ -75,7 +84,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
 
   defp save_unit(socket, :edit, unit_params) do
     case Rental.update_unit(socket.assigns.unit, unit_params) do
-      {:ok, unit} ->
+      {:ok, _unit} ->
         {:noreply,
          socket
          |> put_flash(:info, "Unit updated successfully")
@@ -93,7 +102,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
       })
 
     case Rental.create_unit(unit_params) do
-      {:ok, unit} ->
+      {:ok, _unit} ->
         {:noreply,
          socket
          |> put_flash(:info, "Unit created successfully")

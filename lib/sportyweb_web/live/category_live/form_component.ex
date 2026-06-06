@@ -30,7 +30,8 @@ defmodule SportywebWeb.CategoryLive.FormComponent do
           <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum in Tagen" />
         <% end %>
         <:actions>
-          <.button phx-disable-with="Saving...">Save Category</.button>
+          <.button phx-disable-with="Saving...">Speichern</.button>
+          <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
           <.button
             :if={@category.id}
             class="bg-rose-700 hover:bg-rose-800"

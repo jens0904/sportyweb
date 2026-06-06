@@ -543,4 +543,15 @@ defmodule Sportyweb.Rental do
     |> Repo.update()
   end
 
+  def calculate_new_return_date(%Loan{} = loan, article_id) do
+    article = get_article!(article_id, :loans)
+
+    case article.renewal_period do
+      nil ->
+        nil
+
+      renewal_period ->
+        Date.add(loan.return_date, renewal_period)
+    end
+  end
 end

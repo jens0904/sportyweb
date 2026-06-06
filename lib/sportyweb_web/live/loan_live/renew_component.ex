@@ -13,40 +13,45 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
       <.card>
       <%= if @article.allow_renewal do %>
         <%= if @loan.renewal_count < @article.max_renewals do %>
-          <.simple_form
-            for={@form}
-            id="loan-renew-form"
-            phx-target={@myself}
-            phx-change="validate"
-          phx-submit="save"
-        >
-          <.input
-            field={@form[:return_date]}
-            type="date"
-            label="Neues Rückgabedatum"
-          />
+            <.simple_form
+              for={@form}
+              id="loan-renew-form"
+              phx-target={@myself}
+              phx-change="validate"
+              phx-submit="save"
+          >
+            <.input
+              field={@form[:return_date]}
+              type="date"
+              label="Neues Rückgabedatum"
+              readonly={true}
+            />
 
-          <.button type="submit" class="mt-4">
-            Verlängern
-          </.button>
-        </.simple_form>
+            <.button type="submit" class="mt-4">
+              Verlängern
+            </.button>
+          </.simple_form>
+        <% else %>
+          <p>Die maximale Anzahl an Verlängerungen wurde bereits erreicht.</p>
+        <% end %>
       <% else %>
-        <p>Die maximale Anzahl an Verlängerungen wurde bereits erreicht.</p>
+        <p>Eine Verlängerung für den Artikel ist nicht erlaubt.</p>
       <% end %>
-    <% else %>
-      <p>Eine Verlängerung für den Artikel ist nicht erlaubt.</p>
-    <% end %>
-    </.card>
-   </div>
+      </.card>
+    </div>
     """
   end
 
   @impl true
   def update(%{loan: loan} = assigns, socket) do
+    return_date = Rental.calculate_new_return_date(loan, assigns.article.id)
+
+    changeset = Rental.change_loan(loan, %{"return_date" => return_date})
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:form, to_form(Rental.change_loan(loan)))}
+     |> assign(:form, to_form(changeset))
+     |> assign(:return_date, return_date)}
   end
 
   @impl true

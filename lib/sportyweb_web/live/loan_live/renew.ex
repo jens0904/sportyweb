@@ -1,9 +1,8 @@
 defmodule SportywebWeb.LoanLive.Renew do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Organization
   alias Sportyweb.Rental
-  alias Sportyweb.Rental.Loan
+
 
   @impl true
   def render(assigns) do
@@ -37,7 +36,7 @@ defmodule SportywebWeb.LoanLive.Renew do
   end
 
 
-  @impl true
+
   def apply_action(socket, :renew, %{"id" => id}) do
     loan = Rental.get_loan!(id, article: :club)
 

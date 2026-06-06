@@ -22,6 +22,7 @@ defmodule Sportyweb.Rental.Article do
     field :loan_period, :integer
     field :allow_renewal, :boolean, default: false
     field :max_renewals, :integer, default: 2
+    field :renewal_period, :integer, default: 7
 
     timestamps(type: :utc_datetime)
   end
@@ -39,7 +40,8 @@ defmodule Sportyweb.Rental.Article do
       :category_id,
       :loan_period,
       :allow_renewal,
-      :max_renewals
+      :max_renewals,
+      :renewal_period
     ])
     |> validate_required([
       :name,

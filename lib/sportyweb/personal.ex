@@ -54,9 +54,12 @@ defmodule Sportyweb.Personal do
         from(
           c in Contact,
           join: co in assoc(c, :contracts),
-          join: d in assoc(co, :departments),
+          left_join: d in assoc(co, :departments),
+          left_join: g in assoc(co, :groups),
           where: c.club_id == ^club_id,
-          where: d.id == ^article.department_id,
+          where:
+            d.id == ^article.department_id or
+            g.department_id == ^article.department_id,
           distinct: true,
           order_by: c.name
         )

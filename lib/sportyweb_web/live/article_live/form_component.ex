@@ -43,6 +43,10 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
           />
         </div>
         <.input field={@form[:allow_renewal]} type="checkbox" label="Verlängerung erlauben" />
+        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
+          <.input field={@form[:max_renewals]} type="select" label="Bitte die maximale Anzahl an Verlängerungen auswählen" options={1..5}  />
+          <.input field={@form[:renewal_period]} type="number" label="Verlängerungszeitraum in Tagen" />
+        <% end %>
         <.input
           field={@form[:show_loan_period]}
           type="checkbox"
@@ -52,7 +56,16 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
           <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum in Tagen" />
         <% end %>
         <:actions>
-          <.button phx-disable-with="Saving...">Save Article</.button>
+          <.button phx-disable-with="Saving...">Speichern</.button>
+          <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
+          <.button
+            :if={@article.id}
+            class="bg-rose-700 hover:bg-rose-800"
+            phx-click={JS.push("delete", value: %{id: @article.id})}
+            data-confirm="Unwiderruflich löschen?"
+          >
+            Löschen
+          </.button>
         </:actions>
       </.simple_form>
     </div>

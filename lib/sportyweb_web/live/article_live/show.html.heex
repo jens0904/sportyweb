@@ -25,6 +25,12 @@
     <:item title="Verlängerung erlauben">
       {if @article.allow_renewal, do: "Ja", else: "Nein"} 
     </:item>
+    <:item title="Maximale Anzahl an Verlängerungen">
+      {if @article.max_renewals, do: @article.max_renewals, else: "-"}
+    </:item>
+    <:item title="Verlängerungszeitraum in Tagen">
+      {if @article.renewal_period, do: @article.renewal_period, else: "-"}
+    </:item>
   </.list>
 </.card>
 
