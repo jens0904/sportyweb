@@ -14,6 +14,8 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       </.header>
 
       <.card>
+      <%= if @article.units do %>
+        <%= if Enum.any?(@article.units, &(&1.occupied == false && &1.for_lending == true)) do %>
         <.simple_form
           for={@form}
           id="loan-form"
@@ -87,6 +89,12 @@ defmodule SportywebWeb.LoanLive.FormComponent do
             </div>
           </:actions>
         </.simple_form>
+        <% else %>
+          <p>Es ist derzeit keine Einheit dieses Artikels zur Ausleihe verfügbar.</p>
+        <% end %>
+      <% else %>
+        <p>Der Artikel hat keine zugewiesene Einheit und kann daher nicht ausgeliehen werden. Bitte weisen Sie dem Artikel zuerst eine Einheit zu.</p>
+      <% end %>
       </.card>
     </div>
     """
