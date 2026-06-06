@@ -12,11 +12,12 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
       </.header>
       <.card>
       <%= if @article.allow_renewal do %>
-        <.simple_form
-          for={@form}
-          id="loan-renew-form"
-          phx-target={@myself}
-          phx-change="validate"
+        <%= if @loan.renewal_count < @article.max_renewals do %>
+          <.simple_form
+            for={@form}
+            id="loan-renew-form"
+            phx-target={@myself}
+            phx-change="validate"
           phx-submit="save"
         >
           <.input
@@ -30,10 +31,13 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
           </.button>
         </.simple_form>
       <% else %>
-        <p>Eine Verlängerung für den Artikel ist nicht erlaubt.</p>
+        <p>Die maximale Anzahl an Verlängerungen wurde bereits erreicht.</p>
       <% end %>
-      </.card>
-    </div>
+    <% else %>
+      <p>Eine Verlängerung für den Artikel ist nicht erlaubt.</p>
+    <% end %>
+    </.card>
+   </div>
     """
   end
 

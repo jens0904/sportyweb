@@ -539,6 +539,7 @@ defmodule Sportyweb.Rental do
   def renew_loan(%Loan{} = loan, attrs) do
     loan
     |> Loan.changeset(attrs)
+    |> Loan.changeset(%{renewal_count: loan.renewal_count + 1})
     |> Repo.update()
   end
 

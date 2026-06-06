@@ -18,6 +18,7 @@ defmodule Sportyweb.Rental.Loan do
     field :loan_number, :string
     field :loan_date, :date, default: Date.utc_today()
     field :return_date, :date
+    field :renewal_count, :integer, default: 0
 
     timestamps(type: :utc_datetime)
   end
@@ -25,7 +26,7 @@ defmodule Sportyweb.Rental.Loan do
   @doc false
   def changeset(loan, attrs) do
     loan
-    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date])
+    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date, :renewal_count])
     |> validate_required([:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date])
     |> validate_dates_order(:loan_date, :return_date, "Das Rückgabedatum muss nach dem Ausleihdatum liegen.")
     |> validate_max_loan_duration(180)
