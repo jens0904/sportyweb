@@ -37,6 +37,7 @@ defmodule Sportyweb.Personal do
     Repo.preload(list_contacts(club_id), preloads)
   end
 
+
   def list_contracts(article_id, club_id) do
     article = Rental.get_article!(article_id)
     if is_nil(article.department_id) do

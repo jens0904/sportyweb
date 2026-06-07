@@ -32,3 +32,16 @@
     </:item>
   </.list>
 </.card>
+
+<.header level="2" class="mt-12">
+  Vergangene Ausleihen
+</.header>
+
+<.card> 
+ <%= if Enum.any?(@streams.loans.inserts) do %>
+  
+  <% else %>
+    <p>Es gibt noch keine archivierten Ausleihen.</p>
+  <% end %>
+  
+</.card>

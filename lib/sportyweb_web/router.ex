@@ -195,6 +195,7 @@ defmodule SportywebWeb.Router do
       live "/loans/:id/edit", LoanLive.NewEdit, :edit
 
       live "/loans/:id/renew", LoanLive.Renew, :renew
+      live "/loans/:id/return", LoanLive.Return, :return
       live "/loans/:id", LoanLive.Show, :show
 
 

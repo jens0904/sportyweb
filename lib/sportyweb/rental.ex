@@ -5,8 +5,10 @@ defmodule Sportyweb.Rental do
 
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
-  alias Sportyweb.Asset
   alias Sportyweb.Rental.Category
+  alias Sportyweb.Rental.Article
+  alias Sportyweb.Rental.Unit
+  alias Sportyweb.Rental.Loan
 
   @doc """
   Returns the list of categories.
@@ -180,6 +182,13 @@ defmodule Sportyweb.Rental do
     |> Repo.preload(preloads)
   end
 
+  def get_article_with_active_loans!(id) do
+    active_loans_query = from(l in Loan, where: l.status == "active")
+    Article
+    |> Repo.get!(id)
+    |> Repo.preload([:club, :department, :category, units: :location, loans: {active_loans_query, [:unit, :location, :contact]}])
+  end
+
   @doc """
   Creates a article.
 
@@ -292,6 +301,13 @@ defmodule Sportyweb.Rental do
 
   """
   def get_unit!(id), do: Repo.get!(Unit, id)
+
+  def get_unit_with_inactive_loans!(id) do
+    inactive_loans_query = from(l in Loan, where: l.status != "active")
+    Unit
+    |> Repo.get!(id)
+    |> Repo.preload([:location, article: :club, loans: {inactive_loans_query, [:article, :location, :contact]}])
+  end
 
   @doc """
   Gets a single unit. Preloads associations.
@@ -443,8 +459,12 @@ defmodule Sportyweb.Rental do
 
   """
   def create_loan(attrs \\ %{}) do
+    loan_attrs = Map.merge(attrs, %{
+      "status" => "active"
+    })
+
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:loan, Loan.changeset(%Loan{}, attrs))
+    |> Ecto.Multi.insert(:loan, Loan.changeset(%Loan{}, loan_attrs))
     |> Ecto.Multi.update(:unit, fn %{loan: loan} ->
       Unit.changeset(
         get_unit!(loan.unit_id),
@@ -543,6 +563,18 @@ defmodule Sportyweb.Rental do
     |> Repo.update()
   end
 
+  def return_loan(%Loan{} = loan, attrs) do
+    unit = get_unit!(loan.unit_id)
+
+    loan_attrs = Map.merge(attrs, %{
+      "status" => "returned"
+    })
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:loan, Loan.changeset(loan, loan_attrs))
+    |> Ecto.Multi.update(:unit, Unit.changeset(unit, %{occupied: false}))
+    |> Repo.transaction()
+  end
   def calculate_new_return_date(%Loan{} = loan, article_id) do
     article = get_article!(article_id, :loans)
 

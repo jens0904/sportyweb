@@ -11,7 +11,7 @@ defmodule SportywebWeb.UnitLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     unit =
-      Rental.get_unit!(id, [:location, article: :club])
+      Rental.get_unit_with_inactive_loans!(id)
 
     {:noreply,
      socket
@@ -19,6 +19,7 @@ defmodule SportywebWeb.UnitLive.Show do
      |> assign(:unit, unit)
      |> assign(:location, unit.location)
      |> assign(:article, unit.article)
-     |> assign(:club, unit.article.club)}
+     |> assign(:club, unit.article.club)
+     |> stream(:loans, unit.loans)}
   end
 end

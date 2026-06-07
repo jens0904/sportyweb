@@ -8,6 +8,8 @@ defmodule Sportyweb.Repo.Migrations.CreateLoans do
       add :loan_date, :date, null: false
       add :return_date, :date, null: false
       add :renewal_count, :integer, null: false
+      add :return_comment, :string
+      add :status, :string, null: false
 
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false

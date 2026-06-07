@@ -19,17 +19,28 @@ defmodule Sportyweb.Rental.Loan do
     field :loan_date, :date, default: Date.utc_today()
     field :return_date, :date
     field :renewal_count, :integer, default: 0
+    field :return_comment, :string
+    field :status, :string, default: "returned"
 
     timestamps(type: :utc_datetime)
+  end
+
+  def get_valid_statuses do
+    [
+      [key: "Aktiv", value: "active"],
+      [key: "Zurückgegeben", value: "returned"],
+      [key: "Verloren", value: "lost"]
+    ]
   end
 
   @doc false
   def changeset(loan, attrs) do
     loan
-    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date, :renewal_count])
+    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date, :renewal_count, :return_comment, :status])
     |> validate_required([:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date])
     |> validate_dates_order(:loan_date, :return_date, "Das Rückgabedatum muss nach dem Ausleihdatum liegen.")
     |> validate_max_loan_duration(180)
+    |> validate_inclusion(:status, get_valid_statuses() |> Enum.map(&(&1[:value])))
 
   end
 
