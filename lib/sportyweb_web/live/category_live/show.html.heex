@@ -17,4 +17,19 @@
   </.list>
 </.card>
 
+<.header level="2" class="mt-12">
+  Gebühren
+  <:actions>
+    <.link navigate={~p"/categories/#{@category}/fees/new"}>
+      <.button>Kategoriespezifische Gebühr erstellen</.button>
+    </.link>
+  </:actions>
+</.header>
 
+<.card>
+  <%= if Enum.any?(@category.fees) do %>
+    <SportywebWeb.FeeLive.IndexTableComponent.render fees={@category.fees} />
+  <% else %>
+    <p>Bisher wurde noch keine kategoriespezifische Gebühr erstellt.</p>
+  <% end %>
+</.card>

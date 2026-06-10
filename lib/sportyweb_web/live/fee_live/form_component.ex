@@ -3,7 +3,6 @@ defmodule SportywebWeb.FeeLive.FormComponent do
   import Ecto.Changeset
 
   alias Sportyweb.Asset
-  alias Sportyweb.Asset.Equipment
   alias Sportyweb.Asset.Location
   alias Sportyweb.Calendar
   alias Sportyweb.Calendar.Event
@@ -12,6 +11,8 @@ defmodule SportywebWeb.FeeLive.FormComponent do
   alias Sportyweb.Organization
   alias Sportyweb.Organization.Department
   alias Sportyweb.Organization.Group
+  alias Sportyweb.Rental
+  alias Sportyweb.Rental.Category
 
   @impl true
   def render(assigns) do
@@ -250,6 +251,7 @@ defmodule SportywebWeb.FeeLive.FormComponent do
 
     case Finance.create_fee(fee_params) do
       {:ok, fee} ->
+
         case create_association(fee, socket.assigns.fee_object) do
           {:ok, _} ->
             {:noreply,
@@ -258,12 +260,14 @@ defmodule SportywebWeb.FeeLive.FormComponent do
              |> push_navigate(to: socket.assigns.navigate)}
 
           {:error, _} ->
+
             {:noreply,
              socket
              |> put_flash(:error, "Gebühr konnte nicht erstellt werden")}
         end
 
       {:error, %Ecto.Changeset{} = changeset} ->
+
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
@@ -286,8 +290,8 @@ defmodule SportywebWeb.FeeLive.FormComponent do
     {:ok, fee}
   end
 
-  defp create_association(fee, %Equipment{} = fee_object) do
-    Asset.create_equipment_fee(fee_object, fee)
+  defp create_association(fee, %Category{} = fee_object) do
+    Rental.create_category_fee(fee_object, fee)
     {:ok, fee}
   end
 

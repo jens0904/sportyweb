@@ -1,7 +1,7 @@
-defmodule SportywebWeb.EquipmentLive.FeeNew do
+defmodule SportywebWeb.CategoryLive.FeeNew do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Asset
+  alias Sportyweb.Rental
   alias Sportyweb.Finance.Fee
   alias Sportyweb.Polymorphic.InternalEvent
   alias Sportyweb.Polymorphic.Note
@@ -16,8 +16,8 @@ defmodule SportywebWeb.EquipmentLive.FeeNew do
         title={@page_title}
         action={@live_action}
         fee={@fee}
-        fee_object={@equipment}
-        navigate={if @fee.id, do: ~p"/fees/#{@fee}", else: ~p"/equipment/#{@equipment}"}
+        fee_object={@category}
+        navigate={if @fee.id, do: ~p"/fees/#{@fee}", else: ~p"/categories/#{@category}"}
       />
     </div>
     """
@@ -25,7 +25,7 @@ defmodule SportywebWeb.EquipmentLive.FeeNew do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :assets)}
+    {:ok, assign(socket, :club_navigation_current_item, :categories)}
   end
 
   @impl true
@@ -36,14 +36,14 @@ defmodule SportywebWeb.EquipmentLive.FeeNew do
   defp apply_action(socket, :index, %{"id" => id}) do
     # If the route behind this function should be more than a redirect in the future, put it in its own "Index"-LiveView!
     socket
-    |> push_navigate(to: ~p"/equipment/#{id}")
+    |> push_navigate(to: ~p"/categories/#{id}")
   end
 
   # There is no "edit" action in this LiveView because that gets handled in the default SportywebWeb.FeeLive.NewEdit
 
   defp apply_action(socket, :new, %{"id" => id}) do
-    equipment = Asset.get_equipment!(id, location: :club)
-    type = "equipment"
+    category = Rental.get_category!(id, :club)
+    type = "category"
 
     socket
     |> assign(
@@ -51,15 +51,15 @@ defmodule SportywebWeb.EquipmentLive.FeeNew do
       "Spezifische Gebühr erstellen (#{get_key_for_value(Fee.get_valid_types(), type)})"
     )
     |> assign(:fee, %Fee{
-      club_id: equipment.location.club.id,
-      club: equipment.location.club,
+      club_id: category.club.id,
+      club: category.club,
       is_general: false,
       type: type,
-      equipment: [equipment],
+      categories: [category],
       internal_events: [%InternalEvent{}],
       notes: [%Note{}]
     })
-    |> assign(:equipment, equipment)
-    |> assign(:club, equipment.location.club)
+    |> assign(:category, category)
+    |> assign(:club, category.club)
   end
 end

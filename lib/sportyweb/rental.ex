@@ -6,9 +6,11 @@ defmodule Sportyweb.Rental do
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
   alias Sportyweb.Rental.Category
+  alias Sportyweb.Rental.CategoryFee
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Unit
   alias Sportyweb.Rental.Loan
+  alias Sportyweb.Finance.Fee
 
   @doc """
   Returns the list of categories.
@@ -125,7 +127,14 @@ defmodule Sportyweb.Rental do
     Category.changeset(category, attrs)
   end
 
-  alias Sportyweb.Rental.Article
+  def create_category_fee(%Category{} = category, %Fee{} = fee) do
+    Repo.insert(%CategoryFee{
+      category_id: category.id,
+      fee_id: fee.id
+    })
+  end
+
+
 
   @doc """
   Returns the list of articles.
@@ -254,7 +263,6 @@ defmodule Sportyweb.Rental do
     Article.changeset(article, attrs)
   end
 
-  alias Sportyweb.Rental.Unit
 
   @doc """
   Returns the list of units.

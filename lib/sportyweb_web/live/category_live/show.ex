@@ -11,7 +11,7 @@ defmodule SportywebWeb.CategoryLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     category =
-      Rental.get_category!(id, [:club])
+      Rental.get_category!(id, [:club, fees: :internal_events])
 
     {:noreply,
      socket
