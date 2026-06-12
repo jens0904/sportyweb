@@ -542,27 +542,20 @@ defmodule Sportyweb.Rental do
       nil
   """
 
-  def calculate_return_date(article_id) do
+  def calculate_return_date(article_id, loan_date) do
     article = get_article!(article_id, :category)
 
-    case article.loan_period do
-      nil ->
-        case article.category do
-          nil ->
-          nil
+    loan_period =
+      article.loan_period ||
+      if article.category, do: article.category.loan_period, else: nil
 
-        category ->
-          if category.loan_period do
-            Date.add(Date.utc_today(), category.loan_period)
-          else
-            nil
-          end
-        end
-
-      loan_period ->
-        Date.add(Date.utc_today(), loan_period)
+    if loan_period do
+    Date.add(loan_date, loan_period)
+    else
+      nil
     end
   end
+
 
   def renew_loan(%Loan{} = loan, attrs) do
     loan

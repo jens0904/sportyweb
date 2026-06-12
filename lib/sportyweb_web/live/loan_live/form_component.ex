@@ -25,6 +25,32 @@ defmodule SportywebWeb.LoanLive.FormComponent do
         >
           <.input_grids>
             <.input_grid>
+
+            <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:loan_date]}
+                  type="date"
+                  label="Ausleihdatum"
+                  phx-change="update_return_date"
+                />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                field={@form[:return_date]}
+                type="date"
+                label="Rückgabedatum"
+                disabled={@return_date_locked?}
+                />
+
+                <%= if @return_date_locked? do %>
+                  <input
+                    type="hidden"
+                    name={@form[:return_date].name}
+                    value={@form[:return_date].value}
+                  />
+                <% end %>
+              </div>
               <div class="col-span-12 md:col-span-6">
                 <.input
                   field={@form[:contact_id]}
@@ -55,30 +81,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
                 />
               </div>
 
-              <div class="col-span-12 md:col-span-6">
-                <.input
-                  field={@form[:loan_date]}
-                  type="date"
-                  label="Ausleihdatum"
-                />
-              </div>
 
-              <div class="col-span-12 md:col-span-6">
-                <.input
-                field={@form[:return_date]}
-                type="date"
-                label="Rückgabedatum"
-                disabled={@return_date_locked?}
-                />
-
-                <%= if @return_date_locked? do %>
-                  <input
-                    type="hidden"
-                    name={@form[:return_date].name}
-                    value={@form[:return_date].value}
-                  />
-                <% end %>
-              </div>
             </.input_grid>
           </.input_grids>
 
@@ -102,7 +105,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
 
   @impl true
   def update(%{loan: loan} = assigns, socket) do
-    return_date=Rental.calculate_return_date(assigns.article.id)
+    return_date=Rental.calculate_return_date(assigns.article.id, loan.loan_date)
 
     loan =
       if return_date do
@@ -139,6 +142,10 @@ defmodule SportywebWeb.LoanLive.FormComponent do
   @impl true
   def handle_event("update_unit_options", %{"loan" => %{"location_id" => location_id}}, socket) do
     {:noreply, assign_unit_options(socket, location_id)}
+  end
+
+  def handle_event("update_return_date", %{"loan" => %{"loan_date" => loan_date} = loan_params}, socket) do
+    {:noreply, assign_return_date(socket, loan_date, loan_params)}
   end
 
   defp save_loan(socket, :edit, loan_params) do
@@ -183,5 +190,22 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       :unit_options,
       Rental.list_available_units(socket.assigns.loan.article_id, location_id)
     )
+  end
+
+  defp assign_return_date(socket, loan_date, loan_params) do
+    loan_params =
+      case Date.from_iso8601(loan_date) do
+        {:ok, loan_date} ->
+          case Rental.calculate_return_date(socket.assigns.article.id, loan_date) do
+            nil ->
+              loan_params
+            return_date ->
+              Map.put(loan_params, "return_date", Date.to_iso8601(return_date))
+          end
+        _ ->
+          loan_params
+      end
+      changeset = Rental.change_loan(socket.assigns.loan, loan_params)
+      assign(socket, form: to_form(changeset, action: :validate))
   end
 end

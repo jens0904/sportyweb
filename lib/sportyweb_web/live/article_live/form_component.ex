@@ -23,7 +23,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
         <.input field={@form[:name]} type="text" label="Name" />
         <.input field={@form[:description]} type="text" label="Beschreibung" />
         <.input field={@form[:reference_number]} type="text" label="Referenznummer" />
-        <.input field={@form[:costs_of_loss]} type="number" label="Wiederbeschaffungskosten" />
+        <.input field={@form[:costs_of_loss]} type="text" label="Wiederbeschaffungskosten" />
         <div class="col-span-12">
           <.input
             field={@form[:department_id]}

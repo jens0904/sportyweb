@@ -50,7 +50,8 @@ defmodule SportywebWeb.LoanLive.NewEdit do
     |> assign(:page_title, "Ausleihe anlegen")
     |> assign(:loan, %Loan{
       article_id: article.id,
-      article: article
+      article: article,
+      loan_date: Date.utc_today()
     })
     |> assign(:article, article)
     |> assign(:club, article.club)

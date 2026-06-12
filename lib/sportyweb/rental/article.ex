@@ -1,6 +1,7 @@
 defmodule Sportyweb.Rental.Article do
   use Ecto.Schema
   import Ecto.Changeset
+  import SportywebWeb.CommonValidations
   alias Sportyweb.Organization.Club
   alias Sportyweb.Organization.Department
   alias Sportyweb.Rental.Category
@@ -55,5 +56,7 @@ defmodule Sportyweb.Rental.Article do
     |> validate_length(:name, max: 250)
     |> validate_length(:reference_number, max: 250)
     |> validate_length(:description, max: 20_000)
+    |> validate_currency(:amount, :EUR)
+    |> validate_currency(:amount_one_time, :EUR)
   end
 end
