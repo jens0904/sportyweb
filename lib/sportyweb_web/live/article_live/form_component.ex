@@ -42,18 +42,33 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
             prompt="---"
           />
         </div>
+        <.input field={@form[:for_non_members]} type="checkbox" label="Überlassung an Nichtmitglieder erlauben" />
         <.input field={@form[:allow_renewal]} type="checkbox" label="Verlängerung erlauben" />
         <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
           <.input field={@form[:max_renewals]} type="select" label="Bitte die maximale Anzahl an Verlängerungen auswählen" options={1..5}  />
           <.input field={@form[:renewal_period]} type="number" label="Verlängerungszeitraum in Tagen" />
         <% end %>
         <.input
-          field={@form[:show_loan_period]}
+          field={@form[:choose_loan_period]}
           type="checkbox"
           label="festen Ausleihzeitraum hinzufügen"
         />
-        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:show_loan_period].value) do %>
-          <.input field={@form[:loan_period]} type="number" label="Ausleihzeitraum in Tagen" />
+        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_loan_period].value) do %>
+          <.input field={@form[:loan_period_unit]} type="select" label="Bitte wählen Sie die gewünschte Einheit aus" options={[{"Stunden", "hours"}, {"Tage", "days"}]}  />
+          <%= if @form[:loan_period_unit].value == "hours" do %>
+             <.input
+               field={@form[:loan_period]}
+               type="select"
+               label="Ausleihzeitraum in Stunden"
+               options={Enum.map(1..12, fn n -> {n, n} end)}
+              />
+         <% else %>
+          <.input
+            field={@form[:loan_period]}
+            type="number"
+            label="Ausleihzeitraum in Tagen"
+          />
+          <% end %>
         <% end %>
         <:actions>
           <.button phx-disable-with="Saving...">Speichern</.button>
@@ -101,7 +116,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
       })
 
     case Rental.update_article(socket.assigns.article, article_params) do
-      {:ok, article} ->
+      {:ok, _article} ->
         {:noreply,
          socket
          |> put_flash(:info, "Article updated successfully")
@@ -119,7 +134,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
       })
 
     case Rental.create_article(article_params) do
-      {:ok, article} ->
+      {:ok, _article} ->
         {:noreply,
          socket
          |> put_flash(:info, "Article created successfully")

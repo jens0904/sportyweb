@@ -15,14 +15,14 @@ defmodule Sportyweb.Rental.Category do
     field :name, :string
     field :description, :string
     field :loan_period, :integer
-
+    field :loan_period_unit, :string, default: "Tage"
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(category, attrs) do
     category
-    |> cast(attrs, [:name, :description, :loan_period, :club_id])
+    |> cast(attrs, [:name, :description, :loan_period, :loan_period_unit, :club_id])
     |> validate_required([:name, :description, :club_id])
     |> unique_constraint(
       :name,

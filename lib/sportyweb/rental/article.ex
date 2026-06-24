@@ -20,7 +20,10 @@ defmodule Sportyweb.Rental.Article do
     field :description, :string
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
+    field :choose_loan_period, :boolean, default: false
+    field :for_non_members, :boolean, default: false
     field :loan_period, :integer
+    field :loan_period_unit, :string, default: "Tage"
     field :allow_renewal, :boolean, default: false
     field :max_renewals, :integer, default: 2
     field :renewal_period, :integer, default: 7
@@ -39,7 +42,10 @@ defmodule Sportyweb.Rental.Article do
       :club_id,
       :department_id,
       :category_id,
+      :for_non_members,
+      :choose_loan_period,
       :loan_period,
+      :loan_period_unit,
       :allow_renewal,
       :max_renewals,
       :renewal_period
@@ -48,6 +54,7 @@ defmodule Sportyweb.Rental.Article do
       :name,
       :description,
       :reference_number,
+      :for_non_members,
       :costs_of_loss,
       :club_id,
       :allow_renewal,

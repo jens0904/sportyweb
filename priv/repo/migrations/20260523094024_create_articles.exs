@@ -4,11 +4,14 @@ defmodule Sportyweb.Repo.Migrations.CreateArticles do
   def change do
     create table(:articles, primary_key: false) do
       add :id, :binary_id, primary_key: true
-      add :name, :string
-      add :description, :text
-      add :reference_number, :string
-      add :costs_of_loss, :money_with_currency
-      add :loan_period, :integer
+      add :name, :string, null: false
+      add :description, :text, null: false
+      add :reference_number, :string, null: false
+      add :costs_of_loss, :money_with_currency, null: false
+      add :choose_loan_period, :boolean, default: false
+      add :for_non_members, :boolean, default: false
+      add :loan_period, :integer, null: true
+      add :loan_period_unit, :string, null: true
       add :allow_renewal, :boolean, default: false
       add :max_renewals, :integer
       add :renewal_period, :integer

@@ -52,14 +52,24 @@ defmodule SportywebWeb.LoanLive.FormComponent do
                 <% end %>
               </div>
               <div class="col-span-12 md:col-span-6">
-                <.input
-                  field={@form[:contact_id]}
-                  type="select"
-                  label="Kontakt"
-                  options={@contact_options |> Enum.map(&{&1.name, &1.id})}
-                  prompt="Bitte auswählen"
-                />
-              </div>
+  <%= if @article.for_non_members do %>
+    <.input
+      field={@form[:contact_id]}
+      type="select"
+      label="Kontakt"
+      options={@non_member_contact_options |> Enum.map(&{&1.name, &1.id})}
+      prompt="Bitte auswählen"
+    />
+  <% else %>
+    <.input
+      field={@form[:contact_id]}
+      type="select"
+      label="Kontakt"
+      options={@contact_options |> Enum.map(&{&1.name, &1.id})}
+      prompt="Bitte auswählen"
+    />
+  <% end %>
+</div>
               <div class="col-span-12 md:col-span-6">
                 <.input
                   field={@form[:location_id]}
@@ -118,6 +128,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:return_date_locked?, not is_nil(return_date))
+     |> assign(:non_member_contact_options, Personal.list_contacts(assigns.club.id))
      |> assign(:contact_options, Personal.list_contracts(assigns.article.id, assigns.club.id))
      |> assign(:location_options, Asset.list_locations_with_units(assigns.club.id, assigns.article.id))
      |> assign_new(:form, fn ->
