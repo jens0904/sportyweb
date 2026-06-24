@@ -19,8 +19,11 @@
     <:item title="Kategorie">
       {if @article.category, do: @article.category.name, else: "-"}
     </:item>
-    <:item title="Definierter Ausleihzeitraum in Tagen">
+    <:item title="Definierter Überlassungszeitraum in Tagen">
       {format_integer_field(@article.loan_period)}
+    </:item>
+    <:item title="Überlassung an Vereinsmitglieder erlauben">
+      {if @article.for_club_members, do: "Ja", else: "Nein"} 
     </:item>
     <:item title="Überlassung an Nichtmitglieder erlauben">
       {if @article.for_non_members, do: "Ja", else: "Nein"} 

@@ -42,6 +42,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
             prompt="---"
           />
         </div>
+        <.input field={@form[:for_club_members]} type="checkbox" label="Überlassung an Vereismitlglieder erlauben" />
         <.input field={@form[:for_non_members]} type="checkbox" label="Überlassung an Nichtmitglieder erlauben" />
         <.input field={@form[:allow_renewal]} type="checkbox" label="Verlängerung erlauben" />
         <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>

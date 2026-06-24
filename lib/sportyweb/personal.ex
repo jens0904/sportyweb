@@ -24,6 +24,21 @@ defmodule Sportyweb.Personal do
     Repo.all(query)
   end
 
+
+  def list_members(club_id) do
+  today = Date.utc_today()
+
+  query =
+    from c in Contact,
+      join: contract in assoc(c, :contracts),
+      where: c.club_id == ^club_id,
+      where: contract.start_date <= ^today,
+      where: is_nil(contract.archive_date) or contract.archive_date > ^today,
+      order_by: c.name,
+      distinct: true
+
+  Repo.all(query)
+end
   @doc """
   Returns a clubs list of contacts. Preloads associations.
 

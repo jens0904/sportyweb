@@ -51,24 +51,25 @@ defmodule SportywebWeb.LoanLive.FormComponent do
                   />
                 <% end %>
               </div>
-              <div class="col-span-12 md:col-span-6">
-  <%= if @article.for_non_members do %>
-    <.input
-      field={@form[:contact_id]}
-      type="select"
-      label="Kontakt"
-      options={@non_member_contact_options |> Enum.map(&{&1.name, &1.id})}
-      prompt="Bitte auswählen"
-    />
-  <% else %>
-    <.input
-      field={@form[:contact_id]}
-      type="select"
-      label="Kontakt"
-      options={@contact_options |> Enum.map(&{&1.name, &1.id})}
-      prompt="Bitte auswählen"
-    />
-  <% end %>
+ <div class="col-span-12 md:col-span-6">
+  <.input
+    field={@form[:contact_id]}
+    type="select"
+    label="Kontakt"
+    options={
+      cond do
+        @article.for_non_members ->
+          @non_member_contact_options |> Enum.map(&{&1.name, &1.id})
+
+        @article.for_club_members ->
+          @member_contact_options |> Enum.map(&{&1.name, &1.id})
+
+        true ->
+          @contact_options |> Enum.map(&{&1.name, &1.id})
+      end
+    }
+    prompt="Bitte auswählen"
+  />
 </div>
               <div class="col-span-12 md:col-span-6">
                 <.input
@@ -129,6 +130,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
      |> assign(assigns)
      |> assign(:return_date_locked?, not is_nil(return_date))
      |> assign(:non_member_contact_options, Personal.list_contacts(assigns.club.id))
+     |> assign(:member_contact_options, Personal.list_members(assigns.club.id))
      |> assign(:contact_options, Personal.list_contracts(assigns.article.id, assigns.club.id))
      |> assign(:location_options, Asset.list_locations_with_units(assigns.club.id, assigns.article.id))
      |> assign_new(:form, fn ->
