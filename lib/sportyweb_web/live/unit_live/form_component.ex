@@ -73,6 +73,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
   end
 
   @impl true
+  @spec handle_event(<<_::32, _::_*32>>, map(), any()) :: {:noreply, any()}
   def handle_event("validate", %{"unit" => unit_params}, socket) do
     changeset = Rental.change_unit(socket.assigns.unit, unit_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}

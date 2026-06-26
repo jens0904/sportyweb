@@ -6,8 +6,8 @@ defmodule Sportyweb.Rental do
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
   alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.CategoryFee
   alias Sportyweb.Rental.Article
+  alias Sportyweb.Rental.RentalFee
   alias Sportyweb.Rental.Unit
   alias Sportyweb.Rental.Loan
   alias Sportyweb.Finance.Fee
@@ -127,15 +127,6 @@ defmodule Sportyweb.Rental do
     Category.changeset(category, attrs)
   end
 
-  def create_category_fee(%Category{} = category, %Fee{} = fee) do
-    Repo.insert(%CategoryFee{
-      category_id: category.id,
-      fee_id: fee.id
-    })
-  end
-
-
-
   @doc """
   Returns the list of articles.
 
@@ -195,7 +186,7 @@ defmodule Sportyweb.Rental do
     active_loans_query = from(l in Loan, where: l.status == "active")
     Article
     |> Repo.get!(id)
-    |> Repo.preload([:club, :department, :category, units: :location, loans: {active_loans_query, [:unit, :location, :contact]}])
+    |> Repo.preload([:club, :department, :category, :rental_fees, units: :location, loans: {active_loans_query, [:unit, :location, :contact]}])
   end
 
   @doc """
@@ -309,6 +300,8 @@ defmodule Sportyweb.Rental do
 
   """
   def get_unit!(id), do: Repo.get!(Unit, id)
+
+
 
   def get_unit_with_inactive_loans!(id) do
     inactive_loans_query = from(l in Loan, where: l.status != "active")
@@ -586,5 +579,120 @@ defmodule Sportyweb.Rental do
       renewal_period ->
         Date.add(loan.return_date, renewal_period)
     end
+  end
+
+  alias Sportyweb.Rental.RentalFee
+
+  @doc """
+  Returns the list of rental_fee.
+
+  ## Examples
+
+      iex> list_rental_fee()
+      [%RentalFee{}, ...]
+
+  """
+  def list_rental_fee do
+    Repo.all(RentalFee)
+  end
+
+  @doc """
+  Gets a single rental_fee.
+
+  Raises `Ecto.NoResultsError` if the Rental fee does not exist.
+
+  ## Examples
+
+      iex> get_rental_fee!(123)
+      %RentalFee{}
+
+      iex> get_rental_fee!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_rental_fee!(id), do: Repo.get!(RentalFee, id)
+
+  @doc """
+  Gets a single rental_fee. Preloads associations.
+
+  Raises `Ecto.NoResultsError` if the RentalFee does not exist.
+
+  ## Examples
+
+      iex> get_rental_fee!(123, [:club])
+      %RentalFee{}
+
+      iex> get_rental_fee!(456, [:club])
+      ** (Ecto.NoResultsError)
+  """
+
+  def get_rental_fee!(id, preloads) do
+    RentalFee
+    |> Repo.get!(id)
+    |> Repo.preload(preloads)
+  end
+  @doc """
+  Creates a rental_fee.
+
+  ## Examples
+
+      iex> create_rental_fee(%{field: value})
+      {:ok, %RentalFee{}}
+
+      iex> create_rental_fee(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_rental_fee(attrs \\ %{}) do
+    %RentalFee{}
+    |> RentalFee.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a rental_fee.
+
+  ## Examples
+
+      iex> update_rental_fee(rental_fee, %{field: new_value})
+      {:ok, %RentalFee{}}
+
+      iex> update_rental_fee(rental_fee, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_rental_fee(%RentalFee{} = rental_fee, attrs) do
+    rental_fee
+    |> RentalFee.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a rental_fee.
+
+  ## Examples
+
+      iex> delete_rental_fee(rental_fee)
+      {:ok, %RentalFee{}}
+
+      iex> delete_rental_fee(rental_fee)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_rental_fee(%RentalFee{} = rental_fee) do
+    Repo.delete(rental_fee)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking rental_fee changes.
+
+  ## Examples
+
+      iex> change_rental_fee(rental_fee)
+      %Ecto.Changeset{data: %RentalFee{}}
+
+  """
+  def change_rental_fee(%RentalFee{} = rental_fee, attrs \\ %{}) do
+    RentalFee.changeset(rental_fee, attrs)
   end
 end

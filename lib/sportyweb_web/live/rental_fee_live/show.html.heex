@@ -1,0 +1,43 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/rental_fees/#{@rental_fee}/edit"}>
+      <.button>Einheit bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <.list>
+    <:item title="Name">
+      {@rental_fee.name}
+    </:item>
+
+    <:item title="Für wen gilt die Gebühr?">
+      <%= case @rental_fee.member_type do %>
+        <% :member -> %>Mitglieder
+        <% :non_member -> %>Nichtmitglieder
+        <% _ -> %>–
+      <% end %>
+    </:item>
+
+    <:item title="Mietdauer">
+      <%= case @rental_fee.rental_duration do %>
+        <% :short_term -> %>Kurzfristige Vermietungen
+        <% :long_term -> %>Langfristige Vermietungen
+        <% _ -> %>–
+      <% end %>
+    </:item>
+
+    <:item title="Mindestalter">
+      {@rental_fee.minimum_age_in_years || "–"}
+    </:item>
+
+    <:item title="Höchstalter">
+      {@rental_fee.maximum_age_in_years || "–"}
+    </:item>
+  </.list>
+</.card>
+
+
+  

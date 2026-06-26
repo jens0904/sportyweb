@@ -9,6 +9,7 @@ defmodule SportywebWeb.EquipmentLive.Show do
   end
 
   @impl true
+  @spec handle_params(map(), any(), map()) :: {:noreply, map()}
   def handle_params(%{"id" => id}, _, socket) do
     equipment =
       Asset.get_equipment!(id, [:emails, :notes, :phones, fees: :internal_events, location: :club])

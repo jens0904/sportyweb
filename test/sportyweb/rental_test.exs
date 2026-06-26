@@ -234,4 +234,58 @@ defmodule Sportyweb.RentalTest do
       assert %Ecto.Changeset{} = Rental.change_loan(loan)
     end
   end
+
+  describe "rental_fee" do
+    alias Sportyweb.Rental.RentalFee
+
+    import Sportyweb.RentalFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_rental_fee/0 returns all rental_fee" do
+      rental_fee = rental_fee_fixture()
+      assert Rental.list_rental_fee() == [rental_fee]
+    end
+
+    test "get_rental_fee!/1 returns the rental_fee with given id" do
+      rental_fee = rental_fee_fixture()
+      assert Rental.get_rental_fee!(rental_fee.id) == rental_fee
+    end
+
+    test "create_rental_fee/1 with valid data creates a rental_fee" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %RentalFee{} = rental_fee} = Rental.create_rental_fee(valid_attrs)
+      assert rental_fee.name == "some name"
+    end
+
+    test "create_rental_fee/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Rental.create_rental_fee(@invalid_attrs)
+    end
+
+    test "update_rental_fee/2 with valid data updates the rental_fee" do
+      rental_fee = rental_fee_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %RentalFee{} = rental_fee} = Rental.update_rental_fee(rental_fee, update_attrs)
+      assert rental_fee.name == "some updated name"
+    end
+
+    test "update_rental_fee/2 with invalid data returns error changeset" do
+      rental_fee = rental_fee_fixture()
+      assert {:error, %Ecto.Changeset{}} = Rental.update_rental_fee(rental_fee, @invalid_attrs)
+      assert rental_fee == Rental.get_rental_fee!(rental_fee.id)
+    end
+
+    test "delete_rental_fee/1 deletes the rental_fee" do
+      rental_fee = rental_fee_fixture()
+      assert {:ok, %RentalFee{}} = Rental.delete_rental_fee(rental_fee)
+      assert_raise Ecto.NoResultsError, fn -> Rental.get_rental_fee!(rental_fee.id) end
+    end
+
+    test "change_rental_fee/1 returns a rental_fee changeset" do
+      rental_fee = rental_fee_fixture()
+      assert %Ecto.Changeset{} = Rental.change_rental_fee(rental_fee)
+    end
+  end
 end

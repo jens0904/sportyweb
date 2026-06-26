@@ -175,6 +175,8 @@ defmodule SportywebWeb.LoanLive.FormComponent do
   end
 
   defp save_loan(socket, :new, loan_params) do
+    require IEx
+    IEx.pry()
     loan_params =
       Enum.into(loan_params, %{
         "article_id" => socket.assigns.loan.article.id
@@ -190,7 +192,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       {:error, :loan, %Ecto.Changeset{} = changeset, _changes} ->
         {:noreply, assign(socket, form: to_form(changeset))}
 
-      {:errror, :unit, %Ecto.Changeset{} = _changeset, _changes} ->
+      {:error, :unit, %Ecto.Changeset{} = _changeset, _changes} ->
         {:noreply,
         socket
         |> put_flash(:error, "Die ausgewählte Einheit konnte nicht als belegt markiert werden.")}

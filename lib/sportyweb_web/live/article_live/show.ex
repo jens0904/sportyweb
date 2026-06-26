@@ -20,6 +20,7 @@ defmodule SportywebWeb.ArticleLive.Show do
      |> assign(:article, article)
      |> assign(:club, article.club)
      |> stream(:units, article.units)
-     |> stream(:loans, article.loans)}
+     |> stream(:loans, article.loans)
+     |> stream(:rental_fees, article.rental_fees)}
   end
 end

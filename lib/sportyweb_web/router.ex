@@ -181,6 +181,8 @@ defmodule SportywebWeb.Router do
 
       live "/articles/:id", ArticleLive.Show, :show
 
+      # Unit (Each belongs to an article)
+
       live "/units", UnitLive.Index, :index_root
       live "/articles/:article_id/units", UnitLive.Index, :index
 
@@ -200,6 +202,16 @@ defmodule SportywebWeb.Router do
       live "/loans/:id/renew", LoanLive.Renew, :renew
       live "/loans/:id/return", LoanLive.Return, :return
       live "/loans/:id", LoanLive.Show, :show
+
+      #RentalFee (Each belongs to an article)
+
+      live "/rental_fees", RentalFeeLive.Index, :index_root
+      live "/articles/:article_id/rental_fees", RentalFeeLive.Index, :index
+      live "/articles/:article_id/rental_fees/new", RentalFeeLive.NewEdit, :new
+      live "/rental_fees/:id/edit", RentalFeeLive.NewEdit, :edit
+
+      live "/rental_fees/:id", RentalFeeLive.Show, :show
+
 
 
       # Equipment (Each belongs to a location)

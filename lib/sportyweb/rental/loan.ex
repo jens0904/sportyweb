@@ -4,9 +4,11 @@ defmodule Sportyweb.Rental.Loan do
   import SportywebWeb.CommonValidations
 
   alias Sportyweb.Asset.Location
+  alias Sportyweb.Finance.Fee
   alias Sportyweb.Personal.Contact
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Unit
+
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

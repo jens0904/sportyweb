@@ -67,4 +67,18 @@ defmodule Sportyweb.RentalFixtures do
 
     loan
   end
+
+  @doc """
+  Generate a rental_fee.
+  """
+  def rental_fee_fixture(attrs \\ %{}) do
+    {:ok, rental_fee} =
+      attrs
+      |> Enum.into(%{
+        name: "some name"
+      })
+      |> Sportyweb.Rental.create_rental_fee()
+
+    rental_fee
+  end
 end
