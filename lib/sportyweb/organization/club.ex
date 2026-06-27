@@ -23,6 +23,7 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Category
   alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Rental.RentalRule
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -36,6 +37,7 @@ defmodule Sportyweb.Organization.Club do
     has_many :contacts, Contact, preload_order: [asc: :name]
     has_many :contact_groups, ContactGroup
     has_many :departments, Department, preload_order: [asc: :name]
+    has_many :rental_rules, RentalRule
     has_many :rental_fees, RentalFee
     has_many :events, Event
     has_many :subsidies, Subsidy, preload_order: [asc: :name]

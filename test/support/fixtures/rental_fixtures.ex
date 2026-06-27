@@ -81,4 +81,18 @@ defmodule Sportyweb.RentalFixtures do
 
     rental_fee
   end
+
+  @doc """
+  Generate a rental_rule.
+  """
+  def rental_rule_fixture(attrs \\ %{}) do
+    {:ok, rental_rule} =
+      attrs
+      |> Enum.into(%{
+        name: "some name"
+      })
+      |> Sportyweb.Rental.create_rental_rule()
+
+    rental_rule
+  end
 end

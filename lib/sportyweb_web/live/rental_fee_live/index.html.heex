@@ -1,57 +1,78 @@
 <.header>
-  Listing Rental fee
+  {@page_title}
   <:actions>
-    <.link patch={~p"/rental_fee/new"}>
-      <.button>New Rental fee</.button>
+    <.link navigate={~p"/clubs/#{@club}/rental_fees/new"}>
+      <.button>Mietgebühr erstellen</.button>
     </.link>
   </:actions>
 </.header>
 
-<.table
-  id="rental_fee"
-  rows={@streams.rental_fee_collection}
-  row_click={fn {_id, rental_fee} -> JS.navigate(~p"/rental_fee/#{rental_fee}") end}
->
-    <:col :let={{_id, rental_fee}} label="Name">
-    {rental_fee.name}
-  </:col>
-
-  <:col :let={{_id, rental_fee}} label="Für wen gilt die Gebühr?">
-    <%= case rental_fee.member_type do %>
-      <% :member -> %>Mitglieder
-      <% :non_member -> %>Nichtmitglieder
-      <% _ -> %>–
-    <% end %>
-  </:col>
-
-  <:col :let={{_id, rental_fee}} label="Mietdauer">
-    <%= case rental_fee.rental_duration do %>
-      <% :short_term -> %>Kurzfristig
-      <% :long_term -> %>Langfristig
-      <% _ -> %>–
-    <% end %>
-  </:col>
-
-  <:col :let={{_id, rental_fee}} label="Mindestalter">
-    {rental_fee.minimum_age_in_years || "–"}
-  </:col>
-
-  <:col :let={{_id, rental_fee}} label="Höchstalter">
-    {rental_fee.maximum_age_in_years || "–"}
-  </:col>
-  <:action :let={{_id, rental_fee}}>
-    <div class="sr-only">
-      <.link navigate={~p"/rental_fee/#{rental_fee}"}>Show</.link>
-    </div>
-    <.link patch={~p"/rental_fee/#{rental_fee}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, rental_fee}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: rental_fee.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
+<.card>
+  <%= if Enum.any?(@streams.rental_fees.inserts) do %>
+    <.table
+      id="rental_fees"
+      rows={@streams.rental_fees}
+      row_click={fn {_id, rental_fee} -> JS.navigate(~p"/rental_fees/#{rental_fee}") end}
     >
-      Delete
-    </.link>
-  </:action>
-</.table>
+      <:col :let={{_id, rental_fee}} label="Gilt für">
+        <%= cond do %>
+          <% rental_fee.article -> %>
+            Artikel
+          <% rental_fee.category -> %>
+            Kategorie
+          <% true -> %>
+            -
+        <% end %>
+      </:col>
 
+      <:col :let={{_id, rental_fee}} label="Bezeichnung">
+        <%= cond do %>
+          <% rental_fee.article -> %>
+            {rental_fee.article.name}
+          <% rental_fee.category -> %>
+            {rental_fee.category.name}
+          <% true -> %>
+            -
+        <% end %>
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Name">
+        {rental_fee.name}
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Mitgliedstyp">
+        <%= case rental_fee.member_type do %>
+          <% :member -> %>
+            Mitglieder
+          <% :non_member -> %>
+            Nichtmitglieder
+          <% _ -> %>
+            -
+        <% end %>
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Mietdauer">
+        <%= case rental_fee.rental_duration do %>
+          <% :short_term -> %>
+            Kurzfristig
+          <% :long_term -> %>
+            Langfristig
+          <% _ -> %>
+            -
+        <% end %>
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Grundbetrag">
+        {Money.to_string!(rental_fee.amount)}
+      </:col>
+
+      <:action :let={{_id, rental_fee}}>
+        <.link navigate={~p"/rental_fees/#{rental_fee}"}>Anzeigen</.link>
+      </:action>
+    </.table>
+  <% else %>
+    <p>
+      Bisher wurde noch keine Mietgebühr erstellt.
+    </p>
+  <% end %>
+</.card>

@@ -32,9 +32,6 @@
           end
         )}
       </:col>
-      <:col :let={{_id, article}} label="Definierter Ausleihzeitraum in Tagen">
-        {format_integer_field(article.loan_period)}
-      </:col>
       <:col :let={{_id, article}} label="Überlassung an Nichtmitglieder erlauben">
         {if article.for_non_members, do: "Ja", else: "Nein"}
       </:col>

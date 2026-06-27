@@ -15,8 +15,8 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
         title={@page_title}
         action={@live_action}
         rental_fee={@rental_fee}
-        article={@article}
-        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/articles/#{@article}"}
+        club={@club}
+        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/clubs/#{@club}"}
       />
     </div>
     """
@@ -24,7 +24,7 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :articles)}
+    {:ok, assign(socket, :club_navigation_current_item, :rental_fees)}
   end
 
   @impl true
@@ -33,7 +33,7 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    rental_fee = Rental.get_rental_fee!(id, :category, article: :club)
+    rental_fee = Rental.get_rental_fee!(id, [:category, :article, :club])
 
     socket
     |> assign(:page_title, "Mietgebühr bearbeiten")
@@ -42,17 +42,16 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
     |> assign(:club, rental_fee.article.club)
   end
 
-  defp apply_action(socket, :new, %{"article_id" => article_id}) do
-    article = Rental.get_article!(article_id, [:category, :club, :units])
+  defp apply_action(socket, :new, %{"club_id" => club_id}) do
+    club = Organization.get_club!(club_id, [:categories, :articles])
 
     socket
     |> assign(:page_title, "Mietgebühr anlegen")
     |> assign(:rental_fee, %RentalFee{
-      article_id: article.id,
-      article: article
+      club_id: club.id,
+      club: club
     })
-    |> assign(:article, article)
-    |> assign(:club, article.club)
+    |> assign(:club, club)
   end
 
   @impl true

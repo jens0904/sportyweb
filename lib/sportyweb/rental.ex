@@ -758,4 +758,106 @@ def list_belonging_rental_fees(article_id, contact_id) do
   end
 end
 
+
+  alias Sportyweb.Rental.RentalRule
+
+  @doc """
+  Returns the list of rental_rules.
+
+  ## Examples
+
+      iex> list_rental_rules()
+      [%RentalRule{}, ...]
+
+  """
+  def list_rental_rules do
+    Repo.all(RentalRule)
+  end
+
+  @doc """
+  Gets a single rental_rule.
+
+  Raises `Ecto.NoResultsError` if the Rental rule does not exist.
+
+  ## Examples
+
+      iex> get_rental_rule!(123)
+      %RentalRule{}
+
+      iex> get_rental_rule!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_rental_rule!(id), do: Repo.get!(RentalRule, id)
+
+
+  def get_rental_rule!(id, preloads) do
+    RentalRule
+    |> Repo.get!(id)
+    |> Repo.preload(preloads)
+  end
+  @doc """
+  Creates a rental_rule.
+
+  ## Examples
+
+      iex> create_rental_rule(%{field: value})
+      {:ok, %RentalRule{}}
+
+      iex> create_rental_rule(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_rental_rule(attrs \\ %{}) do
+    %RentalRule{}
+    |> RentalRule.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a rental_rule.
+
+  ## Examples
+
+      iex> update_rental_rule(rental_rule, %{field: new_value})
+      {:ok, %RentalRule{}}
+
+      iex> update_rental_rule(rental_rule, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_rental_rule(%RentalRule{} = rental_rule, attrs) do
+    rental_rule
+    |> RentalRule.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a rental_rule.
+
+  ## Examples
+
+      iex> delete_rental_rule(rental_rule)
+      {:ok, %RentalRule{}}
+
+      iex> delete_rental_rule(rental_rule)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_rental_rule(%RentalRule{} = rental_rule) do
+    Repo.delete(rental_rule)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking rental_rule changes.
+
+  ## Examples
+
+      iex> change_rental_rule(rental_rule)
+      %Ecto.Changeset{data: %RentalRule{}}
+
+  """
+  def change_rental_rule(%RentalRule{} = rental_rule, attrs \\ %{}) do
+    RentalRule.changeset(rental_rule, attrs)
+  end
 end

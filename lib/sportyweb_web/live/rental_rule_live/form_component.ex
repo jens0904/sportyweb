@@ -1,0 +1,199 @@
+defmodule SportywebWeb.RentalRuleLive.FormComponent do
+  use SportywebWeb, :live_component
+
+  alias Sportyweb.Rental
+
+  @impl true
+  def render(assigns) do
+  ~H"""
+  <div>
+    <.header>
+      {@title}
+      <:subtitle>Definieren Sie eine Ausleihregel.</:subtitle>
+    </.header>
+
+    <.simple_form
+      for={@form}
+      id="rental_rule-form"
+      phx-target={@myself}
+      phx-change="validate"
+      phx-submit="save"
+    >
+      <.input
+        field={@form[:scope]}
+        type="select"
+        label="Gilt für"
+        options={[
+          {"Gesamten Verein", "club"},
+          {"Kategorie", "category"},
+          {"Artikel", "article"}
+        ]}
+      />
+
+      <%= case @form[:scope].value do %>
+        <% "category" -> %>
+          <.input
+            field={@form[:category_id]}
+            type="select"
+            label="Kategorie"
+            options={Enum.map(@category_options, &{&1.name, &1.id})}
+            prompt="Kategorie auswählen"
+          />
+
+        <% "article" -> %>
+          <.input
+            field={@form[:article_id]}
+            type="select"
+            label="Artikel"
+            options={Enum.map(@article_options, &{&1.name, &1.id})}
+            prompt="Artikel auswählen"
+          />
+
+        <% _ -> %>
+      <% end %>
+
+      <.input
+        field={@form[:for_club_members]}
+        type="checkbox"
+        label="Für Vereinsmitglieder"
+      />
+
+      <.input
+        field={@form[:for_non_members]}
+        type="checkbox"
+        label="Für Nichtmitglieder"
+      />
+
+      <.input
+        field={@form[:allow_renewal]}
+        type="checkbox"
+        label="Verlängerung erlauben"
+      />
+
+      <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
+        <.input
+          field={@form[:max_renewals]}
+          type="select"
+          label="Maximale Anzahl Verlängerungen"
+          options={1..5}
+        />
+
+        <.input
+          field={@form[:renewal_period]}
+          type="number"
+          label="Verlängerungszeitraum in Tagen"
+        />
+      <% end %>
+
+      <.input
+        field={@form[:choose_loan_period]}
+        type="checkbox"
+        label="Festen Ausleihzeitraum definieren"
+      />
+
+      <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_loan_period].value) do %>
+        <.input
+          field={@form[:loan_period_unit]}
+          type="select"
+          label="Einheit"
+          options={[
+            {"Stunden", "hours"},
+            {"Tage", "days"}
+          ]}
+        />
+
+        <%= if @form[:loan_period_unit].value == "hours" do %>
+          <.input
+            field={@form[:loan_period]}
+            type="select"
+            label="Ausleihzeitraum in Stunden"
+            options={Enum.map(1..12, &{&1, &1})}
+          />
+        <% else %>
+          <.input
+            field={@form[:loan_period]}
+            type="number"
+            label="Ausleihzeitraum in Tagen"
+          />
+        <% end %>
+      <% end %>
+
+      <:actions>
+        <.button phx-disable-with="Saving...">Speichern</.button>
+
+        <.cancel_button navigate={@navigate}>
+          Abbrechen
+        </.cancel_button>
+
+        <.button
+          :if={@rental_rule.id}
+          class="bg-rose-700 hover:bg-rose-800"
+          phx-click={JS.push("delete", value: %{id: @rental_rule.id})}
+          data-confirm="Unwiderruflich löschen?"
+        >
+          Löschen
+        </.button>
+      </:actions>
+    </.simple_form>
+  </div>
+  """
+end
+
+  @impl true
+  def update(%{rental_rule: rental_rule} = assigns, socket) do
+    {:ok,
+     socket
+     |> assign(assigns)
+     |> assign(:category_options, Rental.list_categories(assigns.club.id))
+     |> assign(:article_options, Rental.list_articles(assigns.club.id))
+     |> assign_new(:form, fn ->
+       to_form(Rental.change_rental_rule(rental_rule))
+     end)}
+  end
+
+  @impl true
+  def handle_event("validate", %{"rental_rule" => rental_rule_params}, socket) do
+    changeset = Rental.change_rental_rule(socket.assigns.rental_rule, rental_rule_params)
+    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("save", %{"rental_rule" => rental_rule_params}, socket) do
+    save_rental_rule(socket, socket.assigns.action, rental_rule_params)
+  end
+
+  defp save_rental_rule(socket, :edit, rental_rule_params) do
+    rental_rule_params =
+      Enum.into(rental_rule_params, %{
+        "club_id" => socket.assigns.rental_rule.club.id
+      })
+
+    case Rental.update_rental_rule(socket.assigns.rental_rule, rental_rule_params) do
+      {:ok, _rental_rule} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Rental rule updated successfully")
+         |> push_navigate(to: socket.assigns.navigate)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+
+  defp save_rental_rule(socket, :new, rental_rule_params) do
+    rental_rule_params =
+      Enum.into(rental_rule_params, %{
+        "club_id" => socket.assigns.rental_rule.club.id
+      })
+
+    case Rental.create_rental_rule(rental_rule_params) do
+      {:ok, _rental_rule} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Rental rule created successfully")
+         |> push_navigate(to: socket.assigns.navigate)}
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {:noreply, assign(socket, form: to_form(changeset))}
+    end
+  end
+end

@@ -4,7 +4,7 @@ defmodule Sportyweb.Rental.RentalFee do
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
   alias Sportyweb.Organization
-  alias Organization.Club
+  alias Sportyweb.Organization.Club
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Category
   alias Sportyweb.Rental.Loan
@@ -20,6 +20,7 @@ defmodule Sportyweb.Rental.RentalFee do
     has_many :loans, Loan
     many_to_many :categories, Category, join_through: CategoryRentalFee
     many_to_many :articles, Article, join_through: ArticleRentalFee
+    field :scope, :string, virtual: true
     field :name, :string, default: ""
     field :member_type, Ecto.Enum, values: [:member, :non_member]
     field :amount, Money.Ecto.Composite.Type, default_currency: :EUR
@@ -44,8 +45,11 @@ defmodule Sportyweb.Rental.RentalFee do
         :minimum_age_in_years,
         :maximum_age_in_years,
         :member_type,
+        :scope,
         :rental_duration,
-        :article_id
+        :article_id,
+        :category_id,
+        :club_id
       ],
       empty_values: ["", nil]
     )
@@ -56,15 +60,11 @@ defmodule Sportyweb.Rental.RentalFee do
       :maximum_age_in_years,
       :member_type,
       :rental_duration,
-      :article_id
       ])
 
     |> update_change(:name, &String.trim/1)
-    |> update_change(:reference_number, &String.trim/1)
-    |> update_change(:description, &String.trim/1)
     |> validate_length(:name, max: 250)
     |> validate_currency(:amount, :EUR)
-    |> validate_currency(:amount_one_time, :EUR)
     |> validate_number(:minimum_age_in_years,
       greater_than_or_equal_to: 0,
       less_than_or_equal_to: 125

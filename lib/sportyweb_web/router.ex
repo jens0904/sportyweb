@@ -206,14 +206,19 @@ defmodule SportywebWeb.Router do
       #RentalFee (Each belongs to an article)
 
       live "/rental_fees", RentalFeeLive.Index, :index_root
-      live "/articles/:article_id/rental_fees", RentalFeeLive.Index, :index
-      live "/articles/:article_id/rental_fees/new", RentalFeeLive.NewEdit, :new
-      live "/categories/:category_id/rental_fees/new", CategoryLive.RentalFeeNewEdit, :new
+      live "/clubs/:club_id/rental_fees", RentalFeeLive.Index, :index
+      live "/clubs/:club_id/rental_fees/new", RentalFeeLive.NewEdit, :new
       live "/rental_fees/:id/edit", RentalFeeLive.NewEdit, :edit
 
       live "/rental_fees/:id", RentalFeeLive.Show, :show
 
+      live "/rental_rules", RentalRuleLive.Index, :index_root
+      live "/clubs/:club_id/rental_rules", RentalRuleLive.Index, :index
 
+      live "/clubs/:club_id/rental_rules/new", RentalRuleLive.NewEdit, :new
+      live "/rental_rules/:id/edit", RentalRuleLive.NewEdit, :edit
+
+      live "/rental_rules/:id", RentalRuleLive.Show, :show
 
       # Equipment (Each belongs to a location)
 

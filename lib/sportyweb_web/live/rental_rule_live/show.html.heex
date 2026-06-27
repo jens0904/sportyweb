@@ -1,0 +1,63 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/rental_rules/#{@rental_rule}/edit"}>
+      <.button>Ausleihregel bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <.list>
+    <:item title="Gilt für">
+      <%= cond do %>
+        <% @rental_rule.article -> %>
+          Artikel: {@rental_rule.article.name}
+        <% @rental_rule.category -> %>
+          Kategorie: {@rental_rule.category.name}
+        <% true -> %>
+          Gesamter Verein
+      <% end %>
+    </:item>
+
+    <:item title="Für Vereinsmitglieder">
+      {if @rental_rule.for_club_members, do: "Ja", else: "Nein"}
+    </:item>
+
+    <:item title="Für Nichtmitglieder">
+      {if @rental_rule.for_non_members, do: "Ja", else: "Nein"}
+    </:item>
+
+    <:item title="Fester Ausleihzeitraum">
+      {if @rental_rule.choose_loan_period, do: "Ja", else: "Nein"}
+    </:item>
+
+    <:item title="Ausleihzeitraum">
+      <%= if @rental_rule.choose_loan_period do %>
+        {@rental_rule.loan_period} {@rental_rule.loan_period_unit}
+      <% else %>
+        -
+      <% end %>
+    </:item>
+
+    <:item title="Verlängerung erlaubt">
+      {if @rental_rule.allow_renewal, do: "Ja", else: "Nein"}
+    </:item>
+
+    <:item title="Maximale Anzahl Verlängerungen">
+      <%= if @rental_rule.allow_renewal do %>
+        {@rental_rule.max_renewals}
+      <% else %>
+        -
+      <% end %>
+    </:item>
+
+    <:item title="Verlängerungszeitraum">
+      <%= if @rental_rule.allow_renewal do %>
+        {@rental_rule.renewal_period} Tage
+      <% else %>
+        -
+      <% end %>
+    </:item>
+  </.list>
+</.card>

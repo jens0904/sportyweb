@@ -1,0 +1,64 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/clubs/#{@club}/rental_rules/new"}>
+      <.button>Ausleihregel erstellen</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <%= if Enum.any?(@streams.rental_rules.inserts) do %>
+    <.table
+      id="rental_rules"
+      rows={@streams.rental_rules}
+      row_click={fn {_id, rental_rule} -> JS.navigate(~p"/rental_rules/#{rental_rule}") end}
+    >
+      <:col :let={{_id, rental_rule}} label="Gilt für">
+        <%= cond do %>
+          <% rental_rule.article -> %>
+            Artikel
+          <% rental_rule.category -> %>
+            Kategorie
+          <% true -> %>
+            Gesamter Verein
+        <% end %>
+      </:col>
+
+      <:col :let={{_id, rental_rule}} label="Bezeichnung">
+        <%= cond do %>
+          <% rental_rule.article -> %>
+            {rental_rule.article.name}
+          <% rental_rule.category -> %>
+            {rental_rule.category.name}
+          <% true -> %>
+            -
+        <% end %>
+      </:col>
+
+      <:col :let={{_id, rental_rule}} label="Vereinsmitglieder">
+        {if rental_rule.for_club_members, do: "Ja", else: "Nein"}
+      </:col>
+
+      <:col :let={{_id, rental_rule}} label="Nichtmitglieder">
+        {if rental_rule.for_non_members, do: "Ja", else: "Nein"}
+      </:col>
+
+      <:col :let={{_id, rental_rule}} label="Ausleihzeitraum">
+        <%= if rental_rule.choose_loan_period do %>
+          {rental_rule.loan_period} {rental_rule.loan_period_unit}
+        <% else %>
+          -
+        <% end %>
+      </:col>
+
+      <:action :let={{_id, rental_rule}}>
+        <.link navigate={~p"/rental_rules/#{rental_rule}"}>Anzeigen</.link>
+      </:action>
+    </.table>
+  <% else %>
+    <p>
+      Bisher wurde noch keine Ausleihregel erstellt.
+    </p>
+  <% end %>
+</.card>

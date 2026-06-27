@@ -86,7 +86,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
           ]}
         >
           <.icon name="hero-shopping-bag" class={@classes_icon} />
-          <span class="truncate">Artikel & Verleih</span>
+          <span class="truncate">Miet & Leihartikel</span>
           <.icon
             name="hero-chevron-right"
             class={Enum.join([@classes_chevron, if(@show_submenu_rentals, do: "rotate-90")], " ")}
@@ -107,6 +107,18 @@ defmodule SportywebWeb.ClubNavigationComponent do
           </li>
           <li>
             <.link
+              navigate={~p"/clubs/#{@club}/rental_rules"}
+              class={[
+                @classes_menu_item,
+                @classes_submenu_item,
+                if(@club_navigation_current_item == :rental_rules, do: @classes_menu_item_active)
+              ]}
+            >
+              <span class="truncate">Ausleihregeln</span>
+            </.link>
+          </li>
+          <li>
+            <.link
               navigate={~p"/clubs/#{@club}/articles"}
               class={[
                 @classes_menu_item,
@@ -115,6 +127,18 @@ defmodule SportywebWeb.ClubNavigationComponent do
               ]}
             >
               <span class="truncate">Artikel</span>
+            </.link>
+          </li>
+          <li>
+            <.link
+              navigate={~p"/clubs/#{@club}/rental_fees"}
+              class={[
+                @classes_menu_item,
+                @classes_submenu_item,
+                if(@club_navigation_current_item == :rental_fees, do: @classes_menu_item_active)
+              ]}
+            >
+              <span class="truncate">Mietgebühren</span>
             </.link>
           </li>
         </ul>
@@ -212,7 +236,9 @@ defmodule SportywebWeb.ClubNavigationComponent do
 
     show_submenu_rentals =
       assigns.club_navigation_current_item == :categories ||
-        assigns.club_navigation_current_item == :articles
+        assigns.club_navigation_current_item == :articles ||
+        assigns.club_navigation_current_item == :rental_rules ||
+        assigns.club_navigation_current_item == :rental_fees
 
 
     {:ok,
@@ -231,6 +257,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
   end
 
   @impl true
+  @spec handle_event(<<_::112>>, map(), any()) :: {:noreply, any()}
   def handle_event("toggle_submenu", %{"item" => item}, socket) do
     case item do
       "finances" ->

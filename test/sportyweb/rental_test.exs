@@ -288,4 +288,112 @@ defmodule Sportyweb.RentalTest do
       assert %Ecto.Changeset{} = Rental.change_rental_fee(rental_fee)
     end
   end
+
+  describe "rental_rule" do
+    alias Sportyweb.Rental.RentalRule
+
+    import Sportyweb.RentalFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_rental_rule/0 returns all rental_rule" do
+      rental_rule = rental_rule_fixture()
+      assert Rental.list_rental_rule() == [rental_rule]
+    end
+
+    test "get_rental_rule!/1 returns the rental_rule with given id" do
+      rental_rule = rental_rule_fixture()
+      assert Rental.get_rental_rule!(rental_rule.id) == rental_rule
+    end
+
+    test "create_rental_rule/1 with valid data creates a rental_rule" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %RentalRule{} = rental_rule} = Rental.create_rental_rule(valid_attrs)
+      assert rental_rule.name == "some name"
+    end
+
+    test "create_rental_rule/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Rental.create_rental_rule(@invalid_attrs)
+    end
+
+    test "update_rental_rule/2 with valid data updates the rental_rule" do
+      rental_rule = rental_rule_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %RentalRule{} = rental_rule} = Rental.update_rental_rule(rental_rule, update_attrs)
+      assert rental_rule.name == "some updated name"
+    end
+
+    test "update_rental_rule/2 with invalid data returns error changeset" do
+      rental_rule = rental_rule_fixture()
+      assert {:error, %Ecto.Changeset{}} = Rental.update_rental_rule(rental_rule, @invalid_attrs)
+      assert rental_rule == Rental.get_rental_rule!(rental_rule.id)
+    end
+
+    test "delete_rental_rule/1 deletes the rental_rule" do
+      rental_rule = rental_rule_fixture()
+      assert {:ok, %RentalRule{}} = Rental.delete_rental_rule(rental_rule)
+      assert_raise Ecto.NoResultsError, fn -> Rental.get_rental_rule!(rental_rule.id) end
+    end
+
+    test "change_rental_rule/1 returns a rental_rule changeset" do
+      rental_rule = rental_rule_fixture()
+      assert %Ecto.Changeset{} = Rental.change_rental_rule(rental_rule)
+    end
+  end
+
+  describe "rental_rules" do
+    alias Sportyweb.Rental.RentalRule
+
+    import Sportyweb.RentalFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_rental_rules/0 returns all rental_rules" do
+      rental_rule = rental_rule_fixture()
+      assert Rental.list_rental_rules() == [rental_rule]
+    end
+
+    test "get_rental_rule!/1 returns the rental_rule with given id" do
+      rental_rule = rental_rule_fixture()
+      assert Rental.get_rental_rule!(rental_rule.id) == rental_rule
+    end
+
+    test "create_rental_rule/1 with valid data creates a rental_rule" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %RentalRule{} = rental_rule} = Rental.create_rental_rule(valid_attrs)
+      assert rental_rule.name == "some name"
+    end
+
+    test "create_rental_rule/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Rental.create_rental_rule(@invalid_attrs)
+    end
+
+    test "update_rental_rule/2 with valid data updates the rental_rule" do
+      rental_rule = rental_rule_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %RentalRule{} = rental_rule} = Rental.update_rental_rule(rental_rule, update_attrs)
+      assert rental_rule.name == "some updated name"
+    end
+
+    test "update_rental_rule/2 with invalid data returns error changeset" do
+      rental_rule = rental_rule_fixture()
+      assert {:error, %Ecto.Changeset{}} = Rental.update_rental_rule(rental_rule, @invalid_attrs)
+      assert rental_rule == Rental.get_rental_rule!(rental_rule.id)
+    end
+
+    test "delete_rental_rule/1 deletes the rental_rule" do
+      rental_rule = rental_rule_fixture()
+      assert {:ok, %RentalRule{}} = Rental.delete_rental_rule(rental_rule)
+      assert_raise Ecto.NoResultsError, fn -> Rental.get_rental_rule!(rental_rule.id) end
+    end
+
+    test "change_rental_rule/1 returns a rental_rule changeset" do
+      rental_rule = rental_rule_fixture()
+      assert %Ecto.Changeset{} = Rental.change_rental_rule(rental_rule)
+    end
+  end
 end

@@ -1,6 +1,7 @@
 defmodule SportywebWeb.RentalFeeLive.FormComponent do
   use SportywebWeb, :live_component
 
+  alias Sportyweb.Organization.Club
   alias Sportyweb.Rental
   alias Sportyweb.Rental.Category
   alias Sportyweb.Rental.Article
@@ -21,63 +22,101 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
       phx-change="validate"
       phx-submit="save"
     >
-      <.input_grids>
-        <.input_grid>
-          <div class="col-span-12 md:col-span-6">
-            <.input field={@form[:name]} type="text" label="Name" />
-          </div>
+<.input_grids>
+  <.input_grid>
+    <div class="col-span-12 md:col-span-6">
+      <.input
+        field={@form[:scope]}
+        type="select"
+        label="Gilt für"
+        options={[
+          {"Kategorie", "category"},
+          {"Artikel", "article"}
+        ]}
+      />
+    </div>
 
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:member_type]}
-              type="select"
-              label="Für wen gilt die Gebühr?"
-              prompt="Bitte auswählen"
-              options={[{"Mitglieder", :member}, {"Nichtmitglieder", :non_member}]}
-            />
-          </div>
+    <%= case @form[:scope].value do %>
+      <% "category" -> %>
+        <div class="col-span-12 md:col-span-6">
+          <.input
+            field={@form[:category_id]}
+            type="select"
+            label="Kategorie"
+            options={Enum.map(@category_options, &{&1.name, &1.id})}
+            prompt="Kategorie auswählen"
+          />
+        </div>
 
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:rental_duration]}
-              type="select"
-              label="Für welche Mietdauer?"
-              prompt="Bitte auswählen"
-              options={[
-                {"Kurzfristige Vermietungen", :short_term},
-                {"Langfristige Vermietungen", :long_term}
-              ]}
-            />
-          </div>
-        </.input_grid>
+      <% "article" -> %>
+        <div class="col-span-12 md:col-span-6">
+          <.input
+            field={@form[:article_id]}
+            type="select"
+            label="Artikel"
+            options={Enum.map(@article_options, &{&1.name, &1.id})}
+            prompt="Artikel auswählen"
+          />
+        </div>
 
-        <.input_grid class="pt-6">
-          <div class="col-span-12 md:col-span-6">
-            <.input field={@form[:amount]} type="text" label="Grundbetrag in Euro" />
-            <.input_description>
-              Das €-Zeichen kann, muss aber nicht angegeben werden.
-            </.input_description>
-          </div>
+      <% _ -> %>
+    <% end %>
 
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:minimum_age_in_years]}
-              type="number"
-              label="Mindestalter (optional)"
-              min="0"
-            />
-          </div>
+    <div class="col-span-12 md:col-span-6">
+      <.input field={@form[:name]} type="text" label="Name" />
+    </div>
 
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:maximum_age_in_years]}
-              type="number"
-              label="Höchstalter (optional)"
-              min="0"
-            />
-          </div>
-        </.input_grid>
-      </.input_grids>
+    <div class="col-span-12 md:col-span-6">
+      <.input
+        field={@form[:member_type]}
+        type="select"
+        label="Für wen gilt die Gebühr?"
+        prompt="Bitte auswählen"
+        options={[{"Mitglieder", :member}, {"Nichtmitglieder", :non_member}]}
+      />
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+      <.input
+        field={@form[:rental_duration]}
+        type="select"
+        label="Für welche Mietdauer?"
+        prompt="Bitte auswählen"
+        options={[
+          {"Kurzfristige Vermietungen", :short_term},
+          {"Langfristige Vermietungen", :long_term}
+        ]}
+      />
+    </div>
+  </.input_grid>
+
+  <.input_grid class="pt-6">
+    <div class="col-span-12 md:col-span-6">
+      <.input field={@form[:amount]} type="text" label="Grundbetrag in Euro" />
+      <.input_description>
+        Das €-Zeichen kann, muss aber nicht angegeben werden.
+      </.input_description>
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+      <.input
+        field={@form[:minimum_age_in_years]}
+        type="number"
+        label="Mindestalter (optional)"
+        min="0"
+      />
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+      <.input
+        field={@form[:maximum_age_in_years]}
+        type="number"
+        label="Höchstalter (optional)"
+        min="0"
+      />
+    </div>
+  </.input_grid>
+</.input_grids>
 
       <:actions>
         <div>
@@ -96,6 +135,8 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:category_options, Rental.list_categories(assigns.club.id))
+     |> assign(:article_options, Rental.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Rental.change_rental_fee(rental_fee))
      end)}
@@ -131,33 +172,15 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
     })
 
     case Rental.create_rental_fee(rental_fee_params) do
-      {:ok, rental_fee} ->
-        case create_association(rental_fee, socket.assigns.rental_fee_object) do
-          {:ok, _} ->
+      {:ok, _rental_fee} ->
+
             {:noreply,
             socket
             |> put_flash(:info, "Mietgebühr erfolgreich erstellt")
             |> push_navigate(to: socket.assigns.navigate)}
 
-          {:error, _} ->
-            {:noreply,
-            socket
-            |> put_flash(:error, "Mietgebühr konnte nicht erstellt werden")}
-        end
-
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
-
-  defp create_association(rental_fee, %Category{} = rental_fee_object) do
-    Rental.create_category_rental_fee(rental_fee_object, rental_fee)
-    {:ok, rental_fee}
-  end
-
-  defp create_association(rental_fee, %Article{} = rental_fee_object) do
-    Rental.create_article_rental_fee(rental_fee_object, rental_fee)
-    {:ok, rental_fee}
-  end
-
 end

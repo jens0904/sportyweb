@@ -1,11 +1,11 @@
-defmodule SportywebWeb.RentalFeeLive.Index do
-
+defmodule SportywebWeb.RentalRuleLive.Index do
   use SportywebWeb, :live_view
+
   alias Sportyweb.Organization
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :rental_fees)}
+    {:ok, assign(socket, :club_navigation_current_item, :rental_rules)}
   end
 
   @impl true
@@ -19,11 +19,11 @@ defmodule SportywebWeb.RentalFeeLive.Index do
   end
 
   defp apply_action(socket, :index, %{"club_id" => club_id}) do
-    club = Organization.get_club!(club_id, rental_fees: [:article, :category])
+    club = Organization.get_club!(club_id, rental_rules: [:category, :article])
 
     socket
     |> assign(:page_title, "Ausleihregeln")
     |> assign(:club, club)
-    |> stream(:rental_fees, club.rental_fees)
+    |> stream(:rental_rules, club.rental_rules)
   end
 end
