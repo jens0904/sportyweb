@@ -8,6 +8,7 @@ defmodule Sportyweb.Rental.Loan do
   alias Sportyweb.Personal.Contact
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Unit
+  alias Sportyweb.Rental.RentalFee
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -17,6 +18,7 @@ defmodule Sportyweb.Rental.Loan do
     belongs_to :contact, Contact
     belongs_to :location, Location
     belongs_to :unit, Unit
+    belongs_to :rental_fee, RentalFee
     field :loan_number, :string
     field :loan_date, :date, default: Date.utc_today()
     field :return_date, :date

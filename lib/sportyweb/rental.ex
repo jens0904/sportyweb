@@ -8,9 +8,12 @@ defmodule Sportyweb.Rental do
   alias Sportyweb.Rental.Category
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Rental.ArticleRentalFee
+  alias Sportyweb.Rental.CategoryRentalFee
   alias Sportyweb.Rental.Unit
   alias Sportyweb.Rental.Loan
-  alias Sportyweb.Finance.Fee
+  alias Sportyweb.Personal
+  alias Sportyweb.Personal.Contact
 
   @doc """
   Returns the list of categories.
@@ -695,4 +698,64 @@ defmodule Sportyweb.Rental do
   def change_rental_fee(%RentalFee{} = rental_fee, attrs \\ %{}) do
     RentalFee.changeset(rental_fee, attrs)
   end
+
+  def create_category_rental_fee(%Category{} = category, %RentalFee{} = rental_fee) do
+    Repo.insert(%CategoryRentalFee{
+      category_id: category.id,
+      rental_fee_id: rental_fee.id
+    })
+  end
+
+  def create_article_rental_fee(%Article{} = article, %RentalFee{} = rental_fee) do
+    Repo.insert(%ArticleRentalFee{
+      article_id: article.id,
+      rental_fee_id: rental_fee.id
+    })
+  end
+
+
+
+def list_belonging_rental_fees(article_id, contact_id) do
+  IO.inspect(article_id, label: "article")
+  IO.inspect(contact_id, label: "contact")
+
+  if is_nil(contact_id) || (is_binary(contact_id) && String.trim(contact_id) == "") do
+    []
+  else
+    contact = Personal.get_contact!(contact_id, [:contracts])
+
+    query =
+    from rf in RentalFee,
+    where: rf.article_id == ^article_id
+
+    query =
+  if Contact.has_active_membership_contract?(contact) do
+    from rf in query,
+      where: rf.member_type == ^:member,
+      order_by: [asc: rf.name]
+  else
+    from rf in query,
+      where: rf.member_type == ^:non_member or is_nil(rf.member_type),
+      order_by: [asc: rf.name]
+  end
+
+    query =
+      if Contact.is_person?(contact) do
+        contact_age_in_years = Contact.age_in_years(contact)
+
+        from rf in query,
+          where:
+            is_nil(rf.minimum_age_in_years) or
+              rf.minimum_age_in_years <= ^contact_age_in_years,
+          where:
+            is_nil(rf.maximum_age_in_years) or
+              rf.maximum_age_in_years >= ^contact_age_in_years
+      else
+        query
+      end
+    IO.inspect(Repo.all(query), label: "Rental Fees")
+    Repo.all(query)
+  end
+end
+
 end

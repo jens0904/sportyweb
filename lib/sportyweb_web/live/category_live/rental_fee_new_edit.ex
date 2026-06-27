@@ -1,4 +1,4 @@
-defmodule SportywebWeb.RentalFeeLive.NewEdit do
+defmodule SportywebWeb.CategoryLive.RentalFeeNewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
@@ -15,8 +15,8 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
         title={@page_title}
         action={@live_action}
         rental_fee={@rental_fee}
-        article={@article}
-        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/articles/#{@article}"}
+        rental_fee_object={@category}
+        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/categories/#{@category}"}
       />
     </div>
     """
@@ -24,7 +24,7 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :club_navigation_current_item, :articles)}
+    {:ok, assign(socket, :club_navigation_current_item, :categories)}
   end
 
   @impl true
@@ -33,26 +33,28 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    rental_fee = Rental.get_rental_fee!(id, :category, article: :club)
+    rental_fee = Rental.get_rental_fee!(id, [:category, article: :club])
 
     socket
     |> assign(:page_title, "Mietgebühr bearbeiten")
     |> assign(:rental_fee, rental_fee)
-    |> assign(:article, rental_fee.article)
+    |> assign(:category, rental_fee.category)
     |> assign(:club, rental_fee.article.club)
   end
 
-  defp apply_action(socket, :new, %{"article_id" => article_id}) do
-    article = Rental.get_article!(article_id, [:category, :club, :units])
+  defp apply_action(socket, :new, %{"category_id" => category_id}) do
+    category = Rental.get_category!(category_id, [:club, :rental_fees])
+    club = category.club
 
     socket
     |> assign(:page_title, "Mietgebühr anlegen")
     |> assign(:rental_fee, %RentalFee{
-      article_id: article.id,
-      article: article
+      club_id: club.id,
+      club: club,
+      categories: [category]
     })
-    |> assign(:article, article)
-    |> assign(:club, article.club)
+    |> assign(:category, category)
+    |> assign(:club, club)
   end
 
   @impl true

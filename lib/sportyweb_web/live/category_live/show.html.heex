@@ -18,18 +18,59 @@
 </.card>
 
 <.header level="2" class="mt-12">
-  Gebühren
+  Mietgebühr
   <:actions>
-    <.link navigate={~p"/categories/#{@category}/fees/new"}>
-      <.button>Kategoriespezifische Gebühr erstellen</.button>
+    <.link navigate={~p"/categories/#{@category}/rental_fees/new"}>
+      <.button>Mietgebühr erstellen</.button>
     </.link>
   </:actions>
 </.header>
 
 <.card>
-  <%= if Enum.any?(@category.fees) do %>
-    <SportywebWeb.FeeLive.IndexTableComponent.render fees={@category.fees} />
+  <%= if Enum.any?(@streams.rental_fees.inserts) do %>
+    <.table
+      id="rental_fee"
+      rows={@streams.rental_fees}
+      row_click={fn {_id, rental_fee} -> JS.navigate(~p"/rental_fees/#{rental_fee}") end}
+    >
+      <:col :let={{_id, rental_fee}} label="Name">
+        {format_string_field(rental_fee.name)}
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Für wen gilt die Gebühr?">
+  <%= case rental_fee.member_type do %>
+    <% :member -> %>Mitglieder
+    <% :non_member -> %>Nichtmitglieder
+    <% _ -> %>–
+  <% end %>
+</:col>
+
+<:col :let={{_id, rental_fee}} label="Mietdauer">
+  <%= case rental_fee.rental_duration do %>
+    <% :short_term -> %>Kurzfristige Vermietungen
+    <% :long_term -> %>Langfristige Vermietungen
+    <% _ -> %>–
+  <% end %>
+</:col>
+
+      <:col :let={{_id, rental_fee}} label="Betrag">
+        {Money.to_string!(rental_fee.amount)}
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Mindestalter">
+        {format_integer_field(rental_fee.minimum_age_in_years)}
+      </:col>
+
+      <:col :let={{_id, rental_fee}} label="Höchstalter">
+        {format_integer_field(rental_fee.maximum_age_in_years)}
+      </:col>
+
+      <:action :let={{_id, rental_fee}}>
+        <.link navigate={~p"/rental_fees/#{rental_fee}"}>Anzeigen</.link>
+      </:action>
+    </.table>
   <% else %>
-    <p>Bisher wurde noch keine kategoriespezifische Gebühr erstellt.</p>
+    <p>Bisher wurde noch keine Mietgebühr angelegt.</p>
   <% end %>
 </.card>
+

@@ -3,7 +3,10 @@ defmodule Sportyweb.Rental.RentalFee do
   import Ecto.Changeset
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
+  alias Sportyweb.Organization
+  alias Organization.Club
   alias Sportyweb.Rental.Article
+  alias Sportyweb.Rental.Category
   alias Sportyweb.Rental.Loan
 
 
@@ -11,7 +14,12 @@ defmodule Sportyweb.Rental.RentalFee do
   @foreign_key_type :binary_id
 
   schema "rental_fees" do
+    belongs_to :club, Club
     belongs_to :article, Article
+    belongs_to :category, Category
+    has_many :loans, Loan
+    many_to_many :categories, Category, join_through: CategoryRentalFee
+    many_to_many :articles, Article, join_through: ArticleRentalFee
     field :name, :string, default: ""
     field :member_type, Ecto.Enum, values: [:member, :non_member]
     field :amount, Money.Ecto.Composite.Type, default_currency: :EUR

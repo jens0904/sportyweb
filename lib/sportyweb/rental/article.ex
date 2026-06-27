@@ -7,6 +7,7 @@ defmodule Sportyweb.Rental.Article do
   alias Sportyweb.Rental.Category
   alias Sportyweb.Rental.Unit
   alias Sportyweb.Rental.Loan
+  alias Sportyweb.Rental.ArticleRentalFee
   alias Sportyweb.Rental.RentalFee
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -17,7 +18,7 @@ defmodule Sportyweb.Rental.Article do
     belongs_to :category, Category
     has_many :units, Unit
     has_many :loans, Loan
-    has_many :rental_fees, RentalFee
+    many_to_many :rental_fees, RentalFee, join_through: ArticleRentalFee
     field :name, :string
     field :description, :string
     field :reference_number, :string

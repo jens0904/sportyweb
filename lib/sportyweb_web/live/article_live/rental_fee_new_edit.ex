@@ -1,4 +1,4 @@
-defmodule SportywebWeb.RentalFeeLive.NewEdit do
+defmodule SportywebWeb.ArticleLiveRentalFeeNewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
@@ -15,7 +15,7 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
         title={@page_title}
         action={@live_action}
         rental_fee={@rental_fee}
-        article={@article}
+        rental_fee_object={@article}
         navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/articles/#{@article}"}
       />
     </div>
@@ -45,14 +45,17 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
   defp apply_action(socket, :new, %{"article_id" => article_id}) do
     article = Rental.get_article!(article_id, [:category, :club, :units])
 
+    club = article.club
+
     socket
     |> assign(:page_title, "Mietgebühr anlegen")
     |> assign(:rental_fee, %RentalFee{
-      article_id: article.id,
-      article: article
+      club_id: club.id,
+      club: club,
+      articles: [article]
     })
     |> assign(:article, article)
-    |> assign(:club, article.club)
+    |> assign(:club, club)
   end
 
   @impl true

@@ -3,15 +3,17 @@ defmodule Sportyweb.Rental.Category do
   import Ecto.Changeset
   alias Sportyweb.Organization.Club
   alias Sportyweb.Rental.Article
-  alias Sportyweb.Finance.Fee
-  alias Sportyweb.Rental.CategoryFee
+  alias Sportyweb.Rental.CategoryRentalFee
+  alias Sportyweb.Rental.RentalFee
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "categories" do
     belongs_to :club, Club
     has_many :articles, Article
-    many_to_many :fees, Fee, join_through: CategoryFee
+
+    many_to_many :rental_fees, RentalFee, join_through: CategoryRentalFee
+
     field :name, :string
     field :description, :string
     field :loan_period, :integer

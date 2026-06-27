@@ -11,12 +11,13 @@ defmodule SportywebWeb.CategoryLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     category =
-      Rental.get_category!(id, [:club, fees: :internal_events])
+      Rental.get_category!(id, [:club, :rental_fees])
 
     {:noreply,
      socket
      |> assign(:page_title, "Ausrüstungskategorie: #{category.name}")
      |> assign(:category, category)
-     |> assign(:club, category.club)}
+     |> assign(:club, category.club)
+     |> stream(:rental_fees, category.rental_fees)}
   end
 end

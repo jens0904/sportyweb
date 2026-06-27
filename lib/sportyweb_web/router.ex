@@ -208,6 +208,7 @@ defmodule SportywebWeb.Router do
       live "/rental_fees", RentalFeeLive.Index, :index_root
       live "/articles/:article_id/rental_fees", RentalFeeLive.Index, :index
       live "/articles/:article_id/rental_fees/new", RentalFeeLive.NewEdit, :new
+      live "/categories/:category_id/rental_fees/new", CategoryLive.RentalFeeNewEdit, :new
       live "/rental_fees/:id/edit", RentalFeeLive.NewEdit, :edit
 
       live "/rental_fees/:id", RentalFeeLive.Show, :show

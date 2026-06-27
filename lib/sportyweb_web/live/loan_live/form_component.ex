@@ -69,8 +69,19 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       end
     }
     prompt="Bitte auswählen"
+    phx-change="update_rental_fee_options"
   />
 </div>
+              <div class="col-span-12 md:col-span-6">
+              <.input
+                  field={@form[:rental_fee_id]}
+                  type="select"
+                  label="Mietgebühr"
+                  options={@rental_fee_options |> Enum.map(&{&1.name, &1.id})}
+                  prompt="Bitte auswählen"
+                />
+              </div>
+
               <div class="col-span-12 md:col-span-6">
                 <.input
                   field={@form[:location_id]}
@@ -136,6 +147,7 @@ defmodule SportywebWeb.LoanLive.FormComponent do
      |> assign_new(:form, fn ->
        to_form(Rental.change_loan(loan))
      end)
+     |> assign_rental_fee_options(nil)
      |> assign_unit_options(nil)}
   end
 
@@ -152,6 +164,12 @@ defmodule SportywebWeb.LoanLive.FormComponent do
     save_loan(socket, socket.assigns.action, loan_params)
   end
 
+  def handle_event("update_rental_fee_options", %{"loan" => %{"contact_id" => contact_id}}, socket) do
+    IO.inspect(contact_id, label: "contact_id")
+    IO.inspect("EVENT!")
+    IO.inspect(contact_id)
+    {:noreply, assign_rental_fee_options(socket, contact_id)}
+  end
   @impl true
   def handle_event("update_unit_options", %{"loan" => %{"location_id" => location_id}}, socket) do
     {:noreply, assign_unit_options(socket, location_id)}
@@ -175,8 +193,6 @@ defmodule SportywebWeb.LoanLive.FormComponent do
   end
 
   defp save_loan(socket, :new, loan_params) do
-    require IEx
-    IEx.pry()
     loan_params =
       Enum.into(loan_params, %{
         "article_id" => socket.assigns.loan.article.id
@@ -206,6 +222,16 @@ defmodule SportywebWeb.LoanLive.FormComponent do
       Rental.list_available_units(socket.assigns.loan.article_id, location_id)
     )
   end
+
+  defp assign_rental_fee_options(socket, contact_id) do
+    assign(
+      socket,
+      :rental_fee_options,
+      Rental.list_belonging_rental_fees(socket.assigns.loan.article_id, contact_id)
+    )
+  end
+
+
 
   defp assign_return_date(socket, loan_date, loan_params) do
     loan_params =

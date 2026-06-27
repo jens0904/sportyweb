@@ -2,6 +2,8 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   use SportywebWeb, :live_component
 
   alias Sportyweb.Rental
+  alias Sportyweb.Rental.Category
+  alias Sportyweb.Rental.Article
 
   @impl true
   def render(assigns) do
@@ -123,20 +125,39 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   end
 
   defp save_rental_fee(socket, :new, rental_fee_params) do
-    rental_fee_params =
-      Enum.into(rental_fee_params, %{
-        "article_id" => socket.assigns.rental_fee.article.id
-      })
+  rental_fee_params =
+    Enum.into(rental_fee_params, %{
+      "club_id" => socket.assigns.rental_fee.club.id
+    })
 
     case Rental.create_rental_fee(rental_fee_params) do
-      {:ok, _rental_fee} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Mietgebühr wurde erfolgreich erstellt")
-         |> push_navigate(to: socket.assigns.navigate)}
+      {:ok, rental_fee} ->
+        case create_association(rental_fee, socket.assigns.rental_fee_object) do
+          {:ok, _} ->
+            {:noreply,
+            socket
+            |> put_flash(:info, "Mietgebühr erfolgreich erstellt")
+            |> push_navigate(to: socket.assigns.navigate)}
+
+          {:error, _} ->
+            {:noreply,
+            socket
+            |> put_flash(:error, "Mietgebühr konnte nicht erstellt werden")}
+        end
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
+
+  defp create_association(rental_fee, %Category{} = rental_fee_object) do
+    Rental.create_category_rental_fee(rental_fee_object, rental_fee)
+    {:ok, rental_fee}
+  end
+
+  defp create_association(rental_fee, %Article{} = rental_fee_object) do
+    Rental.create_article_rental_fee(rental_fee_object, rental_fee)
+    {:ok, rental_fee}
+  end
+
 end

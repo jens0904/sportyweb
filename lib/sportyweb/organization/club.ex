@@ -22,6 +22,7 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Polymorphic.Phone
   alias Sportyweb.Rental.Article
   alias Sportyweb.Rental.Category
+  alias Sportyweb.Rental.RentalFee
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -35,6 +36,7 @@ defmodule Sportyweb.Organization.Club do
     has_many :contacts, Contact, preload_order: [asc: :name]
     has_many :contact_groups, ContactGroup
     has_many :departments, Department, preload_order: [asc: :name]
+    has_many :rental_fees, RentalFee
     has_many :events, Event
     has_many :subsidies, Subsidy, preload_order: [asc: :name]
     # This line has to be below "has_many :all_contracts"!

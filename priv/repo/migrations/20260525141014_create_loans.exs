@@ -23,6 +23,8 @@ defmodule Sportyweb.Repo.Migrations.CreateLoans do
       add :unit_id, references(:units, on_delete: :delete_all, type: :binary_id), null: false
 
 
+
+
       timestamps(type: :utc_datetime)
     end
   end

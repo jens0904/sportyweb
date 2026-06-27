@@ -19,6 +19,12 @@ defmodule Sportyweb.Repo.Migrations.CreateRentalFee do
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false
 
+      add :category_id, references(:categories, on_delete: :delete_all, type: :binary_id),
+        null: false
+
+      add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id),
+        null: false
+
       timestamps(type: :utc_datetime)
     end
   end
