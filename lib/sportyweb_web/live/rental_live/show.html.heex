@@ -1,10 +1,10 @@
 <.header>
   {@page_title}
   <:actions>
-    <.link navigate={~p"/loans/#{@loan}/return"}>
+    <.link navigate={~p"/rentals/#{@rental}/return"}>
       <.button color="danger">Ausleihe zurückgeben</.button>
     </.link>
-    <.link navigate={~p"/loans/#{@loan}/renew"}>
+    <.link navigate={~p"/rentals/#{@rental}/renew"}>
       <.button>Ausleihe verlängern</.button>
     </.link>
   </:actions>
@@ -13,19 +13,19 @@
 <.card>
   <.list>
     <:item title="Kontakt">
-      {format_string_field(@loan.contact.name)}
+      {format_string_field(@rental.contact.name)}
     </:item>
     <:item title="Standort">
-      {format_string_field(@loan.location.name)}
+      {format_string_field(@rental.location.name)}
     </:item>
     <:item title="Einheit">
-      {format_string_field(@loan.unit.serial_number)}
+      {format_string_field(@rental.unit.serial_number)}
     </:item>
     <:item title="Ausleihdatum">
-      {format_date_field_dmy(@loan.loan_date)}
+      {format_date_field_dmy(@rental.rental_date)}
     </:item>
     <:item title="Rückgabedatum">
-      {format_date_field_dmy(@loan.return_date)}
+      {format_date_field_dmy(@rental.return_date)}
     </:item>
   </.list>
 </.card>

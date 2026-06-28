@@ -1,7 +1,7 @@
 defmodule SportywebWeb.UnitLive.Show do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   @impl true
   def mount(_params, _session, socket) do
@@ -11,7 +11,7 @@ defmodule SportywebWeb.UnitLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     unit =
-      Rental.get_unit_with_inactive_loans!(id)
+      Inventory.get_unit_with_inactive_rentals!(id)
 
     {:noreply,
      socket
@@ -20,6 +20,6 @@ defmodule SportywebWeb.UnitLive.Show do
      |> assign(:location, unit.location)
      |> assign(:article, unit.article)
      |> assign(:club, unit.article.club)
-     |> stream(:loans, unit.loans)}
+     |> stream(:rentals, unit.rentals)}
   end
 end

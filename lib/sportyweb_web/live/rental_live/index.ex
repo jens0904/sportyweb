@@ -1,9 +1,9 @@
-defmodule SportywebWeb.LoanLive.Index do
+defmodule SportywebWeb.RentalLive.Index do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Rental
 
   @impl true
   def mount(_params, _session, socket) do

@@ -29,12 +29,12 @@
     </:item>
 
     <:item title="Fester Ausleihzeitraum">
-      {if @rental_rule.choose_loan_period, do: "Ja", else: "Nein"}
+      {if @rental_rule.choose_rental_period, do: "Ja", else: "Nein"}
     </:item>
 
     <:item title="Ausleihzeitraum">
-      <%= if @rental_rule.choose_loan_period do %>
-        {@rental_rule.loan_period} {@rental_rule.loan_period_unit}
+      <%= if @rental_rule.choose_rental_period do %>
+        {@rental_rule.rental_period} {@rental_rule.rental_period_unit}
       <% else %>
         -
       <% end %>

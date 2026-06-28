@@ -2,7 +2,7 @@ defmodule SportywebWeb.ArticleLiveTest do
   use SportywebWeb.ConnCase
 
   import Phoenix.LiveViewTest
-  import Sportyweb.RentalFixtures
+  import Sportyweb.InventoryFixtures
 
   @create_attrs %{name: "some name", description: "some description", reference_number: "some reference_number", costs_of_loss: 42}
   @update_attrs %{name: "some updated name", description: "some updated description", reference_number: "some updated reference_number", costs_of_loss: 43}

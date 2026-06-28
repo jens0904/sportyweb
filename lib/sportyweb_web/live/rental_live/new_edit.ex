@@ -1,23 +1,23 @@
-defmodule SportywebWeb.LoanLive.NewEdit do
+defmodule SportywebWeb.RentalLive.NewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Rental
 
   @impl true
   def render(assigns) do
     ~H"""
     <div>
       <.live_component
-        module={SportywebWeb.LoanLive.FormComponent}
-        id={@loan.id || :new}
+        module={SportywebWeb.RentalLive.FormComponent}
+        id={@rental.id || :new}
         title={@page_title}
         action={@live_action}
-        loan={@loan}
+        rental={@rental}
         article={@article}
         club={@club}
-        navigate={if @loan.id, do: ~p"/loans/#{@loan}", else: ~p"/articles/#{@article}"}
+        navigate={if @rental.id, do: ~p"/rentals/#{@rental}", else: ~p"/articles/#{@article}"}
       />
     </div>
     """
@@ -34,24 +34,24 @@ defmodule SportywebWeb.LoanLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    loan = Rental.get_loan!(id, article: :club)
+    rental = Inventory.get_rental!(id, article: :club)
 
     socket
     |> assign(:page_title, "Ausleihe bearbeiten")
-    |> assign(:loan, loan)
-    |> assign(:article, loan.article)
-    |> assign(:club, loan.article.club)
+    |> assign(:rental, rental)
+    |> assign(:article, rental.article)
+    |> assign(:club, rental.article.club)
   end
 
   defp apply_action(socket, :new, %{"article_id" => article_id}) do
-    article = Rental.get_article!(article_id, [:club, :units])
+    article = Inventory.get_article!(article_id, [:club, :units])
 
     socket
     |> assign(:page_title, "Ausleihe anlegen")
-    |> assign(:loan, %Loan{
+    |> assign(:rental, %Rental{
       article_id: article.id,
       article: article,
-      loan_date: Date.utc_today()
+      rental_date: Date.utc_today()
     })
     |> assign(:article, article)
     |> assign(:club, article.club)
@@ -59,12 +59,12 @@ defmodule SportywebWeb.LoanLive.NewEdit do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    loan = Rental.get_loan!(id)
-    {:ok, _} = Rental.delete_loan(loan)
+    rental = Inventory.get_rental!(id)
+    {:ok, _} = Inventory.delete_rental(rental)
 
     {:noreply,
      socket
      |> put_flash(:info, "Ausleihe erfolgreich gelöscht")
-     |> push_navigate(to: "/article/#{loan.article_id}/loans")}
+     |> push_navigate(to: "/article/#{rental.article_id}/rentals")}
   end
 end

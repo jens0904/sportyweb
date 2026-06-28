@@ -1,8 +1,8 @@
 defmodule SportywebWeb.CategoryLive.NewEdit do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.Category
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Category
   alias Sportyweb.Organization
 
   @impl true
@@ -37,7 +37,7 @@ defmodule SportywebWeb.CategoryLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    category = Rental.get_category!(id, [:club])
+    category = Inventory.get_category!(id, [:club])
 
     socket
     |> assign(:page_title, "Ausrüstungskategorie bearbeiten")
@@ -59,8 +59,8 @@ defmodule SportywebWeb.CategoryLive.NewEdit do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    category = Rental.get_category!(id)
-    {:ok, _} = Rental.delete_category(category)
+    category = Inventory.get_category!(id)
+    {:ok, _} = Inventory.delete_category(category)
 
     {:noreply,
      socket

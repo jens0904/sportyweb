@@ -14,7 +14,7 @@ defmodule Sportyweb.Organization.Department do
   alias Sportyweb.Polymorphic.Email
   alias Sportyweb.Polymorphic.Note
   alias Sportyweb.Polymorphic.Phone
-  alias Sportyweb.Rental.Article
+  alias Sportyweb.Inventory.Article
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

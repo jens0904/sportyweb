@@ -11,7 +11,7 @@ defmodule Sportyweb.Asset do
   alias Sportyweb.Asset.Location
   alias Sportyweb.Asset.LocationFee
   alias Sportyweb.Finance.Fee
-  alias Sportyweb.Rental.Article
+  alias Sportyweb.Inventory.Article
 
   @spec list_locations(any()) :: any()
   @doc """

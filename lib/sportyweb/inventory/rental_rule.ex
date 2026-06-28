@@ -1,9 +1,9 @@
-defmodule Sportyweb.Rental.RentalRule do
+defmodule Sportyweb.Inventory.RentalRule do
   use Ecto.Schema
   import Ecto.Changeset
   alias Sportyweb.Organization.Club
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Article
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.Article
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -15,11 +15,11 @@ defmodule Sportyweb.Rental.RentalRule do
     belongs_to :article, Article
 
     field :scope, :string, virtual: true
-    field :choose_loan_period, :boolean, default: false
+    field :choose_rental_period, :boolean, default: false
     field :for_club_members, :boolean, default: false
     field :for_non_members, :boolean, default: false
-    field :loan_period, :integer
-    field :loan_period_unit, :string, default: "Tage"
+    field :rental_period, :integer
+    field :rental_period_unit, :string, default: "Tage"
     field :allow_renewal, :boolean, default: false
     field :max_renewals, :integer, default: 2
     field :renewal_period, :integer, default: 7
@@ -36,11 +36,11 @@ def changeset(rental_rule, attrs) do
     :category_id,
     :article_id,
     :scope,
-    :choose_loan_period,
+    :choose_rental_period,
     :for_club_members,
     :for_non_members,
-    :loan_period,
-    :loan_period_unit,
+    :rental_period,
+    :rental_period_unit,
     :allow_renewal,
     :max_renewals,
     :renewal_period

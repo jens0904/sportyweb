@@ -21,8 +21,8 @@ defmodule Sportyweb.Finance.Fee do
   alias Sportyweb.Organization.GroupFee
   alias Sportyweb.Polymorphic.InternalEvent
   alias Sportyweb.Polymorphic.Note
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.Rental
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

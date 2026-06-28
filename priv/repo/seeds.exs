@@ -35,9 +35,9 @@ alias Sportyweb.Polymorphic.InternalEvent
 alias Sportyweb.Polymorphic.Note
 alias Sportyweb.Polymorphic.Phone
 alias Sportyweb.Polymorphic.PostalAddress
-alias Sportyweb.Rental.Article
-alias Sportyweb.Rental.Category
-alias Sportyweb.Rental.Unit
+alias Sportyweb.Inventory.Article
+alias Sportyweb.Inventory.Category
+alias Sportyweb.Inventory.Unit
 
 alias Sportyweb.RBAC.Role.ApplicationRole
 alias Sportyweb.RBAC.Role.ClubRole
@@ -309,42 +309,42 @@ Repo.insert!(%Category{
   club: club_1,
   name: "Bälle",
   description: "Alle Arten von Bällen",
-  loan_period: 30
+  rental_period: 30
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen",
-  loan_period: 14
+  rental_period: 14
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Schläger",
   description: "Tennis- und Badmintonschläger",
-  loan_period: 21
+  rental_period: 21
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Tauchausrüstung",
   description: "Alles was zum Tauchen benötigt wird",
-  loan_period: nil
+  rental_period: nil
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Wanderausrüstung",
   description: "Alles was zum Wandern benötigt wird",
-  loan_period: 14
+  rental_period: 14
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Ruderausrüstung",
   description: "Alles was zum Rudern benötigt wird",
-  loan_period: 7
+  rental_period: 7
 })
 
 ###################################
@@ -496,42 +496,42 @@ Repo.insert!(%Category{
   club: club_2,
   name: "Bälle",
   description: "Alle Arten von Bällen",
-  loan_period: 30
+  rental_period: 30
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen",
-  loan_period: 14
+  rental_period: 14
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Schläger",
   description: "Tennis- und Badmintonschläger",
-  loan_period: 21
+  rental_period: 21
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Tauchausrüstung",
   description: "Alles was zum Tauchen benötigt wird",
-  loan_period: nil
+  rental_period: nil
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Wanderausrüstung",
   description: "Alles was zum Wandern benötigt wird",
-  loan_period: 14
+  rental_period: 14
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Ruderausrüstung",
   description: "Alles was zum Rudern benötigt wird",
-  loan_period: 7
+  rental_period: 7
 })
 ###################################
 # Add Club 3
@@ -554,21 +554,21 @@ club_3 =
   club: club_3,
   name: "Bälle",
   description: "Alle Arten von Bällen",
-  loan_period: 30
+  rental_period: 30
 })
 
 Repo.insert!(%Category{
   club: club_3,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen",
-  loan_period: 14
+  rental_period: 14
 })
 
 Repo.insert!(%Category{
   club: club_3,
   name: "Schläger",
   description: "Tennis- und Badmintonschläger",
-  loan_period: 21
+  rental_period: 21
 })
 
 ###################################
@@ -627,13 +627,13 @@ Repo.insert!(%Category{
   club: testclub,
   name: "Bälle",
   description: "Alle Arten von Bällen",
-  loan_period: 35
+  rental_period: 35
 })
 Repo.insert!(%Category{
   club: testclub,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen",
-  loan_period: 14
+  rental_period: 14
 })
 
 ###################################
@@ -1206,7 +1206,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
         department_id: department_id,
         category_id: category_id,
         name: Faker.Commerce.product_name(),
-        loan_period: Enum.random([nil, Enum.random(7..180)]),
+        rental_period: Enum.random([nil, Enum.random(7..180)]),
         reference_number: Sportyweb.SeedHelper.get_random_string(5),
         description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
         costs_of_loss: Money.new(:EUR, Enum.random(10..500)),

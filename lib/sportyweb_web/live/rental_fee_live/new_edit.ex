@@ -2,8 +2,8 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.RentalFee
 
   @impl true
   def render(assigns) do
@@ -33,7 +33,7 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    rental_fee = Rental.get_rental_fee!(id, [:category, :article, :club])
+    rental_fee = Inventory.get_rental_fee!(id, [:category, :article, :club])
 
     socket
     |> assign(:page_title, "Mietgebühr bearbeiten")
@@ -56,8 +56,8 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    rental_fee = Rental.get_rental_fee!(id)
-    {:ok, _} = Rental.delete_rental_fee(rental_fee)
+    rental_fee = Inventory.get_rental_fee!(id)
+    {:ok, _} = Inventory.delete_rental_fee(rental_fee)
 
     {:noreply,
      socket

@@ -11,8 +11,8 @@ defmodule SportywebWeb.FeeLive.FormComponent do
   alias Sportyweb.Organization
   alias Sportyweb.Organization.Department
   alias Sportyweb.Organization.Group
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.Category
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Category
 
   @impl true
   def render(assigns) do
@@ -291,7 +291,7 @@ defmodule SportywebWeb.FeeLive.FormComponent do
   end
 
   defp create_association(fee, %Category{} = fee_object) do
-    Rental.create_category_fee(fee_object, fee)
+    Inventory.create_category_fee(fee_object, fee)
     {:ok, fee}
   end
 

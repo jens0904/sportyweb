@@ -14,15 +14,15 @@ defmodule Sportyweb.Asset.Location do
   alias Sportyweb.Polymorphic.Note
   alias Sportyweb.Polymorphic.Phone
   alias Sportyweb.Polymorphic.PostalAddress
-  alias Sportyweb.Rental.Unit
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory.Unit
+  alias Sportyweb.Inventory.Rental
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "locations" do
     belongs_to :club, Club
     has_many :equipment, Equipment, preload_order: [asc: :name]
-    has_many :loans, Loan
+    has_many :rentals, Rental
     has_many :units, Unit
     many_to_many :emails, Email, join_through: LocationEmail
     many_to_many :fees, Fee, join_through: LocationFee

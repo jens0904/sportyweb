@@ -6,9 +6,9 @@ defmodule Sportyweb.Repo.Migrations.CreateCategories do
       add :id, :binary_id, primary_key: true
       add :name, :string, null: false
       add :description, :text, null: true
-      add :choose_loan_period, :boolean, default: false
-      add :loan_period, :integer, null: true
-      add :loan_period_unit, :string, null: true
+      add :choose_rental_period, :boolean, default: false
+      add :rental_period, :integer, null: true
+      add :rental_period_unit, :string, null: true
 
       add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
       timestamps(type: :utc_datetime)

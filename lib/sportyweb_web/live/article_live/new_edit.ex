@@ -2,8 +2,8 @@ defmodule SportywebWeb.ArticleLive.NewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.Article
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Article
 
   @impl true
   def render(assigns) do
@@ -37,7 +37,7 @@ defmodule SportywebWeb.ArticleLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    article = Rental.get_article!(id, [:club])
+    article = Inventory.get_article!(id, [:club])
 
     socket
     |> assign(:page_title, "Artikel bearbeiten")
@@ -59,8 +59,8 @@ defmodule SportywebWeb.ArticleLive.NewEdit do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    article = Rental.get_article!(id)
-    {:ok, _} = Rental.delete_article(article)
+    article = Inventory.get_article!(id)
+    {:ok, _} = Inventory.delete_article(article)
 
     {:noreply,
      socket

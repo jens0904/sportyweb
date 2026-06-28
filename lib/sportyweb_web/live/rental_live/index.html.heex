@@ -1,0 +1,32 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/articles/#{@article}/rentals/new"}>
+      <.button>Ausleihübergabe anlegen</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <%= if Enum.any?(@streams.rentals.inserts) do %>
+    <.table
+      id="rentals"
+      rows={@streams.rentals}
+      row_click={fn {_id, rental} -> JS.navigate(~p"/rentals/#{rental}") end}
+    >
+      <:col :let={{_id, rental}} label="Artikel">{rental.article.name}</:col>
+      <:col :let={{_id, rental}} label="Standort">{rental.location.name}</:col>
+      <:col :let={{_id, rental}} label="Einheit">{rental.rental_date}</:col>
+      <:col :let={{_id, rental}} label="Return date">{rental.return_date}</:col>
+      <:action :let={{_id, rental}}>
+        <div class="sr-only">
+          <.link navigate={~p"/rentals/#{rental}"}>Show</.link>
+        </div>
+      </:action>
+    </.table>
+  <% else %>
+    <p>
+      Bisher wurde noch keine Ausleihe angelegt.<br />
+    </p>
+  <% end %>
+</.card>

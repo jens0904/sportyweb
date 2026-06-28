@@ -1,14 +1,14 @@
-defmodule Sportyweb.Rental.Article do
+defmodule Sportyweb.Inventory.Article do
   use Ecto.Schema
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
   alias Sportyweb.Organization.Club
   alias Sportyweb.Organization.Department
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Unit
-  alias Sportyweb.Rental.Loan
-  alias Sportyweb.Rental.ArticleRentalFee
-  alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.Unit
+  alias Sportyweb.Inventory.Rental
+  alias Sportyweb.Inventory.ArticleRentalFee
+  alias Sportyweb.Inventory.RentalFee
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -17,17 +17,17 @@ defmodule Sportyweb.Rental.Article do
     belongs_to :department, Department
     belongs_to :category, Category
     has_many :units, Unit
-    has_many :loans, Loan
+    has_many :rentals, Rental
     many_to_many :rental_fees, RentalFee, join_through: ArticleRentalFee
     field :name, :string
     field :description, :string
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
-    field :choose_loan_period, :boolean, default: false
+    field :choose_rental_period, :boolean, default: false
     field :for_club_members, :boolean, default: false
     field :for_non_members, :boolean, default: false
-    field :loan_period, :integer
-    field :loan_period_unit, :string, default: "Tage"
+    field :rental_period, :integer
+    field :rental_period_unit, :string, default: "Tage"
     field :allow_renewal, :boolean, default: false
     field :max_renewals, :integer, default: 2
     field :renewal_period, :integer, default: 7
@@ -48,9 +48,9 @@ defmodule Sportyweb.Rental.Article do
       :category_id,
       :for_club_members,
       :for_non_members,
-      :choose_loan_period,
-      :loan_period,
-      :loan_period_unit,
+      :choose_rental_period,
+      :rental_period,
+      :rental_period_unit,
       :allow_renewal,
       :max_renewals,
       :renewal_period

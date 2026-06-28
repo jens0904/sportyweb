@@ -1,17 +1,18 @@
-defmodule Sportyweb.Rental do
+defmodule Sportyweb.Inventory do
   @moduledoc """
-  The Rental context.
+  The Inventory context.
   """
 
   import Ecto.Query, warn: false
+  alias Sportyweb.Inventory
   alias Sportyweb.Repo
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Article
-  alias Sportyweb.Rental.RentalFee
-  alias Sportyweb.Rental.ArticleRentalFee
-  alias Sportyweb.Rental.CategoryRentalFee
-  alias Sportyweb.Rental.Unit
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.RentalFee
+  alias Sportyweb.Inventory.ArticleRentalFee
+  alias Sportyweb.Inventory.CategoryRentalFee
+  alias Sportyweb.Inventory.Unit
+  alias Sportyweb.Inventory.Rental
   alias Sportyweb.Personal
   alias Sportyweb.Personal.Contact
 
@@ -185,11 +186,11 @@ defmodule Sportyweb.Rental do
     |> Repo.preload(preloads)
   end
 
-  def get_article_with_active_loans!(id) do
-    active_loans_query = from(l in Loan, where: l.status == "active")
+  def get_article_with_active_rentals!(id) do
+    active_rentals_query = from(l in Rental, where: l.status == "active")
     Article
     |> Repo.get!(id)
-    |> Repo.preload([:club, :department, :category, :rental_fees, units: :location, loans: {active_loans_query, [:unit, :location, :contact]}])
+    |> Repo.preload([:club, :department, :category, :rental_fees, units: :location, rentals: {active_rentals_query, [:unit, :location, :contact]}])
   end
 
   @doc """
@@ -306,11 +307,11 @@ defmodule Sportyweb.Rental do
 
 
 
-  def get_unit_with_inactive_loans!(id) do
-    inactive_loans_query = from(l in Loan, where: l.status != "active")
+  def get_unit_with_inactive_rentals!(id) do
+    inactive_rentals_query = from(l in Rental, where: l.status != "active")
     Unit
     |> Repo.get!(id)
-    |> Repo.preload([:location, article: :club, loans: {inactive_loans_query, [:article, :location, :contact]}])
+    |> Repo.preload([:location, article: :club, rentals: {inactive_rentals_query, [:article, :location, :contact]}])
   end
 
   @doc """
@@ -399,79 +400,79 @@ defmodule Sportyweb.Rental do
     Unit.changeset(unit, attrs)
   end
 
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory.Rental
 
   @doc """
-  Returns the list of loans.
+  Returns the list of rentals.
 
   ## Examples
 
-      iex> list_loans()
-      [%Loan{}, ...]
+      iex> list_rentals()
+      [%Rental{}, ...]
 
   """
-  def list_loans do
-    Repo.all(Loan)
+  def list_rentals do
+    Repo.all(Rental)
   end
 
   @doc """
-  Gets a single loan.
+  Gets a single rental.
 
-  Raises `Ecto.NoResultsError` if the Loan does not exist.
+  Raises `Ecto.NoResultsError` if the Rental does not exist.
 
   ## Examples
 
-      iex> get_loan!(123)
-      %Loan{}
+      iex> get_rental!(123)
+      %Rental{}
 
-      iex> get_loan!(456)
+      iex> get_rental!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_loan!(id), do: Repo.get!(Loan, id)
+  def get_rental!(id), do: Repo.get!(Rental, id)
 
   @doc """
-  Gets a single loan. Preloads associations.
+  Gets a single rental. Preloads associations.
 
-  Raises `Ecto.NoResultsError` if the Loan does not exist.
+  Raises `Ecto.NoResultsError` if the Rental does not exist.
 
   ## Examples
 
-      iex> get_loan!(123, [:club])
+      iex> get_rental!(123, [:club])
       %Unit{}
 
-      iex> get_loan!(456, [:club])
+      iex> get_rental!(456, [:club])
       ** (Ecto.NoResultsError)
 
   """
-  def get_loan!(id, preloads) do
-    Loan
+  def get_rental!(id, preloads) do
+    Rental
     |> Repo.get!(id)
     |> Repo.preload(preloads)
   end
 
   @doc """
-  Creates a loan under a transaction. Also updates the occupied status of the unit.
+  Creates a rental under a transaction. Also updates the occupied status of the unit.
 
   ## Examples
 
-      iex> c reate_loan(%{field: value})
-      {:ok, %Loan{}}
+      iex> c reate_rental(%{field: value})
+      {:ok, %Rental{}}
 
-      iex> create_loan(%{field: bad_value})
+      iex> create_rental(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_loan(attrs \\ %{}) do
-    loan_attrs = Map.merge(attrs, %{
+  def create_rental(attrs \\ %{}) do
+    rental_attrs = Map.merge(attrs, %{
       "status" => "active"
     })
 
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:loan, Loan.changeset(%Loan{}, loan_attrs))
-    |> Ecto.Multi.update(:unit, fn %{loan: loan} ->
+    |> Ecto.Multi.insert(:rental, Rental.changeset(%Rental{}, rental_attrs))
+    |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
       Unit.changeset(
-        get_unit!(loan.unit_id),
+        get_unit!(rental.unit_id),
         %{
           occupied: true
         }
@@ -481,110 +482,110 @@ defmodule Sportyweb.Rental do
   end
 
   @doc """
-  Updates a loan.
+  Updates a rental.
 
   ## Examples
 
-      iex> update_loan(loan, %{field: new_value})
-      {:ok, %Loan{}}
+      iex> update_rental(rental, %{field: new_value})
+      {:ok, %Rental{}}
 
-      iex> update_loan(loan, %{field: bad_value})
+      iex> update_rental(rental, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_loan(%Loan{} = loan, attrs) do
-    loan
-    |> Loan.changeset(attrs)
+  def update_rental(%Rental{} = rental, attrs) do
+    rental
+    |> Rental.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a loan.
+  Deletes a rental.
 
   ## Examples
 
-      iex> delete_loan(loan)
-      {:ok, %Loan{}}
+      iex> delete_rental(rental)
+      {:ok, %Rental{}}
 
-      iex> delete_loan(loan)
+      iex> delete_rental(rental)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_loan(%Loan{} = loan) do
-    Repo.delete(loan)
+  def delete_rental(%Rental{} = rental) do
+    Repo.delete(rental)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking loan changes.
+  Returns an `%Ecto.Changeset{}` for tracking rental changes.
 
   ## Examples
 
-      iex> change_loan(loan)
-      %Ecto.Changeset{data: %Loan{}}
+      iex> change_rental(rental)
+      %Ecto.Changeset{data: %Rental{}}
 
   """
-  def change_loan(%Loan{} = loan, attrs \\ %{}) do
-    Loan.changeset(loan, attrs)
+  def change_rental(%Rental{} = rental, attrs \\ %{}) do
+    Rental.changeset(rental, attrs)
   end
 
   @doc """
-  Calculates the return date for a given article based on the loan period defined in the article or its category.
+  Calculates the return date for a given article based on the rental period defined in the article or its category.
   ## Examples
 
       iex> calculate_return_date(article_id)
       ~D[2024-07-01]
 
-      iex> calculate_return_date(article_id_with_no_loan_period)
+      iex> calculate_return_date(article_id_with_no_rental_period)
       nil
   """
 
-  def calculate_return_date(article_id, loan_date) do
+  def calculate_return_date(article_id, rental_date) do
     article = get_article!(article_id, :category)
 
-    loan_period =
-      article.loan_period ||
-      if article.category, do: article.category.loan_period, else: nil
+    rental_period =
+      article.rental_period ||
+      if article.category, do: article.category.rental_period, else: nil
 
-    if loan_period do
-    Date.add(loan_date, loan_period)
+    if rental_period do
+    Date.add(rental_date, rental_period)
     else
       nil
     end
   end
 
 
-  def renew_loan(%Loan{} = loan, attrs) do
-    loan
-    |> Loan.changeset(attrs)
-    |> Loan.changeset(%{renewal_count: loan.renewal_count + 1})
+  def renew_rental(%Rental{} = rental, attrs) do
+    rental
+    |> Rental.changeset(attrs)
+    |> Rental.changeset(%{renewal_count: rental.renewal_count + 1})
     |> Repo.update()
   end
 
-  def return_loan(%Loan{} = loan, attrs) do
-    unit = get_unit!(loan.unit_id)
+  def return_rental(%Rental{} = rental, attrs) do
+    unit = get_unit!(rental.unit_id)
 
-    loan_attrs = Map.merge(attrs, %{
+    rental_attrs = Map.merge(attrs, %{
       "status" => "returned"
     })
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:loan, Loan.changeset(loan, loan_attrs))
+    |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
     |> Ecto.Multi.update(:unit, Unit.changeset(unit, %{occupied: false}))
     |> Repo.transaction()
   end
-  def calculate_new_return_date(%Loan{} = loan, article_id) do
-    article = get_article!(article_id, :loans)
+  def calculate_new_return_date(%Rental{} = rental, article_id) do
+    article = get_article!(article_id, :rentals)
 
     case article.renewal_period do
       nil ->
         nil
 
       renewal_period ->
-        Date.add(loan.return_date, renewal_period)
+        Date.add(rental.return_date, renewal_period)
     end
   end
 
-  alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Inventory.RentalFee
 
   @doc """
   Returns the list of rental_fee.
@@ -759,7 +760,7 @@ def list_belonging_rental_fees(article_id, contact_id) do
 end
 
 
-  alias Sportyweb.Rental.RentalRule
+  alias Sportyweb.Inventory.RentalRule
 
   @doc """
   Returns the list of rental_rules.
@@ -789,6 +790,15 @@ end
 
   """
   def get_rental_rule!(id), do: Repo.get!(RentalRule, id)
+
+
+  def get_applicable_rental_rule(article_id) do
+    article = get_article!(article_id, [:category])
+
+    Repo.get_by(RentalRule, article_id: article.id) ||
+      Repo.get_by(RentalRule, category_id: article.category_id)
+  end
+
 
 
   def get_rental_rule!(id, preloads) do

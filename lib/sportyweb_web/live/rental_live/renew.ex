@@ -1,7 +1,7 @@
-defmodule SportywebWeb.LoanLive.Renew do
+defmodule SportywebWeb.RentalLive.Renew do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
 
   @impl true
@@ -9,14 +9,14 @@ defmodule SportywebWeb.LoanLive.Renew do
     ~H"""
     <div>
       <.live_component
-        module={SportywebWeb.LoanLive.RenewComponent}
-        id={@loan.id}
+        module={SportywebWeb.RentalLive.RenewComponent}
+        id={@rental.id}
         title="Ausleihe verlängern"
         action={@live_action}
-        loan={@loan}
+        rental={@rental}
         article={@article}
         club={@club}
-        navigate={~p"/loans/#{@loan}"}
+        navigate={~p"/rentals/#{@rental}"}
       />
     </div>
     """
@@ -38,13 +38,13 @@ defmodule SportywebWeb.LoanLive.Renew do
 
 
   def apply_action(socket, :renew, %{"id" => id}) do
-    loan = Rental.get_loan!(id, article: :club)
+    rental = Inventory.get_rental!(id, article: :club)
 
     socket
     |> assign(:page_title, "Ausleihe verlängern")
-    |> assign(:loan, loan)
-    |> assign(:article, loan.article)
-    |> assign(:club, loan.article.club)
+    |> assign(:rental, rental)
+    |> assign(:article, rental.article)
+    |> assign(:club, rental.article.club)
   end
 
 end

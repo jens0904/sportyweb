@@ -2,7 +2,7 @@ defmodule SportywebWeb.RentalFeeLiveTest do
   use SportywebWeb.ConnCase
 
   import Phoenix.LiveViewTest
-  import Sportyweb.RentalFixtures
+  import Sportyweb.InventoryFixtures
 
   @create_attrs %{name: "some name"}
   @update_attrs %{name: "some updated name"}

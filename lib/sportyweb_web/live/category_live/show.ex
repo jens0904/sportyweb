@@ -1,7 +1,7 @@
 defmodule SportywebWeb.CategoryLive.Show do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   @impl true
   def mount(_params, _session, socket) do
@@ -11,7 +11,7 @@ defmodule SportywebWeb.CategoryLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     category =
-      Rental.get_category!(id, [:club, :rental_fees])
+      Inventory.get_category!(id, [:club, :rental_fees])
 
     {:noreply,
      socket

@@ -1,13 +1,13 @@
-defmodule Sportyweb.Rental.RentalFee do
+defmodule Sportyweb.Inventory.RentalFee do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
   alias Sportyweb.Organization
   alias Sportyweb.Organization.Club
-  alias Sportyweb.Rental.Article
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.Rental
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -17,7 +17,7 @@ defmodule Sportyweb.Rental.RentalFee do
     belongs_to :club, Club
     belongs_to :article, Article
     belongs_to :category, Category
-    has_many :loans, Loan
+    has_many :rentals, Rental
     many_to_many :categories, Category, join_through: CategoryRentalFee
     many_to_many :articles, Article, join_through: ArticleRentalFee
     field :scope, :string, virtual: true

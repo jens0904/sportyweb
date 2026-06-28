@@ -1,7 +1,7 @@
 defmodule SportywebWeb.RentalRuleLive.FormComponent do
   use SportywebWeb, :live_component
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   @impl true
   def render(assigns) do
@@ -86,14 +86,14 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
       <% end %>
 
       <.input
-        field={@form[:choose_loan_period]}
+        field={@form[:choose_rental_period]}
         type="checkbox"
         label="Festen Ausleihzeitraum definieren"
       />
 
-      <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_loan_period].value) do %>
+      <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
         <.input
-          field={@form[:loan_period_unit]}
+          field={@form[:rental_period_unit]}
           type="select"
           label="Einheit"
           options={[
@@ -102,16 +102,16 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
           ]}
         />
 
-        <%= if @form[:loan_period_unit].value == "hours" do %>
+        <%= if @form[:rental_period_unit].value == "hours" do %>
           <.input
-            field={@form[:loan_period]}
+            field={@form[:rental_period]}
             type="select"
             label="Ausleihzeitraum in Stunden"
             options={Enum.map(1..12, &{&1, &1})}
           />
         <% else %>
           <.input
-            field={@form[:loan_period]}
+            field={@form[:rental_period]}
             type="number"
             label="Ausleihzeitraum in Tagen"
           />
@@ -144,16 +144,16 @@ end
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:category_options, Rental.list_categories(assigns.club.id))
-     |> assign(:article_options, Rental.list_articles(assigns.club.id))
+     |> assign(:category_options, Inventory.list_categories(assigns.club.id))
+     |> assign(:article_options, Inventory.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
-       to_form(Rental.change_rental_rule(rental_rule))
+       to_form(Inventory.change_rental_rule(rental_rule))
      end)}
   end
 
   @impl true
   def handle_event("validate", %{"rental_rule" => rental_rule_params}, socket) do
-    changeset = Rental.change_rental_rule(socket.assigns.rental_rule, rental_rule_params)
+    changeset = Inventory.change_rental_rule(socket.assigns.rental_rule, rental_rule_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -167,7 +167,7 @@ end
         "club_id" => socket.assigns.rental_rule.club.id
       })
 
-    case Rental.update_rental_rule(socket.assigns.rental_rule, rental_rule_params) do
+    case Inventory.update_rental_rule(socket.assigns.rental_rule, rental_rule_params) do
       {:ok, _rental_rule} ->
         {:noreply,
          socket
@@ -185,7 +185,7 @@ end
         "club_id" => socket.assigns.rental_rule.club.id
       })
 
-    case Rental.create_rental_rule(rental_rule_params) do
+    case Inventory.create_rental_rule(rental_rule_params) do
       {:ok, _rental_rule} ->
         {:noreply,
          socket

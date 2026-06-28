@@ -1,7 +1,7 @@
-defmodule Sportyweb.RentalFixtures do
+defmodule Sportyweb.InventoryFixtures do
   @moduledoc """
   This module defines test helpers for creating
-  entities via the `Sportyweb.Rental` context.
+  entities via the `Sportyweb.Inventory` context.
   """
 
   @doc """
@@ -12,10 +12,10 @@ defmodule Sportyweb.RentalFixtures do
       attrs
       |> Enum.into(%{
         description: "some description",
-        loan_period: 42,
+        rental_period: 42,
         name: "some name"
       })
-      |> Sportyweb.Rental.create_category()
+      |> Sportyweb.Inventory.create_category()
 
     category
   end
@@ -32,7 +32,7 @@ defmodule Sportyweb.RentalFixtures do
         name: "some name",
         reference_number: "some reference_number"
       })
-      |> Sportyweb.Rental.create_article()
+      |> Sportyweb.Inventory.create_article()
 
     article
   end
@@ -48,24 +48,24 @@ defmodule Sportyweb.RentalFixtures do
         for_lending: true,
         serial_number: 42
       })
-      |> Sportyweb.Rental.create_unit()
+      |> Sportyweb.Inventory.create_unit()
 
     unit
   end
 
   @doc """
-  Generate a loan.
+  Generate a rental.
   """
-  def loan_fixture(attrs \\ %{}) do
-    {:ok, loan} =
+  def rental_fixture(attrs \\ %{}) do
+    {:ok, rental} =
       attrs
       |> Enum.into(%{
-        loan_number: "some loan_number",
+        rental_number: "some rental_number",
         return_date: ~D[2026-05-24]
       })
-      |> Sportyweb.Rental.create_loan()
+      |> Sportyweb.Inventory.create_rental()
 
-    loan
+    rental
   end
 
   @doc """
@@ -77,7 +77,7 @@ defmodule Sportyweb.RentalFixtures do
       |> Enum.into(%{
         name: "some name"
       })
-      |> Sportyweb.Rental.create_rental_fee()
+      |> Sportyweb.Inventory.create_rental_fee()
 
     rental_fee
   end
@@ -91,7 +91,7 @@ defmodule Sportyweb.RentalFixtures do
       |> Enum.into(%{
         name: "some name"
       })
-      |> Sportyweb.Rental.create_rental_rule()
+      |> Sportyweb.Inventory.create_rental_rule()
 
     rental_rule
   end

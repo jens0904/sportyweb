@@ -2,11 +2,11 @@ defmodule SportywebWeb.CategoryLiveTest do
   use SportywebWeb.ConnCase
 
   import Phoenix.LiveViewTest
-  import Sportyweb.RentalFixtures
+  import Sportyweb.InventoryFixtures
 
-  @create_attrs %{name: "some name", description: "some description", loan_period: 42}
-  @update_attrs %{name: "some updated name", description: "some updated description", loan_period: 43}
-  @invalid_attrs %{name: nil, description: nil, loan_period: nil}
+  @create_attrs %{name: "some name", description: "some description", rental_period: 42}
+  @update_attrs %{name: "some updated name", description: "some updated description", rental_period: 43}
+  @invalid_attrs %{name: nil, description: nil, rental_period: nil}
 
   defp create_category(_) do
     category = category_fixture()

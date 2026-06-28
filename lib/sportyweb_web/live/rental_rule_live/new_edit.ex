@@ -2,8 +2,8 @@ defmodule SportywebWeb.RentalRuleLive.NewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Organization
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.RentalRule
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.RentalRule
 
   @impl true
   def render(assigns) do
@@ -37,7 +37,7 @@ defmodule SportywebWeb.RentalRuleLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    rental_rule = Rental.get_rental_rule!(id, [:club])
+    rental_rule = Inventory.get_rental_rule!(id, [:club])
 
     socket
     |> assign(:page_title, "Ausleihregel bearbeiten")
@@ -59,8 +59,8 @@ defmodule SportywebWeb.RentalRuleLive.NewEdit do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    rental_rule = Rental.get_rental_rule!(id)
-    {:ok, _} = Rental.delete_rental_rule(rental_rule)
+    rental_rule = Inventory.get_rental_rule!(id)
+    {:ok, _} = Inventory.delete_rental_rule(rental_rule)
 
     {:noreply,
      socket

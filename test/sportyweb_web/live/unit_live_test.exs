@@ -2,7 +2,7 @@ defmodule SportywebWeb.UnitLiveTest do
   use SportywebWeb.ConnCase
 
   import Phoenix.LiveViewTest
-  import Sportyweb.RentalFixtures
+  import Sportyweb.InventoryFixtures
 
   @create_attrs %{serial_number: 42, for_lending: true, for_booking: true}
   @update_attrs %{serial_number: 43, for_lending: false, for_booking: false}

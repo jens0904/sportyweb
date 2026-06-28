@@ -5,7 +5,7 @@ defmodule Sportyweb.Personal do
 
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   alias Sportyweb.Legal.Contract
   alias Sportyweb.Personal.Contact
@@ -54,7 +54,7 @@ end
 
 
   def list_contracts(article_id, club_id) do
-    article = Rental.get_article!(article_id)
+    article = Inventory.get_article!(article_id)
     if is_nil(article.department_id) do
       query =
         from(

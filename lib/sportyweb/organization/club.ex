@@ -20,10 +20,10 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Polymorphic.FinancialData
   alias Sportyweb.Polymorphic.Note
   alias Sportyweb.Polymorphic.Phone
-  alias Sportyweb.Rental.Article
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.RentalFee
-  alias Sportyweb.Rental.RentalRule
+  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.RentalFee
+  alias Sportyweb.Inventory.RentalRule
 
 
   @primary_key {:id, :binary_id, autogenerate: true}

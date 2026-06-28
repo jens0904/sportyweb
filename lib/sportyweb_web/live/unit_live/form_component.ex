@@ -2,7 +2,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
   use SportywebWeb, :live_component
 
   alias Sportyweb.Asset
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   @impl true
   def render(assigns) do
@@ -68,14 +68,14 @@ defmodule SportywebWeb.UnitLive.FormComponent do
      |> assign(assigns)
      |> assign(:location_options, Asset.list_locations(assigns.club.id))
      |> assign_new(:form, fn ->
-       to_form(Rental.change_unit(unit))
+       to_form(Inventory.change_unit(unit))
      end)}
   end
 
   @impl true
   @spec handle_event(<<_::32, _::_*32>>, map(), any()) :: {:noreply, any()}
   def handle_event("validate", %{"unit" => unit_params}, socket) do
-    changeset = Rental.change_unit(socket.assigns.unit, unit_params)
+    changeset = Inventory.change_unit(socket.assigns.unit, unit_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -84,7 +84,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
   end
 
   defp save_unit(socket, :edit, unit_params) do
-    case Rental.update_unit(socket.assigns.unit, unit_params) do
+    case Inventory.update_unit(socket.assigns.unit, unit_params) do
       {:ok, _unit} ->
         {:noreply,
          socket
@@ -102,7 +102,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
         "article_id" => socket.assigns.unit.article.id
       })
 
-    case Rental.create_unit(unit_params) do
+    case Inventory.create_unit(unit_params) do
       {:ok, _unit} ->
         {:noreply,
          socket

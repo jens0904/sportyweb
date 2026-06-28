@@ -1,18 +1,18 @@
-defmodule Sportyweb.Rental.Unit do
+defmodule Sportyweb.Inventory.Unit do
   use Ecto.Schema
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
 
   alias Sportyweb.Asset.Location
-  alias Sportyweb.Rental.Article
-  alias Sportyweb.Rental.Loan
+  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.Rental
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "units" do
     belongs_to :article, Article
     belongs_to :location, Location
-    has_many :loans, Loan
+    has_many :rentals, Rental
     field :serial_number, :string
     field :for_lending, :boolean, default: true
     field :occupied, :boolean, default: false

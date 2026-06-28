@@ -1,7 +1,7 @@
-defmodule SportywebWeb.LoanLive.RenewComponent do
+defmodule SportywebWeb.RentalLive.RenewComponent do
   use SportywebWeb, :live_component
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   @impl true
   def render(assigns) do
@@ -12,10 +12,10 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
       </.header>
       <.card>
       <%= if @article.allow_renewal do %>
-        <%= if @loan.renewal_count < @article.max_renewals do %>
+        <%= if @rental.renewal_count < @article.max_renewals do %>
             <.simple_form
               for={@form}
-              id="loan-renew-form"
+              id="rental-renew-form"
               phx-target={@myself}
               phx-change="validate"
               phx-submit="save"
@@ -43,10 +43,10 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
   end
 
   @impl true
-  def update(%{loan: loan} = assigns, socket) do
-    return_date = Rental.calculate_new_return_date(loan, assigns.article.id)
+  def update(%{rental: rental} = assigns, socket) do
+    return_date = Inventory.calculate_new_return_date(rental, assigns.article.id)
 
-    changeset = Rental.change_loan(loan, %{"return_date" => return_date})
+    changeset = Inventory.change_rental(rental, %{"return_date" => return_date})
     {:ok,
      socket
      |> assign(assigns)
@@ -55,20 +55,20 @@ defmodule SportywebWeb.LoanLive.RenewComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"loan" => loan_params}, socket) do
-    changeset = Rental.change_loan(socket.assigns.loan, loan_params)
+  def handle_event("validate", %{"rental" => rental_params}, socket) do
+    changeset = Inventory.change_rental(socket.assigns.rental, rental_params)
 
       {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
   @impl true
-  def handle_event("save", %{"loan" => loan_params}, socket) do
-    case Rental.renew_loan(socket.assigns.loan, loan_params) do
-      {:ok, loan} ->
+  def handle_event("save", %{"rental" => rental_params}, socket) do
+    case Inventory.renew_rental(socket.assigns.rental, rental_params) do
+      {:ok, rental} ->
         {:noreply,
          socket
          |> put_flash(:info, "Ausleihe erfolgreich verlängert.")
-         |> push_navigate(to: ~p"/loans/#{loan}")}
+         |> push_navigate(to: ~p"/rentals/#{rental}")}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, :form, changeset)}

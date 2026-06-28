@@ -1,7 +1,7 @@
-defmodule SportywebWeb.LoanLive.ReturnComponent do
+defmodule SportywebWeb.RentalLive.ReturnComponent do
   use SportywebWeb, :live_component
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
 
   @impl true
@@ -10,7 +10,7 @@ defmodule SportywebWeb.LoanLive.ReturnComponent do
     <div>
       <.simple_form
         for={@form}
-        id="loan-return-form"
+        id="rental-return-form"
         phx-target={@myself}
         phx-change="validate"
         phx-submit="save"
@@ -23,8 +23,8 @@ defmodule SportywebWeb.LoanLive.ReturnComponent do
   end
 
   @impl true
-  def update(%{loan: loan} = assigns, socket) do
-    changeset = Rental.change_loan(loan)
+  def update(%{rental: rental} = assigns, socket) do
+    changeset = Inventory.change_rental(rental)
 
     {:ok,
      socket
@@ -33,21 +33,21 @@ defmodule SportywebWeb.LoanLive.ReturnComponent do
   end
 
   @impl true
-  def handle_event("validate", %{"loan" => loan_params}, socket) do
-    changeset = Rental.change_loan(socket.assigns.loan, loan_params)
+  def handle_event("validate", %{"rental" => rental_params}, socket) do
+    changeset = Inventory.change_rental(socket.assigns.rental, rental_params)
 
       {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
-  def handle_event("save", %{"loan" => loan_params}, socket) do
-    case Rental.return_loan(socket.assigns.loan, loan_params) do
-      {:ok, %{loan: _loan}} ->
+  def handle_event("save", %{"rental" => rental_params}, socket) do
+    case Inventory.return_rental(socket.assigns.rental, rental_params) do
+      {:ok, %{rental: _rental}} ->
         {:noreply,
          socket
          |> put_flash(:info, "Ausleihe erfolgreich zurückgegeben")
          |> push_navigate(to: socket.assigns.navigate)}
 
-      {:error, :loan, %Ecto.Changeset{} = changeset, _changes} ->
+      {:error, :rental, %Ecto.Changeset{} = changeset, _changes} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
 
       {:error, :unit, %Ecto.Changeset{} = _changeset, _changes} ->

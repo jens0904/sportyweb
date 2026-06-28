@@ -1,7 +1,7 @@
 defmodule SportywebWeb.ArticleLive.FormComponent do
   use SportywebWeb, :live_component
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
   alias Sportyweb.Organization
 
   @impl true
@@ -50,22 +50,22 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
           <.input field={@form[:renewal_period]} type="number" label="Verlängerungszeitraum in Tagen" />
         <% end %>
         <.input
-          field={@form[:choose_loan_period]}
+          field={@form[:choose_rental_period]}
           type="checkbox"
           label="festen Ausleihzeitraum hinzufügen"
         />
-        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_loan_period].value) do %>
-          <.input field={@form[:loan_period_unit]} type="select" label="Bitte wählen Sie die gewünschte Einheit aus" options={[{"Stunden", "hours"}, {"Tage", "days"}]}  />
-          <%= if @form[:loan_period_unit].value == "hours" do %>
+        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
+          <.input field={@form[:rental_period_unit]} type="select" label="Bitte wählen Sie die gewünschte Einheit aus" options={[{"Stunden", "hours"}, {"Tage", "days"}]}  />
+          <%= if @form[:rental_period_unit].value == "hours" do %>
              <.input
-               field={@form[:loan_period]}
+               field={@form[:rental_period]}
                type="select"
                label="Ausleihzeitraum in Stunden"
                options={Enum.map(1..12, fn n -> {n, n} end)}
               />
          <% else %>
           <.input
-            field={@form[:loan_period]}
+            field={@form[:rental_period]}
             type="number"
             label="Ausleihzeitraum in Tagen"
           />
@@ -94,15 +94,15 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:department_options, Organization.list_departments(assigns.club.id))
-     |> assign(:category_options, Rental.list_categories(assigns.club.id))
+     |> assign(:category_options, Inventory.list_categories(assigns.club.id))
      |> assign_new(:form, fn ->
-       to_form(Rental.change_article(article))
+       to_form(Inventory.change_article(article))
      end)}
   end
 
   @impl true
   def handle_event("validate", %{"article" => article_params}, socket) do
-    changeset = Rental.change_article(socket.assigns.article, article_params)
+    changeset = Inventory.change_article(socket.assigns.article, article_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -116,7 +116,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
         "club_id" => socket.assigns.article.club.id
       })
 
-    case Rental.update_article(socket.assigns.article, article_params) do
+    case Inventory.update_article(socket.assigns.article, article_params) do
       {:ok, _article} ->
         {:noreply,
          socket
@@ -134,7 +134,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
         "club_id" => socket.assigns.article.club.id
       })
 
-    case Rental.create_article(article_params) do
+    case Inventory.create_article(article_params) do
       {:ok, _article} ->
         {:noreply,
          socket

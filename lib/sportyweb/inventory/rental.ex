@@ -1,4 +1,4 @@
-defmodule Sportyweb.Rental.Loan do
+defmodule Sportyweb.Inventory.Rental do
   use Ecto.Schema
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
@@ -6,21 +6,21 @@ defmodule Sportyweb.Rental.Loan do
   alias Sportyweb.Asset.Location
   alias Sportyweb.Finance.Fee
   alias Sportyweb.Personal.Contact
-  alias Sportyweb.Rental.Article
-  alias Sportyweb.Rental.Unit
-  alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.Unit
+  alias Sportyweb.Inventory.RentalFee
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "loans" do
+  schema "rentals" do
     belongs_to :article, Article
     belongs_to :contact, Contact
     belongs_to :location, Location
     belongs_to :unit, Unit
     belongs_to :rental_fee, RentalFee
-    field :loan_number, :string
-    field :loan_date, :date, default: Date.utc_today()
+    field :rental_number, :string
+    field :rental_date, :date, default: Date.utc_today()
     field :return_date, :date
     field :renewal_count, :integer, default: 0
     field :return_comment, :string
@@ -38,12 +38,12 @@ defmodule Sportyweb.Rental.Loan do
   end
 
   @doc false
-  def changeset(loan, attrs) do
-    loan
-    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date, :renewal_count, :return_comment, :status])
-    |> validate_required([:return_date, :location_id, :article_id, :unit_id, :contact_id, :loan_date])
-    |> validate_dates_order(:loan_date, :return_date, "Das Rückgabedatum muss nach dem Ausleihdatum liegen.")
-    |> validate_max_loan_duration(180)
+  def changeset(rental, attrs) do
+    rental
+    |> cast(attrs, [:return_date, :location_id, :article_id, :unit_id, :contact_id, :rental_date, :renewal_count, :return_comment, :status])
+    |> validate_required([:return_date, :location_id, :article_id, :unit_id, :contact_id, :rental_date])
+    |> validate_dates_order(:rental_date, :return_date, "Das Rückgabedatum muss nach dem Ausleihdatum liegen.")
+    |> validate_max_rental_duration(180)
     |> validate_inclusion(:status, get_valid_statuses() |> Enum.map(&(&1[:value])))
 
   end

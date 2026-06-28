@@ -1,10 +1,10 @@
-defmodule Sportyweb.Rental.Category do
+defmodule Sportyweb.Inventory.Category do
   use Ecto.Schema
   import Ecto.Changeset
   alias Sportyweb.Organization.Club
-  alias Sportyweb.Rental.Article
-  alias Sportyweb.Rental.CategoryRentalFee
-  alias Sportyweb.Rental.RentalFee
+  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.CategoryRentalFee
+  alias Sportyweb.Inventory.RentalFee
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -16,15 +16,15 @@ defmodule Sportyweb.Rental.Category do
 
     field :name, :string
     field :description, :string
-    field :loan_period, :integer
-    field :loan_period_unit, :string, default: "Tage"
+    field :rental_period, :integer
+    field :rental_period_unit, :string, default: "Tage"
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(category, attrs) do
     category
-    |> cast(attrs, [:name, :description, :loan_period, :loan_period_unit, :club_id])
+    |> cast(attrs, [:name, :description, :rental_period, :rental_period_unit, :club_id])
     |> validate_required([:name, :description, :club_id])
     |> unique_constraint(
       :name,

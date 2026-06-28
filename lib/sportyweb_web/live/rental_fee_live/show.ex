@@ -1,7 +1,7 @@
 defmodule SportywebWeb.RentalFeeLive.Show do
   use SportywebWeb, :live_view
 
-  alias Sportyweb.Rental
+  alias Sportyweb.Inventory
 
   @impl true
   def mount(_params, _session, socket) do
@@ -11,7 +11,7 @@ defmodule SportywebWeb.RentalFeeLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     rental_fee =
-      Rental.get_rental_fee!(id, article: :club)
+      Inventory.get_rental_fee!(id, article: :club)
 
     {:noreply,
      socket

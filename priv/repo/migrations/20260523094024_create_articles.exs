@@ -8,11 +8,11 @@ defmodule Sportyweb.Repo.Migrations.CreateArticles do
       add :description, :text, null: false
       add :reference_number, :string, null: false
       add :costs_of_loss, :money_with_currency, null: false
-      add :choose_loan_period, :boolean, default: false
+      add :choose_rental_period, :boolean, default: false
       add :for_club_members, :boolean, default: false
       add :for_non_members, :boolean, default: false
-      add :loan_period, :integer, null: true
-      add :loan_period_unit, :string, null: true
+      add :rental_period, :integer, null: true
+      add :rental_period_unit, :string, null: true
       add :allow_renewal, :boolean, default: false
       add :max_renewals, :integer
       add :renewal_period, :integer

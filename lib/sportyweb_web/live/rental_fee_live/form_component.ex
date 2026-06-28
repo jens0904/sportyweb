@@ -2,9 +2,9 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   use SportywebWeb, :live_component
 
   alias Sportyweb.Organization.Club
-  alias Sportyweb.Rental
-  alias Sportyweb.Rental.Category
-  alias Sportyweb.Rental.Article
+  alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Category
+  alias Sportyweb.Inventory.Article
 
   @impl true
   def render(assigns) do
@@ -135,16 +135,16 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
-     |> assign(:category_options, Rental.list_categories(assigns.club.id))
-     |> assign(:article_options, Rental.list_articles(assigns.club.id))
+     |> assign(:category_options, Inventory.list_categories(assigns.club.id))
+     |> assign(:article_options, Inventory.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
-       to_form(Rental.change_rental_fee(rental_fee))
+       to_form(Inventory.change_rental_fee(rental_fee))
      end)}
   end
 
   @impl true
   def handle_event("validate", %{"rental_fee" => rental_fee_params}, socket) do
-    changeset = Rental.change_rental_fee(socket.assigns.rental_fee, rental_fee_params)
+    changeset = Inventory.change_rental_fee(socket.assigns.rental_fee, rental_fee_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
@@ -153,7 +153,7 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   end
 
   defp save_rental_fee(socket, :edit, rental_fee_params) do
-    case Rental.update_rental_fee(socket.assigns.rental_fee, rental_fee_params) do
+    case Inventory.update_rental_fee(socket.assigns.rental_fee, rental_fee_params) do
       {:ok, _rental_fee} ->
         {:noreply,
          socket
@@ -171,7 +171,7 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
       "club_id" => socket.assigns.rental_fee.club.id
     })
 
-    case Rental.create_rental_fee(rental_fee_params) do
+    case Inventory.create_rental_fee(rental_fee_params) do
       {:ok, _rental_fee} ->
 
             {:noreply,
