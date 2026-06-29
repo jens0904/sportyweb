@@ -90,4 +90,31 @@ defmodule SportywebWeb.CommonValidations do
       changeset
     end
   end
+
+
+  @doc """
+Validates that the UTC datetime value of field_1 is smaller than or equal to field_2.
+Either field can be nil.
+
+Takes a custom error message as optional parameter.
+
+## Examples
+
+    changeset
+    |> validate_datetimes_order(:rental_date, :return_date, "Custom error")
+
+"""
+  def validate_datetimes_order(changeset, field_1, field_2, message \\ "Error!") do
+    field_1_datetime_value = get_field(changeset, field_1)
+    field_2_datetime_value = get_field(changeset, field_2)
+
+    if field_1_datetime_value &&
+        field_2_datetime_value &&
+        DateTime.compare(field_2_datetime_value, field_1_datetime_value) == :lt do
+      add_error(changeset, field_2, message)
+    else
+      changeset
+    end
+  end
+
 end

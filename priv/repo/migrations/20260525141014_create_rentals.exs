@@ -5,8 +5,8 @@ defmodule Sportyweb.Repo.Migrations.CreateRentals do
     create table(:rentals, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :rental_number, :string
-      add :rental_date, :date, null: false
-      add :return_date, :date, null: false
+      add :rental_date, :utc_datetime, null: false
+      add :return_date, :utc_datetime, null: false
       add :renewal_count, :integer, null: false
       add :return_comment, :string
       add :status, :string, null: false

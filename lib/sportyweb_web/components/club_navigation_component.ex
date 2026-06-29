@@ -107,18 +107,6 @@ defmodule SportywebWeb.ClubNavigationComponent do
           </li>
           <li>
             <.link
-              navigate={~p"/clubs/#{@club}/rental_rules"}
-              class={[
-                @classes_menu_item,
-                @classes_submenu_item,
-                if(@club_navigation_current_item == :rental_rules, do: @classes_menu_item_active)
-              ]}
-            >
-              <span class="truncate">Ausleihregeln</span>
-            </.link>
-          </li>
-          <li>
-            <.link
               navigate={~p"/clubs/#{@club}/articles"}
               class={[
                 @classes_menu_item,
@@ -127,6 +115,18 @@ defmodule SportywebWeb.ClubNavigationComponent do
               ]}
             >
               <span class="truncate">Artikel</span>
+            </.link>
+          </li>
+          <li>
+            <.link
+              navigate={~p"/clubs/#{@club}/rental_rules"}
+              class={[
+                @classes_menu_item,
+                @classes_submenu_item,
+                if(@club_navigation_current_item == :rental_rules, do: @classes_menu_item_active)
+              ]}
+            >
+              <span class="truncate">Mietregeln</span>
             </.link>
           </li>
           <li>

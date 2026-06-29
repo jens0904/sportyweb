@@ -190,7 +190,7 @@ defmodule Sportyweb.Inventory do
     active_rentals_query = from(l in Rental, where: l.status == "active")
     Article
     |> Repo.get!(id)
-    |> Repo.preload([:club, :department, :category, :rental_fees, units: :location, rentals: {active_rentals_query, [:unit, :location, :contact]}])
+    |> Repo.preload([:club, :department, :category, units: :location, rentals: {active_rentals_query, [:unit, :location, :contact]}])
   end
 
   @doc """
@@ -467,9 +467,10 @@ defmodule Sportyweb.Inventory do
     rental_attrs = Map.merge(attrs, %{
       "status" => "active"
     })
+    max_return_date = calculate_max_return_date(rental_attrs["article_id"], rental_attrs["rental_date"])
 
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:rental, Rental.changeset(%Rental{}, rental_attrs))
+    |> Ecto.Multi.insert(:rental, Rental.changeset(%Rental{}, rental_attrs, max_return_date))
     |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
       Unit.changeset(
         get_unit!(rental.unit_id),
@@ -525,8 +526,48 @@ defmodule Sportyweb.Inventory do
 
   """
   def change_rental(%Rental{} = rental, attrs \\ %{}) do
-    Rental.changeset(rental, attrs)
+    article_id = attrs["article_id"] || rental.article_id
+    rental_date = attrs["rental_date"] || rental.rental_date
+
+    max_return_date =
+      if article_id && rental_date do
+        calculate_max_return_date(article_id, rental_date)
+      end
+
+      Rental.changeset(rental, attrs, max_return_date)
+    end
+
+  def calculate_max_return_date(article_id, rental_date) do
+    with %DateTime{} = rental_date <- normalize_datetime(rental_date),
+       %{choose_rental_period: true, rental_period: period, rental_period_unit: unit}
+       when not is_nil(period) <- get_applicable_rental_rule(article_id) do
+      add_period(rental_date, period, unit)
+    else
+      _ -> nil
+    end
   end
+
+  defp normalize_datetime(%DateTime{} = datetime), do: datetime
+
+  defp normalize_datetime(datetime) when is_binary(datetime) do
+    case DateTime.from_iso8601(datetime) do
+      {:ok, datetime, _offset} -> datetime
+      _ -> nil
+    end
+  end
+
+  defp normalize_datetime(_), do: nil
+
+  defp add_period(datetime, period, "Stunden"),
+    do: DateTime.add(datetime, period * 3_600, :second)
+
+  defp add_period(datetime, period, "Tage"),
+    do: DateTime.add(datetime, period * 86_400, :second)
+
+  defp add_period(datetime, period, "Wochen"),
+    do: DateTime.add(datetime, period * 7 * 86_400, :second)
+
+  defp add_period(datetime, _period, _unit), do: datetime
 
   @doc """
   Calculates the return date for a given article based on the rental period defined in the article or its category.
@@ -540,16 +581,17 @@ defmodule Sportyweb.Inventory do
   """
 
   def calculate_return_date(article_id, rental_date) do
-    article = get_article!(article_id, :category)
+    case get_applicable_rental_rule(article_id) do
+      %{choose_rental_period: true, rental_period: rental_period, rental_period_unit: unit}
+      when not is_nil(rental_period) and unit in ["Tage", "days"] ->
+        DateTime.add(rental_date, rental_period * 24 * 60 * 60, :second)
 
-    rental_period =
-      article.rental_period ||
-      if article.category, do: article.category.rental_period, else: nil
+      %{choose_rental_period: true, rental_period: rental_period, rental_period_unit: unit}
+      when not is_nil(rental_period) and unit in ["Stunden", "hours"] ->
+        DateTime.add(rental_date, rental_period * 60 * 60, :second)
 
-    if rental_period do
-    Date.add(rental_date, rental_period)
-    else
-      nil
+      _ ->
+        nil
     end
   end
 
@@ -573,14 +615,21 @@ defmodule Sportyweb.Inventory do
     |> Ecto.Multi.update(:unit, Unit.changeset(unit, %{occupied: false}))
     |> Repo.transaction()
   end
-  def calculate_new_return_date(%Rental{} = rental, article_id) do
-    article = get_article!(article_id, :rentals)
 
-    case article.renewal_period do
+  def calculate_new_return_date(%Rental{} = rental, article_id) do
+  rental_rule = get_applicable_rental_rule(article_id)
+
+    case rental_rule do
       nil ->
         nil
 
-      renewal_period ->
+      %{allow_renewal: false} ->
+        nil
+
+      %{renewal_period: nil} ->
+        nil
+
+      %{renewal_period: renewal_period} ->
         Date.add(rental.return_date, renewal_period)
     end
   end

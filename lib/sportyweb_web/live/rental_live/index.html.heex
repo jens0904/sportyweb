@@ -17,7 +17,13 @@
       <:col :let={{_id, rental}} label="Artikel">{rental.article.name}</:col>
       <:col :let={{_id, rental}} label="Standort">{rental.location.name}</:col>
       <:col :let={{_id, rental}} label="Einheit">{rental.rental_date}</:col>
-      <:col :let={{_id, rental}} label="Return date">{rental.return_date}</:col>
+      <:col :let={{_id, rental}} label="Rückgabedatum">
+        <%= if rental.article.rental_rule.rental_period_unit == "Stunden" do %>
+          {format_datetime_field(rental.return_date)}
+        <% else %>
+          {format_date_field_dmy(rental.return_date)}
+        <% end %>
+      </:col>
       <:action :let={{_id, rental}}>
         <div class="sr-only">
           <.link navigate={~p"/rentals/#{rental}"}>Show</.link>

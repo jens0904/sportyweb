@@ -51,7 +51,7 @@ defmodule SportywebWeb.RentalLive.NewEdit do
     |> assign(:rental, %Rental{
       article_id: article.id,
       article: article,
-      rental_date: Date.utc_today()
+      rental_date: DateTime.utc_now() |> DateTime.truncate(:second)
     })
     |> assign(:article, article)
     |> assign(:club, article.club)

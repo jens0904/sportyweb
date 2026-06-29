@@ -45,6 +45,32 @@ defmodule SportywebWeb.CommonHelper do
   end
 
   @doc """
+  Takes a date and returns a string that is formated as "day.month.year".
+  If the date is nil, the function returns a string containg a hyphen.
+
+  ## Examples
+
+      iex> format_date_field_dmy(Date.utc_today())
+      "01.01.2023"
+
+      iex> format_date_field_dmy(nil)
+      "-"
+
+  """
+
+  def format_datetime_field(datetime, show_time \\ true)
+
+  def format_datetime_field(nil, _show_time), do: "-"
+
+  def format_datetime_field(datetime, true) do
+    Calendar.strftime(datetime, "%d.%m.%Y %H:%M")
+  end
+
+  def format_datetime_field(datetime, false) do
+    Calendar.strftime(datetime, "%d.%m.%Y")
+  end
+
+  @doc """
   Takes a list of structs and returns a comma separated list of one attribute.
   If the list is empty, the function returns a string containg a hyphen.
 

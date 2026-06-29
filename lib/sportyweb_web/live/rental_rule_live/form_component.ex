@@ -64,59 +64,104 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
         label="Für Nichtmitglieder"
       />
 
-      <.input
-        field={@form[:allow_renewal]}
-        type="checkbox"
-        label="Verlängerung erlauben"
-      />
 
-      <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
-        <.input
-          field={@form[:max_renewals]}
-          type="select"
-          label="Maximale Anzahl Verlängerungen"
-          options={1..5}
-        />
-
-        <.input
-          field={@form[:renewal_period]}
-          type="number"
-          label="Verlängerungszeitraum in Tagen"
-        />
-      <% end %>
-
-      <.input
-        field={@form[:choose_rental_period]}
-        type="checkbox"
-        label="Festen Ausleihzeitraum definieren"
-      />
-
-      <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
         <.input
           field={@form[:rental_period_unit]}
           type="select"
           label="Einheit"
+          prompt="Bitte auswählen"
           options={[
-            {"Stunden", "hours"},
-            {"Tage", "days"}
+            {"Stunden", "Stunden"},
+            {"Tage", "Tage"},
+            {"Wochen", "Wochen"}
           ]}
         />
 
-        <%= if @form[:rental_period_unit].value == "hours" do %>
-          <.input
-            field={@form[:rental_period]}
-            type="select"
-            label="Ausleihzeitraum in Stunden"
-            options={Enum.map(1..12, &{&1, &1})}
-          />
-        <% else %>
-          <.input
-            field={@form[:rental_period]}
-            type="number"
-            label="Ausleihzeitraum in Tagen"
-          />
+        <.input
+          field={@form[:choose_rental_period]}
+          type="checkbox"
+          label="Feste Dauer definieren"
+        />
+
+        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
+          <%= case @form[:rental_period_unit].value do %>
+            <% "Stunden" -> %>
+              <.input
+                field={@form[:rental_period]}
+                type="select"
+                label="Dauer"
+                prompt="Bitte auswählen"
+                options={Enum.map(1..12, &{"#{&1} Stunde#{if &1 == 1, do: "", else: "n"}", &1})}
+              />
+
+            <% "Tage" -> %>
+              <.input
+                field={@form[:rental_period]}
+                type="select"
+                label="Dauer"
+                prompt="Bitte auswählen"
+                options={Enum.map(1..7, &{"#{&1} Tag#{if &1 == 1, do: "", else: "e"}", &1})}
+              />
+
+            <% "Wochen" -> %>
+              <.input
+                field={@form[:rental_period]}
+                type="select"
+                label="Dauer"
+                prompt="Bitte auswählen"
+                options={Enum.map(1..10, &{"#{&1} Woche#{if &1 == 1, do: "", else: "n"}", &1})}
+              />
+
+            <% _ -> %>
+          <% end %>
+        <% end %>
+              <.input
+                field={@form[:allow_renewal]}
+                type="checkbox"
+                label="Verlängerung erlauben"
+              />
+
+          <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
+            <.input
+              field={@form[:max_renewals]}
+              type="select"
+              label="Maximale Anzahl Verlängerungen"
+              options={1..5}
+            />
+
+          <%= case @form[:rental_period_unit].value do %>
+            <% "Stunden" -> %>
+              <.input
+                field={@form[:renewal_period]}
+                type="select"
+                label="Verlängerungszeitraum"
+                prompt="Bitte auswählen"
+                options={Enum.map(1..12, &{"#{&1} Stunde#{if &1 == 1, do: "", else: "n"}", &1})}
+              />
+
+            <% "Tage" -> %>
+              <.input
+                field={@form[:renewal_period]}
+                type="select"
+                label="Verlängerungszeitraum"
+                prompt="Bitte auswählen"
+                options={Enum.map(1..7, &{"#{&1} Tag#{if &1 == 1, do: "", else: "e"}", &1})}
+              />
+
+            <% "Wochen" -> %>
+              <.input
+                field={@form[:renewal_period]}
+                type="select"
+                label="Verlängerungszeitraum"
+                prompt="Bitte auswählen"
+                options={Enum.map(1..10, &{"#{&1} Woche#{if &1 == 1, do: "", else: "n"}", &1})}
+              />
+
+            <% _ -> %>
+
         <% end %>
       <% end %>
+
 
       <:actions>
         <.button phx-disable-with="Saving...">Speichern</.button>

@@ -22,7 +22,7 @@ defmodule SportywebWeb.RentalRuleLive.Index do
     club = Organization.get_club!(club_id, rental_rules: [:category, :article])
 
     socket
-    |> assign(:page_title, "Ausleihregeln")
+    |> assign(:page_title, "Mietregeln")
     |> assign(:club, club)
     |> stream(:rental_rules, club.rental_rules)
   end
