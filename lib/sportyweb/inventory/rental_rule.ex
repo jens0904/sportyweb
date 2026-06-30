@@ -49,5 +49,9 @@ def changeset(rental_rule, attrs) do
   |> foreign_key_constraint(:club_id)
   |> foreign_key_constraint(:category_id)
   |> foreign_key_constraint(:article_id)
+  |> unique_constraint(:article_id, name: :rental_rules_unique_article_id_index)
+  |> unique_constraint(:category_id, name: :rental_rules_unique_category_id_index)
+  |> unique_constraint(:club_id, name: :rental_rules_unique_club_rule_index)
 end
+
 end

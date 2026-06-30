@@ -188,9 +188,16 @@ defmodule Sportyweb.Inventory do
 
   def get_article_with_active_rentals!(id) do
     active_rentals_query = from(l in Rental, where: l.status == "active")
+
     Article
     |> Repo.get!(id)
-    |> Repo.preload([:club, :department, :category, units: :location, rentals: {active_rentals_query, [:unit, :location, :contact]}])
+    |> Repo.preload([
+      :club,
+      :department,
+      :category,
+      units: :location,
+      rentals: {active_rentals_query, [:unit, :location, :contact]}
+    ])
   end
 
   @doc """
@@ -258,7 +265,6 @@ defmodule Sportyweb.Inventory do
     Article.changeset(article, attrs)
   end
 
-
   @doc """
   Returns the list of units.
 
@@ -305,13 +311,16 @@ defmodule Sportyweb.Inventory do
   """
   def get_unit!(id), do: Repo.get!(Unit, id)
 
-
-
   def get_unit_with_inactive_rentals!(id) do
     inactive_rentals_query = from(l in Rental, where: l.status != "active")
+
     Unit
     |> Repo.get!(id)
-    |> Repo.preload([:location, article: :club, rentals: {inactive_rentals_query, [:article, :location, :contact]}])
+    |> Repo.preload([
+      :location,
+      article: :club,
+      rentals: {inactive_rentals_query, [:article, :location, :contact]}
+    ])
   end
 
   @doc """
@@ -464,20 +473,21 @@ defmodule Sportyweb.Inventory do
 
   """
   def create_rental(attrs \\ %{}) do
-    rental_attrs = Map.merge(attrs, %{
-      "status" => "active"
-    })
-    max_return_date = calculate_max_return_date(rental_attrs["article_id"], rental_attrs["rental_date"])
+    rental_attrs =
+      Map.merge(attrs, %{
+        "status" => "active"
+      })
+
+    rental_rule = get_applicable_rental_rule(rental_attrs["article_id"])
+    max_return_date =
+      calculate_max_return_date(rental_attrs["article_id"], rental_attrs["rental_date"])
 
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:rental, Rental.changeset(%Rental{}, rental_attrs, max_return_date))
+    |> Ecto.Multi.insert(:rental, Rental.changeset(%Rental{}, rental_attrs, max_return_date, rental_rule && rental_rule.rental_period_unit))
     |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
-      Unit.changeset(
-        get_unit!(rental.unit_id),
-        %{
-          occupied: true
-        }
-      )
+      rental.unit_id
+      |> get_unit!()
+      |> Unit.occupied_changeset(%{occupied: true})
     end)
     |> Repo.transaction()
   end
@@ -529,18 +539,22 @@ defmodule Sportyweb.Inventory do
     article_id = attrs["article_id"] || rental.article_id
     rental_date = attrs["rental_date"] || rental.rental_date
 
+    rental_rule = if article_id do
+      get_applicable_rental_rule(article_id)
+
+    end
     max_return_date =
       if article_id && rental_date do
         calculate_max_return_date(article_id, rental_date)
       end
 
-      Rental.changeset(rental, attrs, max_return_date)
-    end
+    Rental.changeset(rental, attrs, max_return_date, rental_rule && rental_rule.rental_period_unit)
+  end
 
   def calculate_max_return_date(article_id, rental_date) do
     with %DateTime{} = rental_date <- normalize_datetime(rental_date),
-       %{choose_rental_period: true, rental_period: period, rental_period_unit: unit}
-       when not is_nil(period) <- get_applicable_rental_rule(article_id) do
+         %{choose_rental_period: true, rental_period: period, rental_period_unit: unit}
+         when not is_nil(period) <- get_applicable_rental_rule(article_id) do
       add_period(rental_date, period, unit)
     else
       _ -> nil
@@ -595,7 +609,6 @@ defmodule Sportyweb.Inventory do
     end
   end
 
-
   def renew_rental(%Rental{} = rental, attrs) do
     rental
     |> Rental.changeset(attrs)
@@ -606,9 +619,10 @@ defmodule Sportyweb.Inventory do
   def return_rental(%Rental{} = rental, attrs) do
     unit = get_unit!(rental.unit_id)
 
-    rental_attrs = Map.merge(attrs, %{
-      "status" => "returned"
-    })
+    rental_attrs =
+      Map.merge(attrs, %{
+        "status" => "returned"
+      })
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
@@ -617,7 +631,7 @@ defmodule Sportyweb.Inventory do
   end
 
   def calculate_new_return_date(%Rental{} = rental, article_id) do
-  rental_rule = get_applicable_rental_rule(article_id)
+    rental_rule = get_applicable_rental_rule(article_id)
 
     case rental_rule do
       nil ->
@@ -649,6 +663,14 @@ defmodule Sportyweb.Inventory do
     Repo.all(RentalFee)
   end
 
+
+
+  def list_applicable_rental_fees(club_id) do
+    RentalFee
+    |> where([r], r.club_id == ^club_id)
+    |> preload([:category, :article])
+    |> Repo.all()
+  end
   @doc """
   Gets a single rental_fee.
 
@@ -684,6 +706,7 @@ defmodule Sportyweb.Inventory do
     |> Repo.get!(id)
     |> Repo.preload(preloads)
   end
+
   @doc """
   Creates a rental_fee.
 
@@ -763,51 +786,49 @@ defmodule Sportyweb.Inventory do
     })
   end
 
+  def list_belonging_rental_fees(article_id, contact_id) do
+    IO.inspect(article_id, label: "article")
+    IO.inspect(contact_id, label: "contact")
 
+    if is_nil(contact_id) || (is_binary(contact_id) && String.trim(contact_id) == "") do
+      []
+    else
+      contact = Personal.get_contact!(contact_id, [:contracts])
 
-def list_belonging_rental_fees(article_id, contact_id) do
-  IO.inspect(article_id, label: "article")
-  IO.inspect(contact_id, label: "contact")
+      query =
+        from rf in RentalFee,
+          where: rf.article_id == ^article_id
 
-  if is_nil(contact_id) || (is_binary(contact_id) && String.trim(contact_id) == "") do
-    []
-  else
-    contact = Personal.get_contact!(contact_id, [:contracts])
+      query =
+        if Contact.has_active_membership_contract?(contact) do
+          from rf in query,
+            where: rf.member_type == ^:member,
+            order_by: [asc: rf.name]
+        else
+          from rf in query,
+            where: rf.member_type == ^:non_member or is_nil(rf.member_type),
+            order_by: [asc: rf.name]
+        end
 
-    query =
-    from rf in RentalFee,
-    where: rf.article_id == ^article_id
+      query =
+        if Contact.is_person?(contact) do
+          contact_age_in_years = Contact.age_in_years(contact)
 
-    query =
-  if Contact.has_active_membership_contract?(contact) do
-    from rf in query,
-      where: rf.member_type == ^:member,
-      order_by: [asc: rf.name]
-  else
-    from rf in query,
-      where: rf.member_type == ^:non_member or is_nil(rf.member_type),
-      order_by: [asc: rf.name]
+          from rf in query,
+            where:
+              is_nil(rf.minimum_age_in_years) or
+                rf.minimum_age_in_years <= ^contact_age_in_years,
+            where:
+              is_nil(rf.maximum_age_in_years) or
+                rf.maximum_age_in_years >= ^contact_age_in_years
+        else
+          query
+        end
+
+      IO.inspect(Repo.all(query), label: "Rental Fees")
+      Repo.all(query)
+    end
   end
-
-    query =
-      if Contact.is_person?(contact) do
-        contact_age_in_years = Contact.age_in_years(contact)
-
-        from rf in query,
-          where:
-            is_nil(rf.minimum_age_in_years) or
-              rf.minimum_age_in_years <= ^contact_age_in_years,
-          where:
-            is_nil(rf.maximum_age_in_years) or
-              rf.maximum_age_in_years >= ^contact_age_in_years
-      else
-        query
-      end
-    IO.inspect(Repo.all(query), label: "Rental Fees")
-    Repo.all(query)
-  end
-end
-
 
   alias Sportyweb.Inventory.RentalRule
 
@@ -840,21 +861,37 @@ end
   """
   def get_rental_rule!(id), do: Repo.get!(RentalRule, id)
 
-
   def get_applicable_rental_rule(article_id) do
     article = get_article!(article_id, [:category])
 
     Repo.get_by(RentalRule, article_id: article.id) ||
-      Repo.get_by(RentalRule, category_id: article.category_id)
+      get_category_rental_rule(article) ||
+      get_club_rental_rule(article)
   end
 
+  defp get_category_rental_rule(%{category_id: nil}), do: nil
 
+  defp get_category_rental_rule(article) do
+    Repo.get_by(RentalRule, category_id: article.category_id)
+  end
+
+  defp get_club_rental_rule(article) do
+    from(r in RentalRule,
+      where:
+        r.club_id == ^article.club_id and
+          is_nil(r.article_id) and
+          is_nil(r.category_id),
+      limit: 1
+    )
+    |> Repo.one()
+  end
 
   def get_rental_rule!(id, preloads) do
     RentalRule
     |> Repo.get!(id)
     |> Repo.preload(preloads)
   end
+
   @doc """
   Creates a rental_rule.
 

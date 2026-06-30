@@ -49,4 +49,9 @@ defmodule Sportyweb.Inventory.Unit do
       "Muss zeitlich später als oder gleich \"Nutzung ab\" sein!"
     )
   end
+
+  def occupied_changeset(unit, attrs) do
+    unit
+    |> cast(attrs, [:occupied])
+  end
 end

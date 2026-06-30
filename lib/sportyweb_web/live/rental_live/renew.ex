@@ -5,6 +5,7 @@ defmodule SportywebWeb.RentalLive.Renew do
 
 
   @impl true
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <div>
@@ -38,13 +39,14 @@ defmodule SportywebWeb.RentalLive.Renew do
 
 
   def apply_action(socket, :renew, %{"id" => id}) do
-    rental = Inventory.get_rental!(id, article: :club)
+    rental = Inventory.get_rental!(id, article: :club, article: :rental_rules)
 
     socket
     |> assign(:page_title, "Ausleihe verlängern")
     |> assign(:rental, rental)
     |> assign(:article, rental.article)
     |> assign(:club, rental.article.club)
+    |> assign(:rental_rule, rental.article.rental_rules)
   end
 
 end

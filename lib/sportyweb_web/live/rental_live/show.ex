@@ -14,11 +14,14 @@ defmodule SportywebWeb.RentalLive.Show do
     rental =
       Inventory.get_rental!(id, [:location, :unit, :contact, article: :club])
 
+      rental_rule = Inventory.get_applicable_rental_rule(rental.article.id)
+
     {:noreply,
      socket
      |> assign(:page_title, "Ausleihe: #{rental.rental_number}")
      |> assign(:rental, rental)
      |> assign(:article, rental.article)
+     |> assign(:rental_rule, rental_rule)
      |> assign(:club, rental.article.club)}
   end
 end

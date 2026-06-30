@@ -22,10 +22,18 @@
       {format_string_field(@rental.unit.serial_number)}
     </:item>
     <:item title="Ausleihdatum">
-      {format_date_field_dmy(@rental.rental_date)}
+      <%= if @rental_rule && @rental_rule.rental_period_unit == "Stunden" do %>
+          {"#{format_datetime_field(@rental.rental_date)} Uhr"} 
+        <% else %>
+          {format_date_field_dmy(@rental.rental_date)}
+        <% end %>
     </:item>
     <:item title="Rückgabedatum">
-      {format_date_field_dmy(@rental.return_date)}
+        <%= if @rental_rule && @rental_rule.rental_period_unit == "Stunden" do %>
+          {"#{format_datetime_field(@rental.return_date)} Uhr"} 
+        <% else %>
+          {format_date_field_dmy(@rental.return_date)}
+        <% end %>
     </:item>
   </.list>
 </.card>

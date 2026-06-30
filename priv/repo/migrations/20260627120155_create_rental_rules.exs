@@ -21,6 +21,22 @@ defmodule Sportyweb.Repo.Migrations.CreateRentalRules do
       add :max_renewals, :integer, default: 2
       add :renewal_period, :integer, default: 7
       timestamps(type: :utc_datetime)
+
+
     end
+    create unique_index(:rental_rules, [:article_id],
+         where: "article_id IS NOT NULL",
+         name: :rental_rules_unique_article_id_index
+       )
+
+      create unique_index(:rental_rules, [:category_id],
+         where: "category_id IS NOT NULL",
+         name: :rental_rules_unique_category_id_index
+       )
+
+      create unique_index(:rental_rules, [:club_id],
+         where: "article_id IS NULL AND category_id IS NULL",
+         name: :rental_rules_unique_club_rule_index
+       )
   end
 end
