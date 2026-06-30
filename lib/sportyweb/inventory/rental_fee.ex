@@ -18,8 +18,6 @@ defmodule Sportyweb.Inventory.RentalFee do
     belongs_to :article, Article
     belongs_to :category, Category
     has_many :rentals, Rental
-    many_to_many :categories, Category, join_through: CategoryRentalFee
-    many_to_many :articles, Article, join_through: ArticleRentalFee
     field :scope, :string, virtual: true
     field :name, :string, default: ""
     field :member_type, Ecto.Enum, values: [:member, :non_member]

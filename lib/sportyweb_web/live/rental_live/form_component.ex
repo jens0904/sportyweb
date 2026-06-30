@@ -20,16 +20,13 @@ defmodule SportywebWeb.RentalLive.FormComponent do
               Für diesen Artikel oder dessen Kategorie wurde noch keine Ausleihregel definiert.
               Bitte legen Sie zuerst eine passende Ausleihregel an.
             </p>
-
           <% !@article.units -> %>
             <p>
               Der Artikel hat keine zugewiesene Einheit und kann daher nicht ausgeliehen werden.
               Bitte weisen Sie dem Artikel zuerst eine Einheit zu.
             </p>
-
           <% !Enum.any?(@article.units, &(&1.occupied == false && &1.for_lending == true)) -> %>
             <p>Es ist derzeit keine Einheit dieses Artikels zur Ausleihe verfügbar.</p>
-
           <% true -> %>
             <.simple_form
               for={@form}
@@ -85,23 +82,26 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                         </p>
                       <% end %>
                     <% else %>
-                      <label for="rental_return_date" class="block text-sm font-semibold leading-6 text-zinc-800">
-  Rückgabedatum
-</label>
+                      <label
+                        for="rental_return_date"
+                        class="block text-sm font-semibold leading-6 text-zinc-800"
+                      >
+                        Rückgabedatum
+                      </label>
 
-<input
-  id="rental_return_date"
-  name={@form[:return_date].name}
-  type="date"
-  value={format_date_input_value(@form[:return_date].value)}
-  class="mt-2 block w-full rounded-lg border-zinc-300 text-zinc-900 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
-/>
+                      <input
+                        id="rental_return_date"
+                        name={@form[:return_date].name}
+                        type="date"
+                        value={format_date_input_value(@form[:return_date].value)}
+                        class="mt-2 block w-full rounded-lg border-zinc-300 text-zinc-900 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
+                      />
 
-<%= for error <- @form[:return_date].errors do %>
-  <p class="mt-2 text-sm text-rose-600">
-    {translate_error(error)}
-  </p>
-<% end %>
+                      <%= for error <- @form[:return_date].errors do %>
+                        <p class="mt-2 text-sm text-rose-600">
+                          {translate_error(error)}
+                        </p>
+                      <% end %>
                     <% end %>
                   </div>
 
@@ -112,6 +112,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                       label="Kontakt"
                       options={Enum.map(@contact_options, &{&1.name, &1.id})}
                       prompt="Bitte auswählen"
+                      phx-change="update_rental_fee_options"
                     />
                   </div>
 
@@ -124,8 +125,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                       prompt="Bitte auswählen"
                     />
                   </div>
-
-
 
                   <div class="col-span-12 md:col-span-6">
                     <.input
@@ -166,6 +165,8 @@ defmodule SportywebWeb.RentalLive.FormComponent do
   @impl true
   def update(%{rental: rental} = assigns, socket) do
     rental_rule = Inventory.get_applicable_rental_rule(assigns.article.id)
+    IO.inspect(assigns.article.id, label: "ARTICLE ID")
+    IO.inspect(rental_rule, label: "APPLICABLE RENTAL RULE")
 
     {:ok,
      socket
@@ -173,7 +174,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
      |> assign(:return_time, nil)
      |> assign(:rental_rule, rental_rule)
      |> assign(:contact_options, contact_options(assigns.club.id, assigns.article.id, rental_rule))
-     |> assign(:rental_fee_options, Inventory.list_applicable_rental_fees(assigns.club.id))
      |> assign(:location_options, Asset.list_locations_with_units(assigns.club.id, assigns.article.id))
      |> assign_new(:form, fn ->
        to_form(Inventory.change_rental(rental))
@@ -206,7 +206,11 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     save_rental(socket, socket.assigns.action, rental_params)
   end
 
-  def handle_event("update_rental_fee_options", %{"rental" => %{"contact_id" => contact_id}}, socket) do
+  def handle_event(
+        "update_rental_fee_options",
+        %{"rental" => %{"contact_id" => contact_id}},
+        socket
+      ) do
     {:noreply, assign_rental_fee_options(socket, contact_id)}
   end
 
@@ -254,7 +258,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         {:noreply,
          socket
          |> put_flash(:error, "Die ausgewählte Einheit konnte nicht als belegt markiert werden.")}
-
 
         {:noreply,
          socket
@@ -397,10 +400,10 @@ defmodule SportywebWeb.RentalLive.FormComponent do
   end
 
   defp format_date_input_value(%DateTime{} = datetime) do
-  datetime
-  |> DateTime.to_date()
-  |> Date.to_iso8601()
-end
+    datetime
+    |> DateTime.to_date()
+    |> Date.to_iso8601()
+  end
 
   defp format_date_input_value(%Date{} = date), do: Date.to_iso8601(date)
 
@@ -419,9 +422,11 @@ end
       end
 
     amount =
-      rental_fee.amount
-      |> Decimal.to_string(:normal)
-
+    case Money.to_string(rental_fee.amount) do
+      {:ok, formatted_amount} -> formatted_amount
+      formatted_amount when is_binary(formatted_amount) -> formatted_amount
+      _ -> ""
+    end
     {"#{rental_fee.name} – #{amount} € – #{target}", rental_fee.id}
   end
 end

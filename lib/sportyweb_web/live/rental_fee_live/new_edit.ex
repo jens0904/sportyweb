@@ -39,7 +39,7 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
     |> assign(:page_title, "Mietgebühr bearbeiten")
     |> assign(:rental_fee, rental_fee)
     |> assign(:article, rental_fee.article)
-    |> assign(:club, rental_fee.article.club)
+    |> assign(:club, rental_fee.club)
   end
 
   defp apply_action(socket, :new, %{"club_id" => club_id}) do

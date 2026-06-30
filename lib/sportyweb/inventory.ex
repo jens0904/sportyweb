@@ -479,11 +479,20 @@ defmodule Sportyweb.Inventory do
       })
 
     rental_rule = get_applicable_rental_rule(rental_attrs["article_id"])
+
     max_return_date =
       calculate_max_return_date(rental_attrs["article_id"], rental_attrs["rental_date"])
 
     Ecto.Multi.new()
-    |> Ecto.Multi.insert(:rental, Rental.changeset(%Rental{}, rental_attrs, max_return_date, rental_rule && rental_rule.rental_period_unit))
+    |> Ecto.Multi.insert(
+      :rental,
+      Rental.changeset(
+        %Rental{},
+        rental_attrs,
+        max_return_date,
+        rental_rule && rental_rule.rental_period_unit
+      )
+    )
     |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
       rental.unit_id
       |> get_unit!()
@@ -539,16 +548,22 @@ defmodule Sportyweb.Inventory do
     article_id = attrs["article_id"] || rental.article_id
     rental_date = attrs["rental_date"] || rental.rental_date
 
-    rental_rule = if article_id do
-      get_applicable_rental_rule(article_id)
+    rental_rule =
+      if article_id do
+        get_applicable_rental_rule(article_id)
+      end
 
-    end
     max_return_date =
       if article_id && rental_date do
         calculate_max_return_date(article_id, rental_date)
       end
 
-    Rental.changeset(rental, attrs, max_return_date, rental_rule && rental_rule.rental_period_unit)
+    Rental.changeset(
+      rental,
+      attrs,
+      max_return_date,
+      rental_rule && rental_rule.rental_period_unit
+    )
   end
 
   def calculate_max_return_date(article_id, rental_date) do
@@ -663,14 +678,13 @@ defmodule Sportyweb.Inventory do
     Repo.all(RentalFee)
   end
 
-
-
   def list_applicable_rental_fees(club_id) do
     RentalFee
     |> where([r], r.club_id == ^club_id)
     |> preload([:category, :article])
     |> Repo.all()
   end
+
   @doc """
   Gets a single rental_fee.
 
@@ -795,9 +809,17 @@ defmodule Sportyweb.Inventory do
     else
       contact = Personal.get_contact!(contact_id, [:contracts])
 
+
+      article = get_article!(article_id)
+
       query =
         from rf in RentalFee,
-          where: rf.article_id == ^article_id
+        where:
+            rf.article_id == ^article_id or
+              rf.category_id == ^article.category_id,
+
+          preload: [:category, :article],
+          distinct: true
 
       query =
         if Contact.has_active_membership_contract?(contact) do
@@ -825,7 +847,6 @@ defmodule Sportyweb.Inventory do
           query
         end
 
-      IO.inspect(Repo.all(query), label: "Rental Fees")
       Repo.all(query)
     end
   end
