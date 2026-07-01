@@ -23,7 +23,11 @@ defmodule Sportyweb.Repo.Migrations.CreateRentalFee do
       add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id),
         null: false
 
+      add :successor_id, references(:rental_fees, type: :binary_id, on_delete: :nilify_all)
+
       timestamps(type: :utc_datetime)
     end
+
+    create index(:rental_fees, [:successor_id])
   end
 end

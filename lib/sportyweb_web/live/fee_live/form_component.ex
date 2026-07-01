@@ -290,11 +290,6 @@ defmodule SportywebWeb.FeeLive.FormComponent do
     {:ok, fee}
   end
 
-  defp create_association(fee, %Category{} = fee_object) do
-    Inventory.create_category_fee(fee_object, fee)
-    {:ok, fee}
-  end
-
   defp create_association(fee, %Event{} = fee_object) do
     Calendar.create_event_fee(fee_object, fee)
     {:ok, fee}

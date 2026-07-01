@@ -5,7 +5,6 @@ defmodule Sportyweb.Inventory.RentalRule do
   alias Sportyweb.Inventory.Category
   alias Sportyweb.Inventory.Article
 
-
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
@@ -29,29 +28,40 @@ defmodule Sportyweb.Inventory.RentalRule do
 
   @doc false
   @doc false
-def changeset(rental_rule, attrs) do
-  rental_rule
-  |> cast(attrs, [
-    :club_id,
-    :category_id,
-    :article_id,
-    :scope,
-    :choose_rental_period,
-    :for_club_members,
-    :for_non_members,
-    :rental_period,
-    :rental_period_unit,
-    :allow_renewal,
-    :max_renewals,
-    :renewal_period
-  ])
-  |> validate_required([:club_id])
-  |> foreign_key_constraint(:club_id)
-  |> foreign_key_constraint(:category_id)
-  |> foreign_key_constraint(:article_id)
-  |> unique_constraint(:article_id, name: :rental_rules_unique_article_id_index)
-  |> unique_constraint(:category_id, name: :rental_rules_unique_category_id_index)
-  |> unique_constraint(:club_id, name: :rental_rules_unique_club_rule_index)
-end
-
+  def changeset(rental_rule, attrs) do
+    rental_rule
+    |> cast(attrs, [
+      :club_id,
+      :category_id,
+      :article_id,
+      :scope,
+      :choose_rental_period,
+      :for_club_members,
+      :for_non_members,
+      :rental_period,
+      :rental_period_unit,
+      :allow_renewal,
+      :max_renewals,
+      :renewal_period
+    ])
+    |> validate_required([:club_id])
+    |> foreign_key_constraint(:club_id)
+    |> foreign_key_constraint(:category_id)
+    |> foreign_key_constraint(:article_id)
+    |> unique_constraint(
+      :article_id,
+      name: :rental_rules_unique_article_id_index,
+      message: "article already has a rental rule"
+    )
+    |> unique_constraint(
+      :category_id,
+      name: :rental_rules_unique_category_id_index,
+      message: "category already has a rental rule"
+    )
+    |> unique_constraint(
+      :club_id,
+      name: :rental_rules_unique_club_rule_index,
+      message: "club already has a rental rule"
+    )
+  end
 end

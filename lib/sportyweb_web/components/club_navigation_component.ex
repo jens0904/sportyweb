@@ -51,7 +51,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
           ]}
         >
           <.icon name="hero-building-office-2" class={@classes_icon} />
-          <span class="truncate">Standorte & Verleih</span>
+          <span class="truncate">Standorte & Vermietung</span>
         </.link>
 
         <.link

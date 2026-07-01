@@ -3,12 +3,11 @@ defmodule Sportyweb.Inventory.RentalFee do
   import Ecto.Changeset
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
-  alias Sportyweb.Organization
   alias Sportyweb.Organization.Club
   alias Sportyweb.Inventory.Article
   alias Sportyweb.Inventory.Category
   alias Sportyweb.Inventory.Rental
-
+  alias Sportyweb.Inventory.RentalFee
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -17,6 +16,8 @@ defmodule Sportyweb.Inventory.RentalFee do
     belongs_to :club, Club
     belongs_to :article, Article
     belongs_to :category, Category
+    belongs_to :successor, RentalFee, foreign_key: :successor_id
+    has_many :ancestors, RentalFee, foreign_key: :successor_id
     has_many :rentals, Rental
     field :scope, :string, virtual: true
     field :name, :string, default: ""
@@ -48,7 +49,8 @@ defmodule Sportyweb.Inventory.RentalFee do
         :rental_duration,
         :article_id,
         :category_id,
-        :club_id
+        :club_id,
+        :successor_id
       ],
       empty_values: ["", nil]
     )

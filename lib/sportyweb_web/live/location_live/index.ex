@@ -23,7 +23,7 @@ defmodule SportywebWeb.LocationLive.Index do
     club = Organization.get_club!(club_id, locations: :equipment)
 
     socket
-    |> assign(:page_title, "Standorte & Equipment")
+    |> assign(:page_title, "Standorte")
     |> assign(:club, club)
     |> stream(:locations, club.locations)
   end

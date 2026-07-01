@@ -1,5 +1,6 @@
 defmodule SportywebWeb.RentalFeeLive.FormComponent do
   use SportywebWeb, :live_component
+  import Ecto.Changeset
 
   alias Sportyweb.Organization.Club
   alias Sportyweb.Inventory
@@ -24,39 +25,34 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
         >
           <.input_grids>
             <.input_grid>
-              <div class="col-span-12 md:col-span-6">
-                <.input
-                  field={@form[:scope]}
-                  type="select"
-                  label="Gilt für"
-                  options={[
-                    {"Kategorie", "category"},
-                    {"Artikel", "article"}
-                  ]}
-                />
-              </div>
+              <.input
+                field={@form[:scope]}
+                type="select"
+                label="Gilt für"
+                options={[
+                  {"Gesamten Verein", "club"},
+                  {"Kategorie", "category"},
+                  {"Artikel", "article"}
+                ]}
+              />
 
               <%= case @form[:scope].value do %>
                 <% "category" -> %>
-                  <div class="col-span-12 md:col-span-6">
-                    <.input
-                      field={@form[:category_id]}
-                      type="select"
-                      label="Kategorie"
-                      options={Enum.map(@category_options, &{&1.name, &1.id})}
-                      prompt="Kategorie auswählen"
-                    />
-                  </div>
+                  <.input
+                    field={@form[:category_id]}
+                    type="select"
+                    label="Kategorie"
+                    options={Enum.map(@category_options, &{&1.name, &1.id})}
+                    prompt="Kategorie auswählen"
+                  />
                 <% "article" -> %>
-                  <div class="col-span-12 md:col-span-6">
-                    <.input
-                      field={@form[:article_id]}
-                      type="select"
-                      label="Artikel"
-                      options={Enum.map(@article_options, &{&1.name, &1.id})}
-                      prompt="Artikel auswählen"
-                    />
-                  </div>
+                  <.input
+                    field={@form[:article_id]}
+                    type="select"
+                    label="Artikel"
+                    options={Enum.map(@article_options, &{&1.name, &1.id})}
+                    prompt="Artikel auswählen"
+                  />
                 <% _ -> %>
               <% end %>
 
@@ -135,6 +131,15 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
                   min="0"
                 />
               </div>
+              <div :if={Enum.any?(@successor_rental_fee_options)} class="col-span-12">
+                <.input
+                  field={@form[:successor_id]}
+                  type="select"
+                  label="Nachfolger-Gebühr (optional)"
+                  options={@successor_rental_fee_options |> Enum.map(&{&1.name, &1.id})}
+                  prompt="Keine Nachfolger-Gebühr"
+                />
+              </div>
             </.input_grid>
           </.input_grids>
 
@@ -143,13 +148,13 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
               <.button phx-disable-with="Speichern...">Speichern</.button>
               <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
               <.button
-            :if={@rental_fee.id}
-            class="bg-rose-700 hover:bg-rose-800"
-            phx-click={JS.push("delete", value: %{id: @rental_fee.id})}
-            data-confirm="Unwiderruflich löschen?"
-          >
-            Löschen
-          </.button>
+                :if={@rental_fee.id}
+                class="bg-rose-700 hover:bg-rose-800"
+                phx-click={JS.push("delete", value: %{id: @rental_fee.id})}
+                data-confirm="Unwiderruflich löschen?"
+              >
+                Löschen
+              </.button>
             </div>
           </:actions>
         </.simple_form>
@@ -167,13 +172,38 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
      |> assign(:article_options, Inventory.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
        to_form(Inventory.change_rental_fee(rental_fee))
-     end)}
+     end)
+     |> assign_successor_rental_fee_options(rental_fee, rental_fee.maximum_age_in_years)}
   end
 
   @impl true
   def handle_event("validate", %{"rental_fee" => rental_fee_params}, socket) do
     changeset = Inventory.change_rental_fee(socket.assigns.rental_fee, rental_fee_params)
-    {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+
+    changed_maximum_age_in_years = get_change(changeset, :maximum_age_in_years)
+
+    if changed_maximum_age_in_years do
+      # Assigning new successor_fee_options should usually be done in a separate
+      # handle_event function that gets called every time a change happens
+      # to the value of the :maximum_age_in_years field. This was the case once,
+      # but adding a phx-change="..." to the field removed the ability to
+      # dynamically validate with this function. This led to some unwanted
+      # behaviours (the validation only happend after clicking submit)
+      # and was therefore replaced with what you can see here.
+      # It is not optimal, because the assignment of new successor_fee_options
+      # happens more often than it would with a separate handle_event function,
+      # but at least the dynamic validation works (again) and doesn't confuse users.
+      # https://hexdocs.pm/phoenix_live_view/form-bindings.html
+      {:noreply,
+       socket
+       |> assign(form: to_form(changeset, action: :validate))
+       |> assign_successor_rental_fee_options(
+         socket.assigns.rental_fee,
+         changed_maximum_age_in_years
+       )}
+    else
+      {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
+    end
   end
 
   def handle_event("save", %{"rental_fee" => rental_fee_params}, socket) do
@@ -191,6 +221,14 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
+  end
+
+  defp assign_successor_rental_fee_options(socket, rental_fee, maximum_age_in_years) do
+    assign(
+      socket,
+      :successor_rental_fee_options,
+      Inventory.list_successor_rental_fee_options(rental_fee, maximum_age_in_years)
+    )
   end
 
   defp save_rental_fee(socket, :new, rental_fee_params) do

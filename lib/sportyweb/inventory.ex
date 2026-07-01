@@ -685,6 +685,41 @@ defmodule Sportyweb.Inventory do
     |> Repo.all()
   end
 
+  def list_successor_rental_fee_options(%RentalFee{} = rental_fee, maximum_age_in_years) do
+    cond do
+      is_nil(maximum_age_in_years) ->
+        []
+
+      is_nil(rental_fee.member_type) ->
+        []
+
+      is_nil(rental_fee.rental_duration) ->
+        []
+
+      true ->
+        query =
+          from rf in RentalFee,
+            where: rf.club_id == ^rental_fee.club_id,
+            where: rf.member_type == ^rental_fee.member_type,
+            where: rf.rental_duration == ^rental_fee.rental_duration,
+            where:
+              is_nil(rf.minimum_age_in_years) or
+                rf.minimum_age_in_years - 1 <= ^maximum_age_in_years,
+            where:
+              is_nil(rf.maximum_age_in_years) or
+                rf.maximum_age_in_years > ^maximum_age_in_years,
+            order_by: rf.name
+
+        query =
+          case rental_fee.id do
+            nil -> query
+            _ -> from rf in query, where: rf.id != ^rental_fee.id
+          end
+
+        Repo.all(query)
+    end
+  end
+
   @doc """
   Gets a single rental_fee.
 
@@ -809,17 +844,25 @@ defmodule Sportyweb.Inventory do
     else
       contact = Personal.get_contact!(contact_id, [:contracts])
 
-
       article = get_article!(article_id)
 
       query =
         from rf in RentalFee,
-        where:
+          where:
             rf.article_id == ^article_id or
-              rf.category_id == ^article.category_id,
-
+              (rf.club_id == ^article.club_id and
+                 is_nil(rf.article_id) and
+                 is_nil(rf.category_id)),
           preload: [:category, :article],
           distinct: true
+
+      query =
+        if article.category_id do
+          from rf in query,
+            or_where: rf.category_id == ^article.category_id
+        else
+          query
+        end
 
       query =
         if Contact.has_active_membership_contract?(contact) do
