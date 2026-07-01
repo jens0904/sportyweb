@@ -26,13 +26,7 @@ defmodule Sportyweb.Inventory.Article do
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
     field :choose_rental_period, :boolean, default: false
-    field :for_club_members, :boolean, default: false
-    field :for_non_members, :boolean, default: false
     field :rental_period, :integer
-    field :rental_period_unit, :string, default: "Tage"
-    field :allow_renewal, :boolean, default: false
-    field :max_renewals, :integer, default: 2
-    field :renewal_period, :integer, default: 7
 
     timestamps(type: :utc_datetime)
   end

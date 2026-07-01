@@ -52,9 +52,7 @@
           end
         )}
       </:col>
-      <:col :let={{_id, article}} label="Überlassung an Nichtmitglieder erlauben">
-        {if article.for_non_members, do: "Ja", else: "Nein"}
-      </:col>
+      
       <:action :let={{_id, article}}>
         <.link navigate={~p"/articles/#{article}"}>Anzeigen</.link>
       </:action>

@@ -42,35 +42,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
             prompt="---"
           />
         </div>
-        <.input field={@form[:for_club_members]} type="checkbox" label="Überlassung an Vereismitlglieder erlauben" />
-        <.input field={@form[:for_non_members]} type="checkbox" label="Überlassung an Nichtmitglieder erlauben" />
-        <.input field={@form[:allow_renewal]} type="checkbox" label="Verlängerung erlauben" />
-        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
-          <.input field={@form[:max_renewals]} type="select" label="Bitte die maximale Anzahl an Verlängerungen auswählen" options={1..5}  />
-          <.input field={@form[:renewal_period]} type="number" label="Verlängerungszeitraum in Tagen" />
-        <% end %>
-        <.input
-          field={@form[:choose_rental_period]}
-          type="checkbox"
-          label="festen Ausleihzeitraum hinzufügen"
-        />
-        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
-          <.input field={@form[:rental_period_unit]} type="select" label="Bitte wählen Sie die gewünschte Einheit aus" options={[{"Stunden", "hours"}, {"Tage", "days"}]}  />
-          <%= if @form[:rental_period_unit].value == "hours" do %>
-             <.input
-               field={@form[:rental_period]}
-               type="select"
-               label="Ausleihzeitraum in Stunden"
-               options={Enum.map(1..12, fn n -> {n, n} end)}
-              />
-         <% else %>
-          <.input
-            field={@form[:rental_period]}
-            type="number"
-            label="Ausleihzeitraum in Tagen"
-          />
-          <% end %>
-        <% end %>
+
         <:actions>
           <.button phx-disable-with="Saving...">Speichern</.button>
           <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
