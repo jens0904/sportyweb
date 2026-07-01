@@ -6,12 +6,13 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
   @impl true
   def render(assigns) do
   ~H"""
-  <div>
-    <.header>
-      {@title}
-      <:subtitle>Definieren Sie eine Ausleihregel.</:subtitle>
-    </.header>
+<div>
+  <.header>
+    {@title}
+    <:subtitle>Definieren Sie eine Ausleihregel.</:subtitle>
+  </.header>
 
+  <.card>
     <.simple_form
       for={@form}
       id="rental_rule-form"
@@ -19,169 +20,191 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
       phx-change="validate"
       phx-submit="save"
     >
-      <.input
-        field={@form[:scope]}
-        type="select"
-        label="Gilt für"
-        options={[
-          {"Gesamten Verein", "club"},
-          {"Kategorie", "category"},
-          {"Artikel", "article"}
-        ]}
-      />
+      <.input_grids>
+        <.input_grid>
+          <div class="col-span-12 md:col-span-6">
+            <.input
+              field={@form[:scope]}
+              type="select"
+              label="Gilt für"
+              options={[
+                {"Gesamten Verein", "club"},
+                {"Kategorie", "category"},
+                {"Artikel", "article"}
+              ]}
+            />
+          </div>
 
-      <%= case @form[:scope].value do %>
-        <% "category" -> %>
-          <.input
-            field={@form[:category_id]}
-            type="select"
-            label="Kategorie"
-            options={Enum.map(@category_options, &{&1.name, &1.id})}
-            prompt="Kategorie auswählen"
-          />
+          <div class="col-span-12 md:col-span-6">
+            <%= case @form[:scope].value do %>
+              <% "category" -> %>
+                <.input
+                  field={@form[:category_id]}
+                  type="select"
+                  label="Kategorie"
+                  options={Enum.map(@category_options, &{&1.name, &1.id})}
+                  prompt="Kategorie auswählen"
+                />
 
-        <% "article" -> %>
-          <.input
-            field={@form[:article_id]}
-            type="select"
-            label="Artikel"
-            options={Enum.map(@article_options, &{&1.name, &1.id})}
-            prompt="Artikel auswählen"
-          />
+              <% "article" -> %>
+                <.input
+                  field={@form[:article_id]}
+                  type="select"
+                  label="Artikel"
+                  options={Enum.map(@article_options, &{&1.name, &1.id})}
+                  prompt="Artikel auswählen"
+                />
 
-        <% _ -> %>
-      <% end %>
+              <% _ -> %>
+                <div></div>
+            <% end %>
+          </div>
+        </.input_grid>
 
-      <.input
-        field={@form[:for_club_members]}
-        type="checkbox"
-        label="Für Vereinsmitglieder"
-      />
+        <.input_grid class="pt-6">
+          <div class="col-span-12 md:col-span-6">
+            <.input
+              field={@form[:for_club_members]}
+              type="checkbox"
+              label="Für Vereinsmitglieder"
+            />
+          </div>
 
-      <.input
-        field={@form[:for_non_members]}
-        type="checkbox"
-        label="Für Nichtmitglieder"
-      />
+          <div class="col-span-12 md:col-span-6">
+            <.input
+              field={@form[:for_non_members]}
+              type="checkbox"
+              label="Für Nichtmitglieder"
+            />
+          </div>
+        </.input_grid>
 
+        <.input_grid class="pt-6">
+          <div class="col-span-12 md:col-span-6">
+            <.input
+              field={@form[:rental_period_unit]}
+              type="select"
+              label="Einheit"
+              prompt="Bitte auswählen"
+              options={[
+                {"Stunden", "Stunden"},
+                {"Tage", "Tage"},
+                {"Wochen", "Wochen"}
+              ]}
+            />
+          </div>
 
-        <.input
-          field={@form[:rental_period_unit]}
-          type="select"
-          label="Einheit"
-          prompt="Bitte auswählen"
-          options={[
-            {"Stunden", "Stunden"},
-            {"Tage", "Tage"},
-            {"Wochen", "Wochen"}
-          ]}
-        />
+          <div class="col-span-12 md:col-span-6">
+            <.input
+              field={@form[:choose_rental_period]}
+              type="checkbox"
+              label="Feste Dauer definieren"
+            />
+          </div>
 
-        <.input
-          field={@form[:choose_rental_period]}
-          type="checkbox"
-          label="Feste Dauer definieren"
-        />
+          <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
+            <div class="col-span-12 md:col-span-6">
+              <%= case @form[:rental_period_unit].value do %>
+                <% "Stunden" -> %>
+                  <.input
+                    field={@form[:rental_period]}
+                    type="select"
+                    label="Dauer"
+                    prompt="Bitte auswählen"
+                    options={Enum.map(1..12, &{"#{&1} Stunde#{if &1 == 1, do: "", else: "n"}", &1})}
+                  />
 
-        <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:choose_rental_period].value) do %>
-          <%= case @form[:rental_period_unit].value do %>
-            <% "Stunden" -> %>
-              <.input
-                field={@form[:rental_period]}
-                type="select"
-                label="Dauer"
-                prompt="Bitte auswählen"
-                options={Enum.map(1..12, &{"#{&1} Stunde#{if &1 == 1, do: "", else: "n"}", &1})}
-              />
+                <% "Tage" -> %>
+                  <.input
+                    field={@form[:rental_period]}
+                    type="select"
+                    label="Dauer"
+                    prompt="Bitte auswählen"
+                    options={Enum.map(1..7, &{"#{&1} Tag#{if &1 == 1, do: "", else: "e"}", &1})}
+                  />
 
-            <% "Tage" -> %>
-              <.input
-                field={@form[:rental_period]}
-                type="select"
-                label="Dauer"
-                prompt="Bitte auswählen"
-                options={Enum.map(1..7, &{"#{&1} Tag#{if &1 == 1, do: "", else: "e"}", &1})}
-              />
+                <% "Wochen" -> %>
+                  <.input
+                    field={@form[:rental_period]}
+                    type="select"
+                    label="Dauer"
+                    prompt="Bitte auswählen"
+                    options={Enum.map(1..10, &{"#{&1} Woche#{if &1 == 1, do: "", else: "n"}", &1})}
+                  />
 
-            <% "Wochen" -> %>
-              <.input
-                field={@form[:rental_period]}
-                type="select"
-                label="Dauer"
-                prompt="Bitte auswählen"
-                options={Enum.map(1..10, &{"#{&1} Woche#{if &1 == 1, do: "", else: "n"}", &1})}
-              />
-
-            <% _ -> %>
+                <% _ -> %>
+                  <div></div>
+              <% end %>
+            </div>
           <% end %>
-        <% end %>
-              <.input
-                field={@form[:allow_renewal]}
-                type="checkbox"
-                label="Verlängerung erlauben"
-              />
+        </.input_grid>
+
+        <.input_grid class="pt-6">
+          <div class="col-span-12 md:col-span-6">
+            <.input
+              field={@form[:allow_renewal]}
+              type="checkbox"
+              label="Verlängerung erlauben"
+            />
+          </div>
 
           <%= if Phoenix.HTML.Form.normalize_value("checkbox", @form[:allow_renewal].value) do %>
-            <.input
-              field={@form[:max_renewals]}
-              type="select"
-              label="Maximale Anzahl Verlängerungen"
-              options={1..5}
-            />
-
-          <%= case @form[:rental_period_unit].value do %>
-            <% "Stunden" -> %>
+            <div class="col-span-12 md:col-span-6">
               <.input
-                field={@form[:renewal_period]}
+                field={@form[:max_renewals]}
                 type="select"
-                label="Verlängerungszeitraum"
-                prompt="Bitte auswählen"
-                options={Enum.map(1..12, &{"#{&1} Stunde#{if &1 == 1, do: "", else: "n"}", &1})}
+                label="Maximale Anzahl Verlängerungen"
+                options={1..5}
               />
+            </div>
 
-            <% "Tage" -> %>
-              <.input
-                field={@form[:renewal_period]}
-                type="select"
-                label="Verlängerungszeitraum"
-                prompt="Bitte auswählen"
-                options={Enum.map(1..7, &{"#{&1} Tag#{if &1 == 1, do: "", else: "e"}", &1})}
-              />
+            <div class="col-span-12 md:col-span-6">
+              <%= case @form[:rental_period_unit].value do %>
+                <% "Stunden" -> %>
+                  <.input
+                    field={@form[:renewal_period]}
+                    type="select"
+                    label="Verlängerungszeitraum"
+                    prompt="Bitte auswählen"
+                    options={Enum.map(1..12, &{"#{&1} Stunde#{if &1 == 1, do: "", else: "n"}", &1})}
+                  />
 
-            <% "Wochen" -> %>
-              <.input
-                field={@form[:renewal_period]}
-                type="select"
-                label="Verlängerungszeitraum"
-                prompt="Bitte auswählen"
-                options={Enum.map(1..10, &{"#{&1} Woche#{if &1 == 1, do: "", else: "n"}", &1})}
-              />
+                <% "Tage" -> %>
+                  <.input
+                    field={@form[:renewal_period]}
+                    type="select"
+                    label="Verlängerungszeitraum"
+                    prompt="Bitte auswählen"
+                    options={Enum.map(1..7, &{"#{&1} Tag#{if &1 == 1, do: "", else: "e"}", &1})}
+                  />
 
-            <% _ -> %>
+                <% "Wochen" -> %>
+                  <.input
+                    field={@form[:renewal_period]}
+                    type="select"
+                    label="Verlängerungszeitraum"
+                    prompt="Bitte auswählen"
+                    options={Enum.map(1..10, &{"#{&1} Woche#{if &1 == 1, do: "", else: "n"}", &1})}
+                  />
 
-        <% end %>
-      <% end %>
-
+                <% _ -> %>
+                  <div></div>
+              <% end %>
+            </div>
+          <% end %>
+        </.input_grid>
+      </.input_grids>
 
       <:actions>
-        <.button phx-disable-with="Saving...">Speichern</.button>
-
-        <.cancel_button navigate={@navigate}>
-          Abbrechen
-        </.cancel_button>
-
-        <.button
-          :if={@rental_rule.id}
-          class="bg-rose-700 hover:bg-rose-800"
-          phx-click={JS.push("delete", value: %{id: @rental_rule.id})}
-          data-confirm="Unwiderruflich löschen?"
-        >
-          Löschen
-        </.button>
+        <div>
+          <.button phx-disable-with="Speichern...">Speichern</.button>
+          <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
+        </div>
       </:actions>
     </.simple_form>
-  </div>
-  """
+  </.card>
+</div>
+"""
 end
 
   @impl true
