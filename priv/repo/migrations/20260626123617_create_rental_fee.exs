@@ -11,6 +11,7 @@ defmodule Sportyweb.Repo.Migrations.CreateRentalFee do
       add :amount_currency, :string, null: false, default: "EUR"
       add :amount, :money_with_currency, null: false
 
+
       add :minimum_age_in_years, :integer, null: true
       add :maximum_age_in_years, :integer, null: true
 

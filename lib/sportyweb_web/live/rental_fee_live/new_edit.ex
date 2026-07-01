@@ -16,7 +16,8 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
         action={@live_action}
         rental_fee={@rental_fee}
         club={@club}
-        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/clubs/#{@club}"}
+        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/clubs/#{@club}/rental_fees"}
+
       />
     </div>
     """
@@ -62,6 +63,6 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
     {:noreply,
      socket
      |> put_flash(:info, "Mietgebühr erfolgreich gelöscht")
-     |> push_navigate(to: "/article/#{rental_fee.article_id}/rental_fees")}
+     |> push_navigate(to: "/clubs/#{rental_fee.club_id}/rental_fees")}
   end
 end

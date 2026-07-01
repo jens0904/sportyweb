@@ -53,6 +53,29 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                   </div>
 
                   <div class="col-span-12 md:col-span-6">
+                    <.input
+                      field={@form[:contact_id]}
+                      type="select"
+                      label="Kontakt"
+                      options={Enum.map(@contact_options, &{&1.name, &1.id})}
+                      prompt="Bitte auswählen"
+                      phx-change="update_rental_fee_options"
+                    />
+                  </div>
+
+                  <div class="col-span-12 md:col-span-6">
+                    <.input
+                      field={@form[:rental_fee_id]}
+                      type="select"
+                      label="Gebühr"
+                      options={
+                        Enum.map(@rental_fee_options, &rental_fee_option_label(&1, @rental_rule))
+                      }
+                      prompt="Bitte auswählen"
+                    />
+                  </div>
+
+                  <div class="col-span-12 md:col-span-6">
                     <%= if @rental_rule.rental_period_unit == "Stunden" do %>
                       <label
                         for="rental_return_time"
@@ -107,22 +130,12 @@ defmodule SportywebWeb.RentalLive.FormComponent do
 
                   <div class="col-span-12 md:col-span-6">
                     <.input
-                      field={@form[:contact_id]}
-                      type="select"
-                      label="Kontakt"
-                      options={Enum.map(@contact_options, &{&1.name, &1.id})}
-                      prompt="Bitte auswählen"
-                      phx-change="update_rental_fee_options"
-                    />
-                  </div>
-
-                  <div class="col-span-12 md:col-span-6">
-                    <.input
-                      field={@form[:rental_fee_id]}
-                      type="select"
-                      label="Gebühr"
-                      options={Enum.map(@rental_fee_options, &rental_fee_option_label/1)}
-                      prompt="Bitte auswählen"
+                      name="total_fee_preview"
+                      value={@total_fee_preview || ""}
+                      type="text"
+                      label="Gesamtgebühr"
+                      disabled
+                      class="bg-gray-100 text-gray-500 cursor-not-allowed"
                     />
                   </div>
 
@@ -172,9 +185,16 @@ defmodule SportywebWeb.RentalLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:return_time, nil)
+     |> assign(:total_fee_preview, "")
      |> assign(:rental_rule, rental_rule)
-     |> assign(:contact_options, contact_options(assigns.club.id, assigns.article.id, rental_rule))
-     |> assign(:location_options, Asset.list_locations_with_units(assigns.club.id, assigns.article.id))
+     |> assign(
+       :contact_options,
+       contact_options(assigns.club.id, assigns.article.id, rental_rule)
+     )
+     |> assign(
+       :location_options,
+       Asset.list_locations_with_units(assigns.club.id, assigns.article.id)
+     )
      |> assign_new(:form, fn ->
        to_form(Inventory.change_rental(rental))
      end)
@@ -187,6 +207,13 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     IO.inspect(rental_params, label: "VALIDATE PARAMS")
     return_time = Map.get(rental_params, "return_time")
 
+    total_fee =
+      total_fee_preview(
+        rental_params,
+        socket.assigns.rental_fee_options,
+        socket.assigns.rental_rule
+      )
+
     rental_params =
       rental_params
       |> Enum.into(%{"article_id" => socket.assigns.rental.article.id})
@@ -198,6 +225,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     {:noreply,
      socket
      |> assign(:return_time, return_time)
+     |> assign(:total_fee_preview, total_fee)
      |> assign(form: to_form(changeset, action: :validate))}
   end
 
@@ -208,10 +236,16 @@ defmodule SportywebWeb.RentalLive.FormComponent do
 
   def handle_event(
         "update_rental_fee_options",
-        %{"rental" => %{"contact_id" => contact_id}},
+        %{"rental" => rental_params = %{"contact_id" => contact_id}},
         socket
       ) do
-    {:noreply, assign_rental_fee_options(socket, contact_id)}
+    changeset =
+      Inventory.change_rental(socket.assigns.rental, rental_params)
+
+    {:noreply,
+     socket
+     |> assign_rental_fee_options(contact_id)
+     |> assign(form: to_form(changeset, action: :validate))}
   end
 
   @impl true
@@ -411,9 +445,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
 
   defp format_date_input_value(_value), do: ""
 
-  defp rental_fee_option_label(rental_fee) do
-    IO.inspect(rental_fee, label: "RENTAL FEE")
-
+  defp rental_fee_option_label(rental_fee, rental_rule) do
     target =
       cond do
         rental_fee.category -> "Kategorie: #{rental_fee.category.name}"
@@ -421,12 +453,156 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         true -> "Ohne Zuordnung"
       end
 
-    amount =
-    case Money.to_string(rental_fee.amount) do
+    amount = gross_amount_label(rental_fee)
+
+    unit =
+      case rental_rule.rental_period_unit do
+        "Tage" -> "Tag"
+        "Wochen" -> "Woche"
+        "Stunden" -> "Stunde"
+        value -> value
+      end
+
+    {"#{rental_fee.name} – #{amount} / #{unit} – #{target}", rental_fee.id}
+  end
+
+  defp gross_amount_label(rental_fee) do
+    vat_rate =
+      case rental_fee.member_type do
+        :member -> Decimal.new("0.07")
+        :non_member -> Decimal.new("0.19")
+        _ -> Decimal.new("0")
+      end
+
+    gross_amount =
+      rental_fee.amount.amount
+      |> Decimal.mult(Decimal.add(Decimal.new("1"), vat_rate))
+      |> Decimal.round(2)
+
+    rental_fee.amount
+    |> Map.put(:amount, gross_amount)
+    |> Money.to_string()
+    |> case do
       {:ok, formatted_amount} -> formatted_amount
       formatted_amount when is_binary(formatted_amount) -> formatted_amount
       _ -> ""
     end
-    {"#{rental_fee.name} – #{amount} € – #{target}", rental_fee.id}
   end
+
+  defp total_fee_preview(params, rental_fee_options, rental_rule) do
+    rental_fee_id = Map.get(params, "rental_fee_id")
+    rental_date = Map.get(params, "rental_date")
+    return_date = Map.get(params, "return_date")
+    return_time = Map.get(params, "return_time")
+
+    rental_fee =
+      Enum.find(rental_fee_options, fn fee ->
+        to_string(fee.id) == to_string(rental_fee_id)
+      end)
+
+    with %{} = rental_fee <- rental_fee,
+         units when not is_nil(units) <-
+           rental_units(rental_date, return_date, return_time, rental_rule) do
+      rental_fee
+      |> gross_money()
+      |> multiply_money(units)
+      |> money_to_string()
+    else
+      _ -> ""
+    end
+  end
+
+  defp rental_units(rental_date, return_date, return_time, rental_rule) do
+    case rental_rule.rental_period_unit do
+      "Stunden" ->
+        with {:ok, start_naive} <- parse_datetime_local(rental_date),
+             {:ok, time} <- Time.from_iso8601(return_time <> ":00") do
+          end_naive =
+            start_naive
+            |> NaiveDateTime.to_date()
+            |> NaiveDateTime.new!(time)
+
+          max(Decimal.new(NaiveDateTime.diff(end_naive, start_naive, :hour)), Decimal.new(0))
+        else
+          _ -> nil
+        end
+
+      "Tage" ->
+        with {:ok, start_date} <- parse_date_from_datetime(rental_date),
+             {:ok, end_date} <- Date.from_iso8601(to_string(return_date)) do
+          days = Date.diff(end_date, start_date)
+          Decimal.new(max(days, 0))
+        else
+          _ -> nil
+        end
+
+      "Wochen" ->
+        with {:ok, start_date} <- parse_date_from_datetime(rental_date),
+             {:ok, end_date} <- Date.from_iso8601(to_string(return_date)) do
+          days = Date.diff(end_date, start_date)
+          weeks = Decimal.div(Decimal.new(max(days, 0)), Decimal.new(7))
+          Decimal.round(weeks, 2)
+        else
+          _ -> nil
+        end
+
+      _ ->
+        nil
+    end
+  end
+
+  defp gross_money(rental_fee) do
+    vat_rate =
+      case rental_fee.member_type do
+        :member -> Decimal.new("0.07")
+        :non_member -> Decimal.new("0.19")
+        _ -> Decimal.new("0")
+      end
+
+    gross_amount =
+      rental_fee.amount.amount
+      |> Decimal.mult(Decimal.add(Decimal.new("1"), vat_rate))
+      |> Decimal.round(2)
+
+    %{rental_fee.amount | amount: gross_amount}
+  end
+
+  defp multiply_money(%Money{} = money, nil), do: money
+
+  defp multiply_money(%Money{} = money, units) do
+    %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
+  end
+
+  defp money_to_string(%Money{} = money) do
+    case Money.to_string(money) do
+      {:ok, formatted} -> formatted
+      formatted when is_binary(formatted) -> formatted
+      _ -> ""
+    end
+  end
+
+  defp parse_datetime_local(%DateTime{} = datetime), do: {:ok, DateTime.to_naive(datetime)}
+
+  defp parse_datetime_local(value) when is_binary(value) do
+    value =
+      if String.length(value) == 16 do
+        value <> ":00"
+      else
+        value
+      end
+
+    NaiveDateTime.from_iso8601(value)
+  end
+
+  defp parse_datetime_local(_), do: :error
+
+  defp parse_date_from_datetime(%DateTime{} = datetime), do: {:ok, DateTime.to_date(datetime)}
+
+  defp parse_date_from_datetime(value) when is_binary(value) do
+    value
+    |> String.slice(0, 10)
+    |> Date.from_iso8601()
+  end
+
+  defp parse_date_from_datetime(_), do: :error
 end
