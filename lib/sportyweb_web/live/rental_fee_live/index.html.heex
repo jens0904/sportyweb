@@ -7,6 +7,37 @@
   </:actions>
 </.header>
 
+<form phx-change="filter">
+  <select name="scope">
+    <option value="" selected={@scope == ""}>Alle Ebenen</option>
+    <option value="club" selected={@scope == "club"}>Gesamter Verein</option>
+    <option value="category" selected={@scope == "category"}>Kategorie</option>
+    <option value="article" selected={@scope == "article"}>Artikel</option>
+  </select>
+
+  <%= if @scope == "category" do %>
+    <select name="object_id">
+      <option value="">Alle Kategorien</option>
+      <%= for category <- @club.categories do %>
+        <option value={category.id} selected={@object_id == category.id}>
+          {category.name}
+        </option>
+      <% end %>
+    </select>
+  <% end %>
+
+  <%= if @scope == "article" do %>
+    <select name="object_id">
+      <option value="">Alle Artikel</option>
+      <%= for article <- @club.articles do %>
+        <option value={article.id} selected={@object_id == article.id}>
+          {article.name}
+        </option>
+      <% end %>
+    </select>
+  <% end %>
+</form>
+
 <.card>
   <%= if Enum.any?(@streams.rental_fees.inserts) do %>
     <.table
@@ -20,12 +51,14 @@
             Artikel
           <% rental_fee.category -> %>
             Kategorie
+          <% rental_fee.club -> %>
+            Verein
           <% true -> %>
             -
         <% end %>
       </:col>
 
-      <:col :let={{_id, rental_fee}} label="Bezeichnung">
+      <:col :let={{_id, rental_fee}} label="Name">
         <%= cond do %>
           <% rental_fee.article -> %>
             {rental_fee.article.name}
@@ -36,7 +69,7 @@
         <% end %>
       </:col>
 
-      <:col :let={{_id, rental_fee}} label="Name">
+      <:col :let={{_id, rental_fee}} label="Bezeichnung">
         {rental_fee.name}
       </:col>
 

@@ -16,7 +16,7 @@ defmodule SportywebWeb.CoreComponents do
   """
   use Phoenix.Component
   use Gettext, backend: SportywebWeb.Gettext
-
+  import Flop.Phoenix
   alias Phoenix.LiveView.JS
 
   @doc """
@@ -212,6 +212,43 @@ defmodule SportywebWeb.CoreComponents do
     """
   end
 
+
+  @doc """
+  Renders a filter form for Flop filtering.
+
+
+  ## Examples
+
+      <.filter_form
+        id="filter-form"
+        meta={@meta}
+        fields={[
+          %{field: :name, label: "Name", type: "text"},
+          %{field: :age, label: "Age", type: "number"}
+        ]}
+      />
+  """
+  attr :fields, :list, required: true
+  attr :meta, Flop.Meta, required: true
+  attr :id, :string, default: nil
+  attr :on_change, :string, default: "update-filter"
+  attr :target, :string, default: nil
+
+
+  def filter_form(%{meta: meta} = assigns) do
+    assigns = assign(assigns, form: Phoenix.Component.to_form(meta), meta: nil)
+
+    ~H"""
+    <.form for={@form} id={@id} phx-target={@target} phx-change={@on_change} phx-submit={@on_change}>
+      <.filter_fields :let={i} form={@form} fields={@fields}>
+        <.input field={i.field} label={i.label} type={i.type} phx-debounce={120} {i.rest} />
+      </.filter_fields>
+
+      <button name="reset">reset</button>
+    </.form>
+    """
+  end
+
   @doc """
   Renders a button.
 
@@ -220,6 +257,8 @@ defmodule SportywebWeb.CoreComponents do
       <.button>Send!</.button>
       <.button phx-click="go" class="ml-2">Send!</.button>
   """
+
+
   attr :type, :string, default: nil
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)

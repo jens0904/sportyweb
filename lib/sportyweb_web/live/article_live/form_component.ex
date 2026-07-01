@@ -110,6 +110,7 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
     save_article(socket, socket.assigns.action, article_params)
   end
 
+
   defp save_article(socket, :edit, article_params) do
     article_params =
       Enum.into(article_params, %{

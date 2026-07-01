@@ -72,6 +72,8 @@ defmodule Sportyweb.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
+      {:flop, "~> 0.26.0"},
+      {:flop_phoenix, "~> 0.24.0"},
 
       ###################################
       # Custom Dependencies

@@ -74,4 +74,10 @@ defmodule Sportyweb.Inventory.Article do
     |> validate_currency(:amount, :EUR)
     |> validate_currency(:amount_one_time, :EUR)
   end
+  @derive {
+  Flop.Schema,
+  filterable: [:name, :reference_number, :category_id],
+  sortable: [:name, :reference_number],
+  default_limit: 20
+  }
 end

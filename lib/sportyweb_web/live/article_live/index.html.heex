@@ -7,6 +7,26 @@
   </:actions>
 </.header>
 
+<form phx-change="filter">
+  <select name="department_id">
+    <option value="">Alle Abteilungen</option>
+    <%= for department <- @club.departments do %>
+      <option value={department.id} selected={@department_id == department.id}>
+        {department.name}
+      </option>
+    <% end %>
+  </select>
+
+  <select name="category_id">
+    <option value="">Alle Kategorien</option>
+    <%= for category <- @club.categories do %>
+      <option value={category.id} selected={@category_id == category.id}>
+        {category.name}
+      </option>
+    <% end %>
+  </select>
+</form>
+
 <.card>
   <%= if Enum.any?(@streams.articles.inserts) do %>
     <.table
