@@ -61,8 +61,7 @@ defmodule Sportyweb.Finance.Fee do
       [key: "Abteilung", value: "department"],
       [key: "Gruppe", value: "group"],
       [key: "Veranstaltung", value: "event"],
-      [key: "Standort", value: "location"],
-      [key: "Kategorie", value: "category"]
+      [key: "Standort", value: "location"]
     ]
   end
 

@@ -182,6 +182,14 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
 
     changed_maximum_age_in_years = get_change(changeset, :maximum_age_in_years)
 
+    rental_fee =
+    %{
+      socket.assigns.rental_fee
+      | member_type: get_field(changeset, :member_type),
+        rental_duration: get_field(changeset, :rental_duration)
+    }
+
+
     if changed_maximum_age_in_years do
       # Assigning new successor_fee_options should usually be done in a separate
       # handle_event function that gets called every time a change happens
@@ -198,7 +206,7 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
        socket
        |> assign(form: to_form(changeset, action: :validate))
        |> assign_successor_rental_fee_options(
-         socket.assigns.rental_fee,
+         rental_fee,
          changed_maximum_age_in_years
        )}
     else

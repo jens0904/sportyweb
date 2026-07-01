@@ -57,8 +57,6 @@ defmodule Sportyweb.Inventory.RentalFee do
     |> validate_required([
       :name,
       :amount,
-      :minimum_age_in_years,
-      :maximum_age_in_years,
       :member_type,
       :rental_duration,
       ])
