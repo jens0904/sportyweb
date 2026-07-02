@@ -2,183 +2,188 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   use SportywebWeb, :live_component
   import Ecto.Changeset
 
-  alias Sportyweb.Organization.Club
   alias Sportyweb.Inventory
-  alias Sportyweb.Inventory.Category
-  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.RentalFee
 
   @impl true
   def render(assigns) do
-~H"""
-<div>
-  <.header>
-    {@title}
-  </.header>
+    ~H"""
+    <div>
+      <.header>
+        {@title}
+      </.header>
 
-  <.card>
-    <.simple_form
-      for={@form}
-      id="rental_fee-form"
-      phx-target={@myself}
-      phx-change="validate"
-      phx-submit="save"
-    >
-      <.input_grids>
-        <.input_grid>
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:scope]}
-              type="select"
-              label="Gilt für"
-              options={[
-                {"Gesamten Verein", "club"},
-                {"Kategorie", "category"},
-                {"Artikel", "article"}
-              ]}
-            />
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <%= case @form[:scope].value do %>
-              <% "category" -> %>
-                <.input
-                  field={@form[:category_id]}
-                  type="select"
-                  label="Kategorie"
-                  options={Enum.map(@category_options, &{&1.name, &1.id})}
-                  prompt="Kategorie auswählen"
-                />
-
-              <% "article" -> %>
-                <.input
-                  field={@form[:article_id]}
-                  type="select"
-                  label="Artikel"
-                  options={Enum.map(@article_options, &{&1.name, &1.id})}
-                  prompt="Artikel auswählen"
-                />
-
-              <% _ -> %>
-                <div></div>
-            <% end %>
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <.input field={@form[:name]} type="text" label="Name" />
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:member_type]}
-              type="select"
-              label="Für wen gilt die Gebühr?"
-              prompt="Bitte auswählen"
-              options={[{"Mitglieder", :member}, {"Nichtmitglieder", :non_member}]}
-            />
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:rental_duration]}
-              type="select"
-              label="Für welche Mietdauer?"
-              prompt="Bitte auswählen"
-              options={[
-                {"Kurzfristige Vermietungen", :short_term},
-                {"Langfristige Vermietungen", :long_term}
-              ]}
-            />
-          </div>
-        </.input_grid>
-
-        <.input_grid class="pt-6">
-          <div class="col-span-12 md:col-span-6">
-            <.input field={@form[:amount]} type="text" label="Grundbetrag in Euro" />
-            <.input_description>
-              Das €-Zeichen kann, muss aber nicht angegeben werden.
-            </.input_description>
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              name="vat_amount"
-              value={vat_amount_preview(@form)}
-              type="text"
-              label="Mehrwertsteuer"
-              disabled
-              class="bg-gray-100 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              name="gross_amount"
-              value={gross_amount_preview(@form)}
-              type="text"
-              label="Bruttopreis"
-              disabled
-              class="bg-gray-100 text-gray-500 cursor-not-allowed"
-            />
-          </div>
-        </.input_grid>
-
-        <.input_grid class="pt-6">
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:minimum_age_in_years]}
-              type="number"
-              label="Mindestalter (optional)"
-              min="0"
-            />
-          </div>
-
-          <div class="col-span-12 md:col-span-6">
-            <.input
-              field={@form[:maximum_age_in_years]}
-              type="number"
-              label="Höchstalter (optional)"
-              min="0"
-            />
-          </div>
-
-          <div :if={Enum.any?(@successor_rental_fee_options)} class="col-span-12">
-            <.input
-              field={@form[:successor_id]}
-              type="select"
-              label="Nachfolger-Gebühr (optional)"
-              options={Enum.map(@successor_rental_fee_options, &{&1.name, &1.id})}
-              prompt="Keine Nachfolger-Gebühr"
-            />
-          </div>
-        </.input_grid>
-      </.input_grids>
-
-      <:actions>
-        <div>
-          <.button phx-disable-with="Speichern...">Speichern</.button>
-          <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
-        </div>
-
-        <.button
-          :if={@rental_fee.id}
-          class="bg-rose-700 hover:bg-rose-800"
-          phx-click={JS.push("delete", value: %{id: @rental_fee.id})}
-          data-confirm="Unwiderruflich löschen?"
+      <.card>
+        <.simple_form
+          for={@form}
+          id="rental_fee-form"
+          phx-target={@myself}
+          phx-change="validate"
+          phx-submit="save"
         >
-          Löschen
-        </.button>
-      </:actions>
-    </.simple_form>
-  </.card>
-</div>
-"""
+          <.input_grids>
+            <.input_grid>
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:scope]}
+                  type="select"
+                  label="Gilt für"
+                  options={[
+                    {"Gesamten Verein", "club"},
+                    {"Kategorie", "category"},
+                    {"Artikel", "article"}
+                  ]}
+                />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <%= case @form[:scope].value do %>
+                  <% "category" -> %>
+                    <.input
+                      field={@form[:category_id]}
+                      type="select"
+                      label="Kategorie"
+                      options={Enum.map(@category_options, &{&1.name, &1.id})}
+                      prompt="Kategorie auswählen"
+                    />
+                  <% "article" -> %>
+                    <.input
+                      field={@form[:article_id]}
+                      type="select"
+                      label="Artikel"
+                      options={Enum.map(@article_options, &{&1.name, &1.id})}
+                      prompt="Artikel auswählen"
+                    />
+                  <% _ -> %>
+                    <div></div>
+                <% end %>
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input field={@form[:name]} type="text" label="Name" />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:member_type]}
+                  type="select"
+                  label="Für wen gilt die Gebühr?"
+                  prompt="Bitte auswählen"
+                  options={[{"Mitglieder", :member}, {"Nichtmitglieder", :non_member}]}
+                />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:rental_duration]}
+                  type="select"
+                  label="Für welche Mietdauer?"
+                  prompt="Bitte auswählen"
+                  options={[
+                    {"Kurzfristige Vermietungen", :short_term},
+                    {"Langfristige Vermietungen", :long_term}
+                  ]}
+                />
+              </div>
+            </.input_grid>
+
+            <.input_grid class="pt-6">
+              <div class="col-span-12 md:col-span-6">
+                <.input field={@form[:amount]} type="text" label="Grundbetrag in Euro" />
+                <.input_description>
+                  Das €-Zeichen kann, muss aber nicht angegeben werden.
+                </.input_description>
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  name="vat_amount"
+                  value={vat_amount_preview(@form)}
+                  type="text"
+                  label="Mehrwertsteuer"
+                  disabled
+                  class="bg-gray-100 text-gray-500 cursor-not-allowed"
+                />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input field={@form[:flat_fee]} type="checkbox" label="Pauschalgebühr" />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  name="gross_amount"
+                  value={gross_amount_preview(@form)}
+                  type="text"
+                  label="Bruttopreis"
+                  disabled
+                  class="bg-gray-100 text-gray-500 cursor-not-allowed"
+                />
+              </div>
+            </.input_grid>
+
+            <.input_grid class="pt-6">
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:minimum_age_in_years]}
+                  type="number"
+                  label="Mindestalter (optional)"
+                  min="0"
+                />
+              </div>
+
+              <div class="col-span-12 md:col-span-6">
+                <.input
+                  field={@form[:maximum_age_in_years]}
+                  type="number"
+                  label="Höchstalter (optional)"
+                  min="0"
+                />
+              </div>
+
+              <div :if={Enum.any?(@successor_rental_fee_options)} class="col-span-12">
+                <.input
+                  field={@form[:successor_id]}
+                  type="select"
+                  label="Nachfolger-Gebühr (optional)"
+                  options={Enum.map(@successor_rental_fee_options, &{&1.name, &1.id})}
+                  prompt="Keine Nachfolger-Gebühr"
+                />
+              </div>
+            </.input_grid>
+          </.input_grids>
+
+          <:actions>
+            <div>
+              <.button phx-disable-with="Speichern...">Speichern</.button>
+              <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
+            </div>
+
+            <.button
+              :if={@rental_fee.id}
+              class="bg-rose-700 hover:bg-rose-800"
+              phx-click={JS.push("delete", value: %{id: @rental_fee.id})}
+              data-confirm="Unwiderruflich löschen?"
+            >
+              Löschen
+            </.button>
+          </:actions>
+        </.simple_form>
+      </.card>
+    </div>
+    """
   end
 
   @impl true
+  @impl true
   def update(%{rental_fee: rental_fee} = assigns, socket) do
+    rental_fee =
+      %{rental_fee | scope: rental_fee_scope(rental_fee)}
+
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(:rental_fee, rental_fee)
      |> assign(:category_options, Inventory.list_categories(assigns.club.id))
      |> assign(:article_options, Inventory.list_articles(assigns.club.id))
      |> assign_new(:form, fn ->
@@ -194,12 +199,11 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
     changed_maximum_age_in_years = get_change(changeset, :maximum_age_in_years)
 
     rental_fee =
-    %{
-      socket.assigns.rental_fee
-      | member_type: get_field(changeset, :member_type),
-        rental_duration: get_field(changeset, :rental_duration)
-    }
-
+      %{
+        socket.assigns.rental_fee
+        | member_type: get_field(changeset, :member_type),
+          rental_duration: get_field(changeset, :rental_duration)
+      }
 
     if changed_maximum_age_in_years do
       # Assigning new successor_fee_options should usually be done in a separate
@@ -269,28 +273,16 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   end
 
   defp vat_amount_preview(form) do
-    amount = form[:amount].value
-    member_type = form[:member_type].value
-
-    case parse_amount(amount) do
+    case parse_amount(form[:amount].value) do
       nil ->
         ""
 
       amount ->
-        vat_rate =
-          case member_type do
-            :member -> Decimal.new("0.07")
-            "member" -> Decimal.new("0.07")
-            :non_member -> Decimal.new("0.19")
-            "non_member" -> Decimal.new("0.19")
-            _ -> Decimal.new("0")
-          end
-
-        amount
-        |> Decimal.mult(vat_rate)
-        |> Decimal.round(2)
-        |> Decimal.to_string(:normal)
-        |> Kernel.<>(" €")
+        %RentalFee{
+          amount: Money.new(:EUR, amount),
+          member_type: form[:member_type].value
+        }
+        |> RentalFee.vat_amount_label()
     end
   end
 
@@ -315,28 +307,20 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
   defp parse_amount(_), do: nil
 
   defp gross_amount_preview(form) do
-    amount = form[:amount].value
-    member_type = form[:member_type].value
-
-    case parse_amount(amount) do
+    case parse_amount(form[:amount].value) do
       nil ->
         ""
 
       amount ->
-        vat_rate =
-          case member_type do
-            :member -> Decimal.new("0.07")
-            "member" -> Decimal.new("0.07")
-            :non_member -> Decimal.new("0.19")
-            "non_member" -> Decimal.new("0.19")
-            _ -> Decimal.new("0")
-          end
-
-        amount
-        |> Decimal.mult(Decimal.add(Decimal.new("1"), vat_rate))
-        |> Decimal.round(2)
-        |> Decimal.to_string(:normal)
-        |> Kernel.<>(" €")
+        %RentalFee{
+          amount: Money.new(:EUR, amount),
+          member_type: form[:member_type].value
+        }
+        |> RentalFee.gross_amount_label()
     end
   end
+
+  defp rental_fee_scope(%{article_id: article_id}) when not is_nil(article_id), do: "article"
+  defp rental_fee_scope(%{category_id: category_id}) when not is_nil(category_id), do: "category"
+  defp rental_fee_scope(_), do: "club"
 end

@@ -12,19 +12,18 @@ defmodule Sportyweb.Inventory.Category do
     belongs_to :club, Club
     has_many :articles, Article
 
-    many_to_many :rental_fees, RentalFee, join_through: CategoryRentalFee
+    has_many :rental_fees, RentalFee
 
     field :name, :string
     field :description, :string
-    field :rental_period, :integer
-    field :rental_period_unit, :string, default: "Tage"
+
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(category, attrs) do
     category
-    |> cast(attrs, [:name, :description, :rental_period, :rental_period_unit, :club_id])
+    |> cast(attrs, [:name, :description, :club_id])
     |> validate_required([:name, :description, :club_id])
     |> unique_constraint(
       :name,

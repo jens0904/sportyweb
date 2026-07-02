@@ -490,7 +490,7 @@ defmodule Sportyweb.Inventory do
         %Rental{},
         rental_attrs,
         max_return_date,
-        rental_rule && rental_rule.rental_period_unit
+        rental_rule
       )
     )
     |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
@@ -514,8 +514,13 @@ defmodule Sportyweb.Inventory do
 
   """
   def update_rental(%Rental{} = rental, attrs) do
+    rental_rule = get_applicable_rental_rule(rental.article_id)
+
+    max_return_date =
+      calculate_max_return_date(rental.article_id, attrs["rental_date"] || rental.rental_date)
+
     rental
-    |> Rental.changeset(attrs)
+    |> Rental.changeset(attrs, max_return_date, rental_rule)
     |> Repo.update()
   end
 
@@ -562,10 +567,11 @@ defmodule Sportyweb.Inventory do
       rental,
       attrs,
       max_return_date,
-      rental_rule && rental_rule.rental_period_unit
+      rental_rule
     )
   end
 
+  @spec calculate_max_return_date(any(), any()) :: nil | DateTime.t()
   def calculate_max_return_date(article_id, rental_date) do
     with %DateTime{} = rental_date <- normalize_datetime(rental_date),
          %{choose_rental_period: true, rental_period: period, rental_period_unit: unit}
@@ -821,24 +827,7 @@ defmodule Sportyweb.Inventory do
     RentalFee.changeset(rental_fee, attrs)
   end
 
-  def create_category_rental_fee(%Category{} = category, %RentalFee{} = rental_fee) do
-    Repo.insert(%CategoryRentalFee{
-      category_id: category.id,
-      rental_fee_id: rental_fee.id
-    })
-  end
-
-  def create_article_rental_fee(%Article{} = article, %RentalFee{} = rental_fee) do
-    Repo.insert(%ArticleRentalFee{
-      article_id: article.id,
-      rental_fee_id: rental_fee.id
-    })
-  end
-
   def list_belonging_rental_fees(article_id, contact_id) do
-    IO.inspect(article_id, label: "article")
-    IO.inspect(contact_id, label: "contact")
-
     if is_nil(contact_id) || (is_binary(contact_id) && String.trim(contact_id) == "") do
       []
     else

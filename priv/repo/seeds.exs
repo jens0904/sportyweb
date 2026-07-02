@@ -309,42 +309,48 @@ Repo.insert!(%Category{
   club: club_1,
   name: "Bälle",
   description: "Alle Arten von Bällen",
-  rental_period: 30
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen",
-  rental_period: 14
+  description: "Verschiedene Trikots in verschiedenen Größen"
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Schläger",
-  description: "Tennis- und Badmintonschläger",
-  rental_period: 21
+  description: "Tennis- und Badmintonschläger"
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Tauchausrüstung",
-  description: "Alles was zum Tauchen benötigt wird",
-  rental_period: nil
+  description: "Alles was zum Tauchen benötigt wird"
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Wanderausrüstung",
-  description: "Alles was zum Wandern benötigt wird",
-  rental_period: 14
+  description: "Alles was zum Wandern benötigt wird"
 })
 
 Repo.insert!(%Category{
   club: club_1,
   name: "Ruderausrüstung",
-  description: "Alles was zum Rudern benötigt wird",
-  rental_period: 7
+  description: "Alles was zum Rudern benötigt wird"
+})
+
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Skiausrüstung",
+  description: "Alles was zum Skifahren benötigt wird"
+})
+
+Repo.insert!(%Category{
+  club: club_1,
+  name: "Surfausrüstung",
+  description: "Alles was zum Surfen benötigt wird"
 })
 
 ###################################
@@ -495,43 +501,49 @@ Repo.insert!(%Department{
 Repo.insert!(%Category{
   club: club_2,
   name: "Bälle",
-  description: "Alle Arten von Bällen",
-  rental_period: 30
+  description: "Alle Arten von Bällen"
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen",
-  rental_period: 14
+  description: "Verschiedene Trikots in verschiedenen Größen"
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Schläger",
-  description: "Tennis- und Badmintonschläger",
-  rental_period: 21
+  description: "Tennis- und Badmintonschläger"
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Tauchausrüstung",
-  description: "Alles was zum Tauchen benötigt wird",
-  rental_period: nil
+  description: "Alles was zum Tauchen benötigt wird"
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Wanderausrüstung",
-  description: "Alles was zum Wandern benötigt wird",
-  rental_period: 14
+  description: "Alles was zum Wandern benötigt wird"
 })
 
 Repo.insert!(%Category{
   club: club_2,
   name: "Ruderausrüstung",
-  description: "Alles was zum Rudern benötigt wird",
-  rental_period: 7
+  description: "Alles was zum Rudern benötigt wird"
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Skiausrüstung",
+  description: "Alles was zum Skifahren benötigt wird"
+})
+
+Repo.insert!(%Category{
+  club: club_2,
+  name: "Surfausrüstung",
+  description: "Alles was zum Surfen benötigt wird"
 })
 ###################################
 # Add Club 3
@@ -553,22 +565,31 @@ club_3 =
   Repo.insert!(%Category{
   club: club_3,
   name: "Bälle",
-  description: "Alle Arten von Bällen",
-  rental_period: 30
+  description: "Alle Arten von Bällen"
 })
 
 Repo.insert!(%Category{
   club: club_3,
   name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen",
-  rental_period: 14
+  description: "Verschiedene Trikots in verschiedenen Größen"
 })
 
 Repo.insert!(%Category{
   club: club_3,
   name: "Schläger",
-  description: "Tennis- und Badmintonschläger",
-  rental_period: 21
+  description: "Tennis- und Badmintonschläger"
+})
+
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Skiausrüstung",
+  description: "Alles was zum Skifahren benötigt wird"
+})
+
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Surfausrüstung",
+  description: "Alles was zum Surfen benötigt wird"
 })
 
 ###################################
@@ -626,14 +647,12 @@ Repo.insert!(%Department{
 Repo.insert!(%Category{
   club: testclub,
   name: "Bälle",
-  description: "Alle Arten von Bällen",
-  rental_period: 35
+  description: "Alle Arten von Bällen"
 })
 Repo.insert!(%Category{
   club: testclub,
   name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen",
-  rental_period: 14
+  description: "Verschiedene Trikots in verschiedenen Größen"
 })
 
 ###################################
@@ -1206,11 +1225,9 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
         department_id: department_id,
         category_id: category_id,
         name: Faker.Commerce.product_name(),
-        rental_period: Enum.random([nil, Enum.random(7..180)]),
         reference_number: Sportyweb.SeedHelper.get_random_string(5),
         description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
-        costs_of_loss: Money.new(:EUR, Enum.random(10..500)),
-        allow_renewal: Enum.random([true, false])
+        costs_of_loss: Money.new(:EUR, Enum.random(10..500))
       })
 
 

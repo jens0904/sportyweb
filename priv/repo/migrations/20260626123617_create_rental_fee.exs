@@ -14,11 +14,12 @@ defmodule Sportyweb.Repo.Migrations.CreateRentalFee do
 
       add :minimum_age_in_years, :integer, null: true
       add :maximum_age_in_years, :integer, null: true
+      add :flat_fee, :boolean, default: false, null: false
 
       add :rental_duration, :string, null: false
 
-      add :category_id, references(:categories, on_delete: :nilify_all, type: :binary_id)
-      add :article_id, references(:articles, on_delete: :nilify_all, type: :binary_id)
+      add :category_id, references(:categories, on_delete: :delete_all, type: :binary_id)
+      add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id)
 
       add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id),
         null: false

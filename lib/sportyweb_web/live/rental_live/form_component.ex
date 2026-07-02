@@ -4,6 +4,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
   alias Sportyweb.Asset
   alias Sportyweb.Inventory
   alias Sportyweb.Personal
+  alias Sportyweb.Inventory.RentalFee
 
   @impl true
   def render(assigns) do
@@ -76,55 +77,65 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                   </div>
 
                   <div class="col-span-12 md:col-span-6">
-                    <%= if @rental_rule.rental_period_unit == "Stunden" do %>
-                      <label
-                        for="rental_return_time"
-                        class="block text-sm font-semibold leading-6 text-zinc-800"
-                      >
-                        Rückgabezeit
-                      </label>
+                    <%= cond do %>
+                      <% @rental_rule.rental_period_unit == "Stunden" -> %>
+                        <label
+                          for="rental_return_time"
+                          class="block text-sm font-semibold leading-6 text-zinc-800"
+                        >
+                          Rückgabezeit
+                        </label>
 
-                      <select
-                        id="rental_return_time"
-                        name="rental[return_time]"
-                        class="mt-2 block w-full rounded-lg border-zinc-300 text-zinc-900 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
-                      >
-                        <option value="">Bitte auswählen</option>
+                        <select
+                          id="rental_return_time"
+                          name="rental[return_time]"
+                          class="mt-2 block w-full rounded-lg border-zinc-300 text-zinc-900 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        >
+                          <option value="">Bitte auswählen</option>
 
-                        <%= for hour <- 8..22 do %>
-                          <% time = String.pad_leading(Integer.to_string(hour), 2, "0") <> ":00" %>
-                          <option value={time} selected={@return_time == time}>
-                            {time}
-                          </option>
-                        <% end %>
-                      </select>
+                          <%= for hour <- 8..22 do %>
+                            <% time = String.pad_leading(Integer.to_string(hour), 2, "0") <> ":00" %>
+                            <option value={time} selected={@return_time == time}>
+                              {time}
+                            </option>
+                          <% end %>
+                        </select>
+                      <% @rental_rule.rental_period_unit == "Saison" -> %>
+                        <.input
+                          name="season_return_date"
+                          value={format_date_input_value(@rental_rule.season_end_date)}
+                          type="date"
+                          label="Rückgabedatum"
+                          disabled
+                          class="bg-gray-100 text-gray-500 cursor-not-allowed"
+                        />
 
-                      <%= for error <- @form[:return_date].errors do %>
-                        <p class="mt-2 text-sm text-rose-600">
-                          {translate_error(error)}
-                        </p>
-                      <% end %>
-                    <% else %>
-                      <label
-                        for="rental_return_date"
-                        class="block text-sm font-semibold leading-6 text-zinc-800"
-                      >
-                        Rückgabedatum
-                      </label>
+                        <input
+                          type="hidden"
+                          name={@form[:return_date].name}
+                          value={format_date_input_value(@rental_rule.season_end_date)}
+                        />
+                      <% true -> %>
+                        <label
+                          for="rental_return_date"
+                          class="block text-sm font-semibold leading-6 text-zinc-800"
+                        >
+                          Rückgabedatum
+                        </label>
 
-                      <input
-                        id="rental_return_date"
-                        name={@form[:return_date].name}
-                        type="date"
-                        value={format_date_input_value(@form[:return_date].value)}
-                        class="mt-2 block w-full rounded-lg border-zinc-300 text-zinc-900 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
-                      />
+                        <input
+                          id="rental_return_date"
+                          name={@form[:return_date].name}
+                          type="date"
+                          value={format_date_input_value(@form[:return_date].value)}
+                          class="mt-2 block w-full rounded-lg border-zinc-300 text-zinc-900 focus:border-zinc-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        />
+                    <% end %>
 
-                      <%= for error <- @form[:return_date].errors do %>
-                        <p class="mt-2 text-sm text-rose-600">
-                          {translate_error(error)}
-                        </p>
-                      <% end %>
+                    <%= for error <- @form[:return_date].errors do %>
+                      <p class="mt-2 text-sm text-rose-600">
+                        {translate_error(error)}
+                      </p>
                     <% end %>
                   </div>
 
@@ -306,6 +317,11 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         |> normalize_datetime_local("rental_date")
         |> put_return_date_from_time()
 
+      "Saison" ->
+        params
+        |> normalize_datetime_local("rental_date")
+        |> put_season_return_date(rental_rule)
+
       _ ->
         params
         |> normalize_datetime_local("rental_date")
@@ -453,41 +469,20 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         true -> "Ohne Zuordnung"
       end
 
-    amount = gross_amount_label(rental_fee)
+    amount = RentalFee.gross_amount_label(rental_fee)
 
-    unit =
+    rental_unit =
       case rental_rule.rental_period_unit do
         "Tage" -> "Tag"
         "Wochen" -> "Woche"
         "Stunden" -> "Stunde"
+        "Saison" -> "Saison"
         value -> value
       end
 
-    {"#{rental_fee.name} – #{amount} / #{unit} – #{target}", rental_fee.id}
+    {"#{rental_fee.name} – #{amount} / #{rental_unit} – #{target}", rental_fee.id}
   end
 
-  defp gross_amount_label(rental_fee) do
-    vat_rate =
-      case rental_fee.member_type do
-        :member -> Decimal.new("0.07")
-        :non_member -> Decimal.new("0.19")
-        _ -> Decimal.new("0")
-      end
-
-    gross_amount =
-      rental_fee.amount.amount
-      |> Decimal.mult(Decimal.add(Decimal.new("1"), vat_rate))
-      |> Decimal.round(2)
-
-    rental_fee.amount
-    |> Map.put(:amount, gross_amount)
-    |> Money.to_string()
-    |> case do
-      {:ok, formatted_amount} -> formatted_amount
-      formatted_amount when is_binary(formatted_amount) -> formatted_amount
-      _ -> ""
-    end
-  end
 
   defp total_fee_preview(params, rental_fee_options, rental_rule) do
     rental_fee_id = Map.get(params, "rental_fee_id")
@@ -500,13 +495,22 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         to_string(fee.id) == to_string(rental_fee_id)
       end)
 
-    with %{} = rental_fee <- rental_fee,
-         units when not is_nil(units) <-
-           rental_units(rental_date, return_date, return_time, rental_rule) do
-      rental_fee
-      |> gross_money()
-      |> multiply_money(units)
-      |> money_to_string()
+    with %{} = rental_fee <- rental_fee do
+      money = RentalFee.gross_money(rental_fee)
+
+      if rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison" do
+        RentalFee.money_label(money)
+      else
+        case rental_units(rental_date, return_date, return_time, rental_rule) do
+          nil ->
+            ""
+
+          billing_units ->
+            money
+            |> multiply_money(billing_units)
+            |> RentalFee.money_label()
+        end
+      end
     else
       _ -> ""
     end
@@ -514,6 +518,9 @@ defmodule SportywebWeb.RentalLive.FormComponent do
 
   defp rental_units(rental_date, return_date, return_time, rental_rule) do
     case rental_rule.rental_period_unit do
+      "Saison" ->
+        Decimal.new(1)
+
       "Stunden" ->
         with {:ok, start_naive} <- parse_datetime_local(rental_date),
              {:ok, time} <- Time.from_iso8601(return_time <> ":00") do
@@ -551,21 +558,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     end
   end
 
-  defp gross_money(rental_fee) do
-    vat_rate =
-      case rental_fee.member_type do
-        :member -> Decimal.new("0.07")
-        :non_member -> Decimal.new("0.19")
-        _ -> Decimal.new("0")
-      end
-
-    gross_amount =
-      rental_fee.amount.amount
-      |> Decimal.mult(Decimal.add(Decimal.new("1"), vat_rate))
-      |> Decimal.round(2)
-
-    %{rental_fee.amount | amount: gross_amount}
-  end
 
   defp multiply_money(%Money{} = money, nil), do: money
 
@@ -573,13 +565,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
   end
 
-  defp money_to_string(%Money{} = money) do
-    case Money.to_string(money) do
-      {:ok, formatted} -> formatted
-      formatted when is_binary(formatted) -> formatted
-      _ -> ""
-    end
-  end
 
   defp parse_datetime_local(%DateTime{} = datetime), do: {:ok, DateTime.to_naive(datetime)}
 
@@ -605,4 +590,23 @@ defmodule SportywebWeb.RentalLive.FormComponent do
   end
 
   defp parse_date_from_datetime(_), do: :error
+
+  defp put_season_return_date(params, rental_rule) do
+    with rental_date when is_binary(rental_date) <- Map.get(params, "rental_date"),
+         {:ok, rental_datetime, _offset} <- DateTime.from_iso8601(rental_date),
+         rental_date <- DateTime.to_date(rental_datetime),
+         %Date{} = season_start_date <- rental_rule.season_start_date,
+         %Date{} = season_end_date <- rental_rule.season_end_date,
+         true <- Date.compare(rental_date, season_start_date) in [:eq, :gt],
+         true <- Date.compare(rental_date, season_end_date) in [:eq, :lt] do
+      return_datetime =
+        season_end_date
+        |> DateTime.new!(~T[00:00:00], "Etc/UTC")
+        |> DateTime.to_iso8601()
+
+      Map.put(params, "return_date", return_datetime)
+    else
+      _ -> params
+    end
+  end
 end

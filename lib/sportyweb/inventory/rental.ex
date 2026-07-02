@@ -8,8 +8,6 @@ defmodule Sportyweb.Inventory.Rental do
   alias Sportyweb.Inventory.Article
   alias Sportyweb.Inventory.Unit
 
-
-
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "rentals" do
@@ -37,89 +35,107 @@ defmodule Sportyweb.Inventory.Rental do
   end
 
   @doc false
-  def changeset(rental, attrs, max_return_date \\ nil, rental_period_unit \\ nil) do
-  rental
-  |> cast(attrs, [
-    :return_date,
-    :location_id,
-    :article_id,
-    :unit_id,
-    :contact_id,
-    :rental_date,
-    :renewal_count,
-    :return_comment,
-    :status
-  ])
-  |> validate_required([
-    :return_date,
-    :location_id,
-    :article_id,
-    :unit_id,
-    :contact_id,
-    :rental_date
-  ])
-  |> validate_datetimes_order(
-    :rental_date,
-    :return_date,
-    "Das Rückgabedatum muss nach dem Ausleihdatum liegen."
-  )
-  |> validate_return_date_after_previous_return_date(rental.return_date)
-  |> validate_inclusion(:status, get_valid_statuses() |> Enum.map(& &1[:value]))
-  |> validate_return_date_within_max_return_date(max_return_date)
-  |> validate_same_weekday_for_weekly_rental(rental_period_unit)
-end
-
-defp validate_same_weekday_for_weekly_rental(changeset, "Wochen") do
-  rental_date = get_field(changeset, :rental_date)
-  return_date = get_field(changeset, :return_date)
-
-  if rental_date &&
-       return_date &&
-       Date.day_of_week(DateTime.to_date(rental_date)) !=
-         Date.day_of_week(DateTime.to_date(return_date)) do
-    add_error(
-      changeset,
+  def changeset(rental, attrs, max_return_date \\ nil, rental_rule \\ nil) do
+    rental
+    |> cast(attrs, [
       :return_date,
-      "muss auf denselben Wochentag wie das Ausleihdatum fallen"
+      :location_id,
+      :article_id,
+      :unit_id,
+      :contact_id,
+      :rental_date,
+      :renewal_count,
+      :return_comment,
+      :status
+    ])
+    |> validate_required([
+      :return_date,
+      :location_id,
+      :article_id,
+      :unit_id,
+      :contact_id,
+      :rental_date
+    ])
+    |> validate_datetimes_order(
+      :rental_date,
+      :return_date,
+      "Das Rückgabedatum muss nach dem Ausleihdatum liegen."
     )
-  else
-    changeset
+    |> validate_return_date_after_previous_return_date(rental.return_date)
+    |> validate_inclusion(:status, get_valid_statuses() |> Enum.map(& &1[:value]))
+    |> validate_return_date_within_max_return_date(max_return_date)
+    |> validate_same_weekday_for_weekly_rental(rental_rule)
+    |> validate_rental_date_in_season(rental_rule)
   end
-end
 
-defp validate_same_weekday_for_weekly_rental(changeset, _), do: changeset
+  defp validate_same_weekday_for_weekly_rental(changeset, %{rental_period_unit: "Wochen"}) do
+    rental_date = get_field(changeset, :rental_date)
+    return_date = get_field(changeset, :return_date)
 
+    if rental_date &&
+         return_date &&
+         Date.day_of_week(DateTime.to_date(rental_date)) !=
+           Date.day_of_week(DateTime.to_date(return_date)) do
+      add_error(
+        changeset,
+        :return_date,
+        "muss auf denselben Wochentag wie das Ausleihdatum fallen"
+      )
+    else
+      changeset
+    end
+  end
+
+  defp validate_same_weekday_for_weekly_rental(changeset, _), do: changeset
 
   defp validate_return_date_within_max_return_date(changeset, nil), do: changeset
 
-defp validate_return_date_within_max_return_date(changeset, max_return_date) do
-  return_date = get_field(changeset, :return_date)
+  defp validate_return_date_within_max_return_date(changeset, max_return_date) do
+    return_date = get_field(changeset, :return_date)
 
-  if return_date &&
-       DateTime.compare(return_date, max_return_date) == :gt do
-    add_error(
-      changeset,
-      :return_date,
-      "darf nicht nach der maximalen Ausleihdauer liegen"
-    )
-  else
-    changeset
+    if return_date &&
+         DateTime.compare(return_date, max_return_date) == :gt do
+      add_error(
+        changeset,
+        :return_date,
+        "darf nicht nach der maximalen Ausleihdauer liegen"
+      )
+    else
+      changeset
+    end
   end
-end
 
-defp validate_return_date_after_previous_return_date(changeset, nil), do: changeset
+  defp validate_return_date_after_previous_return_date(changeset, nil), do: changeset
 
-defp validate_return_date_after_previous_return_date(changeset, previous_return_date) do
-  new_return_date = get_field(changeset, :return_date)
+  defp validate_return_date_after_previous_return_date(changeset, previous_return_date) do
+    new_return_date = get_field(changeset, :return_date)
 
-  if new_return_date && DateTime.compare(new_return_date, previous_return_date) == :lt do
-    add_error(
-      changeset,
-      :return_date,
-      "darf nicht vor dem bisherigen Rückgabedatum liegen"
-    )
-  else
-    changeset
+    if new_return_date && DateTime.compare(new_return_date, previous_return_date) == :lt do
+      add_error(
+        changeset,
+        :return_date,
+        "darf nicht vor dem bisherigen Rückgabedatum liegen"
+      )
+    else
+      changeset
+    end
   end
-end
+
+  defp validate_rental_date_in_season(changeset, %{rental_period_unit: "Saison"} = rental_rule) do
+    rental_date = get_field(changeset, :rental_date)
+    season_start_date = rental_rule.season_start_date
+    season_end_date = rental_rule.season_end_date
+
+    if rental_date &&
+         season_start_date &&
+         season_end_date &&
+         Date.compare(DateTime.to_date(rental_date), season_start_date) in [:eq, :gt] &&
+         Date.compare(DateTime.to_date(rental_date), season_end_date) in [:eq, :lt] do
+      changeset
+    else
+      add_error(changeset, :rental_date, "liegt außerhalb der Saison")
+    end
+  end
+
+  defp validate_rental_date_in_season(changeset, _), do: changeset
 end

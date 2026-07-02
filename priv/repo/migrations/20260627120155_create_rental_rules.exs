@@ -15,6 +15,9 @@ defmodule Sportyweb.Repo.Migrations.CreateRentalRules do
       add :for_non_members, :boolean, default: false, null: false
       add :allow_renewal, :boolean, default: false, null: false
 
+      add :season_start_date, :date, null: true
+      add :season_end_date, :date, null: true
+
       add :rental_period, :integer
       add :rental_period_unit, :string, default: "days"
 

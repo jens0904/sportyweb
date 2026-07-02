@@ -20,13 +20,12 @@ defmodule Sportyweb.Inventory.Article do
     has_many :units, Unit
     has_many :rentals, Rental
     has_many :rental_rules, RentalRule
-    many_to_many :rental_fees, RentalFee, join_through: ArticleRentalFee
+    has_many :rental_fees, RentalFee
     field :name, :string
     field :description, :string
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
-    field :choose_rental_period, :boolean, default: false
-    field :rental_period, :integer
+
 
     timestamps(type: :utc_datetime)
   end
@@ -41,26 +40,12 @@ defmodule Sportyweb.Inventory.Article do
       :costs_of_loss,
       :club_id,
       :department_id,
-      :category_id,
-      :for_club_members,
-      :for_non_members,
-      :choose_rental_period,
-      :rental_period,
-      :rental_period_unit,
-      :allow_renewal,
-      :max_renewals,
-      :renewal_period
+      :category_id
     ])
     |> validate_required([
       :name,
       :description,
-      :reference_number,
-      :for_club_members,
-      :for_non_members,
-      :costs_of_loss,
-      :club_id,
-      :allow_renewal,
-      :max_renewals
+      :reference_number
     ])
     |> validate_length(:name, max: 250)
     |> validate_length(:reference_number, max: 250)

@@ -22,6 +22,8 @@ defmodule Sportyweb.Inventory.RentalRule do
     field :allow_renewal, :boolean, default: false
     field :max_renewals, :integer, default: 2
     field :renewal_period, :integer, default: 7
+    field :season_start_date, :date
+    field :season_end_date, :date
 
     timestamps(type: :utc_datetime)
   end
@@ -42,7 +44,9 @@ defmodule Sportyweb.Inventory.RentalRule do
       :rental_period_unit,
       :allow_renewal,
       :max_renewals,
-      :renewal_period
+      :renewal_period,
+      :season_start_date,
+      :season_end_date
     ])
     |> validate_required([:club_id])
     |> foreign_key_constraint(:club_id)
