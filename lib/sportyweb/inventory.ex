@@ -411,8 +411,6 @@ defmodule Sportyweb.Inventory do
     Unit.changeset(unit, attrs)
   end
 
-  alias Sportyweb.Inventory.Rental
-
   @doc """
   Returns the list of rentals.
 
@@ -639,7 +637,6 @@ defmodule Sportyweb.Inventory do
   end
 
   def renew_rental(%Rental{} = rental, attrs) do
-
     attrs =
       attrs
       |> Map.put("renewal_count", rental.renewal_count + 1)
@@ -652,7 +649,7 @@ defmodule Sportyweb.Inventory do
   def return_rental(%Rental{} = rental, attrs) do
     rental =
       rental.id
-      |> get_rental!([:article])
+      |> get_rental!([:article, :rental_fee])
 
     rental_rule = get_applicable_rental_rule(rental.article_id)
     returned_at = DateTime.utc_now()
@@ -664,6 +661,7 @@ defmodule Sportyweb.Inventory do
     }
 
     total_fee = calculate_total_fee(fee_attrs, rental_rule)
+    vat_fee = vat_money_for_total_fee(total_fee, rental.rental_fee)
 
     rental_attrs =
       Map.merge(attrs, %{
@@ -673,16 +671,17 @@ defmodule Sportyweb.Inventory do
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
-    |> maybe_create_old_rental(rental, rental_attrs, total_fee, returned_at)
+    |> maybe_create_old_rental(rental, rental_attrs, total_fee, vat_fee, returned_at)
     |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
       rental.unit_id
       |> get_unit!()
       |> Unit.occupied_changeset(%{occupied: false})
     end)
+    |> Ecto.Multi.delete(:rental, rental)
     |> Repo.transaction()
   end
 
-  defp maybe_create_old_rental(multi, %Rental{} = rental, attrs, total_fee, returned_at) do
+  defp maybe_create_old_rental(multi, %Rental{} = rental, attrs, total_fee, vat_fee, returned_at) do
     if fee_required?(total_fee) do
       old_rental_attrs = %{
         club_id: rental.article.club_id,
@@ -695,6 +694,7 @@ defmodule Sportyweb.Inventory do
         renewal_count: rental.renewal_count,
         return_comment: Map.get(attrs, "return_comment") || rental.return_comment,
         total_fee: total_fee,
+        vat_fee: vat_fee,
         fee_required: true,
         returned_at: DateTime.utc_now()
       }
@@ -715,6 +715,18 @@ defmodule Sportyweb.Inventory do
 
   defp fee_required?(nil), do: false
 
+  defp vat_money_for_total_fee(nil, _rental_fee), do: nil
+
+  defp vat_money_for_total_fee(%Money{} = total_fee, %RentalFee{} = rental_fee) do
+    vat_amount =
+      total_fee.amount
+      |> Decimal.mult(RentalFee.vat_rate(rental_fee))
+      |> Decimal.div(Decimal.add(Decimal.new("1"), RentalFee.vat_rate(rental_fee)))
+      |> Decimal.round(2)
+
+    %{total_fee | amount: vat_amount}
+  end
+
   def calculate_new_return_date(%Rental{} = rental, article_id) do
     rental_rule = get_applicable_rental_rule(article_id)
 
@@ -732,8 +744,6 @@ defmodule Sportyweb.Inventory do
         Date.add(rental.return_date, renewal_period)
     end
   end
-
-  alias Sportyweb.Inventory.RentalFee
 
   @doc """
   Returns the list of rental_fee.
@@ -953,8 +963,6 @@ defmodule Sportyweb.Inventory do
     end
   end
 
-  alias Sportyweb.Inventory.RentalRule
-
   def calculate_total_fee(attrs, %RentalRule{} = rental_rule) do
     rental_fee_id = Map.get(attrs, "rental_fee_id") || Map.get(attrs, :rental_fee_id)
 
@@ -993,14 +1001,9 @@ defmodule Sportyweb.Inventory do
 
       "Stunden" ->
         with {:ok, start_naive} <- parse_datetime(rental_date),
-             {:ok, time} <- Time.from_iso8601(return_time <> ":00") do
-          end_naive =
-            start_naive
-            |> NaiveDateTime.to_date()
-            |> NaiveDateTime.new!(time)
-
+             {:ok, end_naive} <-
+               end_datetime_for_hourly_rental(rental_date, return_date, return_time) do
           diff = NaiveDateTime.diff(end_naive, start_naive, :hour)
-
           Decimal.new(max(diff, 1))
         else
           _ -> nil
@@ -1027,6 +1030,34 @@ defmodule Sportyweb.Inventory do
 
       _ ->
         nil
+    end
+  end
+
+  defp end_datetime_for_hourly_rental(rental_date, return_date, nil) do
+    parse_datetime(return_date)
+  end
+
+  defp end_datetime_for_hourly_rental(rental_date, return_date, "") do
+    parse_datetime(return_date)
+  end
+
+  defp end_datetime_for_hourly_rental(rental_date, _return_date, return_time)
+       when is_binary(return_time) do
+    with {:ok, start_naive} <- parse_datetime(rental_date),
+         {:ok, time} <- Time.from_iso8601(normalize_time(return_time)) do
+      end_naive =
+        start_naive
+        |> NaiveDateTime.to_date()
+        |> NaiveDateTime.new!(time)
+
+      {:ok, end_naive}
+    end
+  end
+
+  defp normalize_time(value) when is_binary(value) do
+    cond do
+      String.length(value) == 5 -> value <> ":00"
+      true -> value
     end
   end
 
@@ -1073,8 +1104,6 @@ defmodule Sportyweb.Inventory do
   end
 
   defp parse_date_from_datetime(_), do: :error
-
-  alias Sportyweb.Inventory.RentalRule
 
   @doc """
   Returns the list of rental_rules.
@@ -1200,8 +1229,6 @@ defmodule Sportyweb.Inventory do
   def change_rental_rule(%RentalRule{} = rental_rule, attrs \\ %{}) do
     RentalRule.changeset(rental_rule, attrs)
   end
-
-  alias Sportyweb.Inventory.OldRentals
 
   @doc """
   Returns the list of old_rentals.

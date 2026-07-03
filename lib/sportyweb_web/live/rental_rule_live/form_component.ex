@@ -108,7 +108,7 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
                 <.input
                   field={@form[:choose_rental_period]}
                   type="checkbox"
-                  label="Feste Dauer definieren"
+                  label="Höchstdauer definieren"
                 />
               </div>
 

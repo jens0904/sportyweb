@@ -23,7 +23,7 @@ defmodule Sportyweb.Inventory.OldRentals do
     field :renewal_count, :integer, default: 0
     field :return_comment, :string
     field :total_fee, Money.Ecto.Composite.Type, default_currency: :EUR
-
+    field :vat_fee, Money.Ecto.Composite.Type, default_currency: :EUR
     # Zeitpunkt der tatsächlichen Rückgabe/Archivierung
     field :returned_at, :utc_datetime
 
@@ -47,7 +47,8 @@ defmodule Sportyweb.Inventory.OldRentals do
       :return_comment,
       :returned_at,
       :fee_required,
-      :total_fee
+      :total_fee,
+      :vat_fee
     ])
     |> validate_required([
       :article_id,

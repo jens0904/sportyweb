@@ -41,6 +41,10 @@
       {@old_rentals.total_fee}
     </:item>
 
+    <:item title="Mehrwertsteuer">
+      {@old_rentals.vat_fee}
+    </:item>
+
     <:item title="Zurückgegeben am">
       {Calendar.strftime(@old_rentals.returned_at, "%d.%m.%Y %H:%M")}
     </:item>

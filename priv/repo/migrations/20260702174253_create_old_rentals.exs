@@ -24,7 +24,7 @@ defmodule Sportyweb.Repo.Migrations.CreateOldRentals do
         add :renewal_count, :integer, default: 0, null: false
         add :return_comment, :text
         add :total_fee, :money_with_currency, null: false
-
+        add :vat_fee, :money_with_currency, null: false
         add :returned_at, :utc_datetime, null: false
         add :fee_required, :boolean, null: false
 

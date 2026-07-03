@@ -32,7 +32,7 @@
       {if @rental_rule.choose_rental_period, do: "Ja", else: "Nein"}
     </:item>
 
-    <:item title="Ausleihzeitraum">
+    <:item title="Höchstdauer">
       <%= if @rental_rule.choose_rental_period do %>
         {@rental_rule.rental_period} {@rental_rule.rental_period_unit}
       <% else %>
