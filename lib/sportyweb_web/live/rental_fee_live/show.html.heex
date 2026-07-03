@@ -9,8 +9,34 @@
 
 <.card>
   <.list>
+    <:item title="Gilt für">
+      <%= cond do %>
+        <% @rental_fee.article_id -> %>
+          Artikel
+        <% @rental_fee.category_id -> %>
+          Kategorie
+        <% @rental_fee.club_id -> %>
+          Gesamter Verein
+        <% true -> %>
+          –
+      <% end %>
+    </:item>
+
+    <:item title="Bereich">
+      <%= cond do %>
+        <% @rental_fee.article -> %>
+          <%= @rental_fee.article.name %>
+        <% @rental_fee.category -> %>
+          <%= @rental_fee.category.name %>
+        <% @rental_fee.club -> %>
+          <%= @rental_fee.club.name %>
+        <% true -> %>
+          –
+      <% end %>
+    </:item>
+
     <:item title="Name">
-      {@rental_fee.name}
+      <%= @rental_fee.name %>
     </:item>
 
     <:item title="Für wen gilt die Gebühr?">
@@ -29,15 +55,28 @@
       <% end %>
     </:item>
 
+    <:item title="Grundbetrag">
+      <%= Money.to_string!(@rental_fee.amount) %>
+    </:item>
+
+    <:item title="Pauschalgebühr">
+      <%= if @rental_fee.flat_fee, do: "Ja", else: "Nein" %>
+    </:item>
+
     <:item title="Mindestalter">
-      {@rental_fee.minimum_age_in_years || "–"}
+      <%= @rental_fee.minimum_age_in_years || "–" %>
     </:item>
 
     <:item title="Höchstalter">
-      {@rental_fee.maximum_age_in_years || "–"}
+      <%= @rental_fee.maximum_age_in_years || "–" %>
+    </:item>
+
+    <:item title="Nachfolger-Gebühr">
+      <%= if @rental_fee.successor do %>
+        <%= @rental_fee.successor.name %>
+      <% else %>
+        –
+      <% end %>
     </:item>
   </.list>
 </.card>
-
-
-  

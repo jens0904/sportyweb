@@ -639,82 +639,81 @@ defmodule Sportyweb.Inventory do
   end
 
   def renew_rental(%Rental{} = rental, attrs) do
+
+    attrs =
+      attrs
+      |> Map.put("renewal_count", rental.renewal_count + 1)
+
     rental
     |> Rental.changeset(attrs)
-    |> Rental.changeset(%{renewal_count: rental.renewal_count + 1})
     |> Repo.update()
   end
 
-def return_rental(%Rental{} = rental, attrs) do
-  rental =
-    rental.id
-    |> get_rental!([:article])
+  def return_rental(%Rental{} = rental, attrs) do
+    rental =
+      rental.id
+      |> get_rental!([:article])
 
-  rental_rule = get_applicable_rental_rule(rental.article_id)
-  returned_at = DateTime.utc_now()
+    rental_rule = get_applicable_rental_rule(rental.article_id)
+    returned_at = DateTime.utc_now()
 
-  fee_attrs = %{
-    "rental_fee_id" => rental.rental_fee_id,
-    "rental_date" => rental.rental_date,
-    "return_date" => returned_at
-  }
-
-  total_fee = calculate_total_fee(fee_attrs, rental_rule)
-
-  rental_attrs =
-    Map.merge(attrs, %{
-      "status" => "returned",
-      "total_fee" => total_fee
-    })
-
-  Ecto.Multi.new()
-  |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
-  |> maybe_create_old_rental(rental, rental_attrs, total_fee, returned_at)
-  |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
-    rental.unit_id
-    |> get_unit!()
-    |> Unit.occupied_changeset(%{occupied: false})
-  end)
-  |> Repo.transaction()
-end
-
-
-
-defp maybe_create_old_rental(multi, %Rental{} = rental, attrs, total_fee, returned_at) do
-  if fee_required?(total_fee) do
-    old_rental_attrs = %{
-      club_id: rental.article.club_id,
-      article_id: rental.article_id,
-      contact_id: rental.contact_id,
-      location_id: rental.location_id,
-      unit_id: rental.unit_id,
-      rental_date: rental.rental_date,
-      return_date: rental.return_date,
-      renewal_count: rental.renewal_count,
-      return_comment: Map.get(attrs, "return_comment") || rental.return_comment,
-      total_fee: total_fee,
-      fee_required: true,
-      returned_at: DateTime.utc_now()
+    fee_attrs = %{
+      "rental_fee_id" => rental.rental_fee_id,
+      "rental_date" => rental.rental_date,
+      "return_date" => returned_at
     }
 
-    Ecto.Multi.insert(
-      multi,
-      :old_rental,
-      OldRentals.changeset(%OldRentals{}, old_rental_attrs)
-    )
-  else
-    multi
+    total_fee = calculate_total_fee(fee_attrs, rental_rule)
+
+    rental_attrs =
+      Map.merge(attrs, %{
+        "status" => "returned",
+        "total_fee" => total_fee
+      })
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
+    |> maybe_create_old_rental(rental, rental_attrs, total_fee, returned_at)
+    |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
+      rental.unit_id
+      |> get_unit!()
+      |> Unit.occupied_changeset(%{occupied: false})
+    end)
+    |> Repo.transaction()
   end
-end
+
+  defp maybe_create_old_rental(multi, %Rental{} = rental, attrs, total_fee, returned_at) do
+    if fee_required?(total_fee) do
+      old_rental_attrs = %{
+        club_id: rental.article.club_id,
+        article_id: rental.article_id,
+        contact_id: rental.contact_id,
+        location_id: rental.location_id,
+        unit_id: rental.unit_id,
+        rental_date: rental.rental_date,
+        return_date: rental.return_date,
+        renewal_count: rental.renewal_count,
+        return_comment: Map.get(attrs, "return_comment") || rental.return_comment,
+        total_fee: total_fee,
+        fee_required: true,
+        returned_at: DateTime.utc_now()
+      }
+
+      Ecto.Multi.insert(
+        multi,
+        :old_rental,
+        OldRentals.changeset(%OldRentals{}, old_rental_attrs)
+      )
+    else
+      multi
+    end
+  end
 
   defp fee_required?(%Money{amount: amount}) do
     Decimal.compare(amount, Decimal.new(0)) == :gt
   end
 
-
   defp fee_required?(nil), do: false
-
-
 
   def calculate_new_return_date(%Rental{} = rental, article_id) do
     rental_rule = get_applicable_rental_rule(article_id)
@@ -1248,11 +1247,11 @@ end
 
   """
 
-    def get_old_rentals!(id, preloads) do
+  def get_old_rentals!(id, preloads) do
     OldRentals
     |> Repo.get!(id)
     |> Repo.preload(preloads)
-    end
+  end
 
   @doc """
   Creates a old_rentals.

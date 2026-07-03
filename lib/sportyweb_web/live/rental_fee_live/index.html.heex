@@ -98,17 +98,6 @@
         <% end %>
       </:col>
 
-      <:col :let={{_id, rental_fee}} label="Mietdauer">
-        <%= case rental_fee.rental_duration do %>
-          <% :short_term -> %>
-            Kurzfristig
-          <% :long_term -> %>
-            Langfristig
-          <% _ -> %>
-            -
-        <% end %>
-      </:col>
-
       <:col :let={{_id, rental_fee}} label="Grundbetrag">
         {Money.to_string!(rental_fee.amount)}
       </:col>

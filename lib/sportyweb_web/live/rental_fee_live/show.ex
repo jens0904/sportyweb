@@ -11,7 +11,7 @@ defmodule SportywebWeb.RentalFeeLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     rental_fee =
-      Inventory.get_rental_fee!(id, [:article, :club])
+      Inventory.get_rental_fee!(id, [:article, :club, :category, :successor])
 
     {:noreply,
      socket

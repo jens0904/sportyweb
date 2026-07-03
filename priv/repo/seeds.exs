@@ -38,6 +38,8 @@ alias Sportyweb.Polymorphic.PostalAddress
 alias Sportyweb.Inventory.Article
 alias Sportyweb.Inventory.Category
 alias Sportyweb.Inventory.Unit
+alias Sportyweb.Inventory.RentalRule
+alias Sportyweb.Inventory.RentalFee
 
 alias Sportyweb.RBAC.Role.ApplicationRole
 alias Sportyweb.RBAC.Role.ClubRole
@@ -305,53 +307,234 @@ Repo.insert!(%Department{
   notes: [Sportyweb.SeedHelper.get_random_note()]
 })
 
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Bälle",
   description: "Alle Arten von Bällen",
 })
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Bälle",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 5),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Bälle",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 8),
+  rental_duration: :short_term
+})
 
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Trikots",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Trikots",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
 
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Schläger",
   description: "Tennis- und Badmintonschläger"
 })
 
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Schläger",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Schläger",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 13),
+  rental_duration: :short_term
+})
+
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Tauchausrüstung",
   description: "Alles was zum Tauchen benötigt wird"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Tauchausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 20),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Tauchausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 25),
+  rental_duration: :short_term
+})
 
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Wanderausrüstung",
   description: "Alles was zum Wandern benötigt wird"
 })
 
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Wanderausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 17),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Wanderausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 25),
+  rental_duration: :short_term
+})
+
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Ruderausrüstung",
   description: "Alles was zum Rudern benötigt wird"
 })
-
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Ruderausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Ruderausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 20),
+  rental_duration: :short_term
+})
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Skiausrüstung",
   description: "Alles was zum Skifahren benötigt wird"
 })
-
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Skiausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 35),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Skiausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 45),
+  rental_duration: :short_term
+})
+category =
 Repo.insert!(%Category{
   club: club_1,
   name: "Surfausrüstung",
   description: "Alles was zum Surfen benötigt wird"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Surfausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Surfausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
+
+Repo.insert!(%RentalRule{
+  club_id: club_1.id,
+  choose_rental_period: false,
+  for_club_members: true,
+  for_non_members: true,
+  allow_renewal: true,
+  max_renewals: 2,
+  renewal_period: 7,
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  name: "Standard Leihgebühr",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 0),
+  rental_duration: :short_term
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_1.id,
+  name: "Standard Leihgebühr",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 0),
+  rental_duration: :short_term
+})
+
 
 ###################################
 # Add Club 2
@@ -498,52 +681,232 @@ Repo.insert!(%Department{
   notes: [Sportyweb.SeedHelper.get_random_note()]
 })
 
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Bälle",
-  description: "Alle Arten von Bällen"
+  description: "Alle Arten von Bällen",
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Bälle",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 5),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Bälle",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 8),
+  rental_duration: :short_term
 })
 
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Trikots",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Trikots",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
 
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Schläger",
   description: "Tennis- und Badmintonschläger"
 })
 
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Schläger",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Schläger",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 13),
+  rental_duration: :short_term
+})
+
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Tauchausrüstung",
   description: "Alles was zum Tauchen benötigt wird"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Tauchausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 20),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Tauchausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 25),
+  rental_duration: :short_term
+})
 
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Wanderausrüstung",
   description: "Alles was zum Wandern benötigt wird"
 })
 
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Wanderausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 17),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Wanderausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 25),
+  rental_duration: :short_term
+})
+
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Ruderausrüstung",
   description: "Alles was zum Rudern benötigt wird"
 })
-
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Ruderausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Ruderausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 20),
+  rental_duration: :short_term
+})
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Skiausrüstung",
   description: "Alles was zum Skifahren benötigt wird"
 })
-
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Skiausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 35),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Skiausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 45),
+  rental_duration: :short_term
+})
+category =
 Repo.insert!(%Category{
   club: club_2,
   name: "Surfausrüstung",
   description: "Alles was zum Surfen benötigt wird"
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Surfausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Surfausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
+
+Repo.insert!(%RentalRule{
+  club_id: club_2.id,
+  choose_rental_period: false,
+  for_club_members: true,
+  for_non_members: true,
+  allow_renewal: true,
+  max_renewals: 2,
+  renewal_period: 7,
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  name: "Standard Leihgebühr",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 0),
+  rental_duration: :short_term
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_2.id,
+  name: "Standard Leihgebühr",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 0),
+  rental_duration: :short_term
 })
 ###################################
 # Add Club 3
@@ -562,35 +925,234 @@ club_3 =
     notes: [Sportyweb.SeedHelper.get_random_note()]
   })
 
-  Repo.insert!(%Category{
+  category =
+Repo.insert!(%Category{
   club: club_3,
   name: "Bälle",
-  description: "Alle Arten von Bällen"
+  description: "Alle Arten von Bällen",
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Bälle",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 5),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Bälle",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 8),
+  rental_duration: :short_term
 })
 
+category =
 Repo.insert!(%Category{
   club: club_3,
   name: "Trikots",
   description: "Verschiedene Trikots in verschiedenen Größen"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Trikots",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Trikots",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
 
+category =
 Repo.insert!(%Category{
   club: club_3,
   name: "Schläger",
   description: "Tennis- und Badmintonschläger"
 })
 
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Schläger",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Schläger",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 13),
+  rental_duration: :short_term
+})
+
+category =
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Tauchausrüstung",
+  description: "Alles was zum Tauchen benötigt wird"
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Tauchausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 20),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Tauchausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 25),
+  rental_duration: :short_term
+})
+
+category =
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Wanderausrüstung",
+  description: "Alles was zum Wandern benötigt wird"
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Wanderausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 17),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Wanderausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 25),
+  rental_duration: :short_term
+})
+
+category =
+Repo.insert!(%Category{
+  club: club_3,
+  name: "Ruderausrüstung",
+  description: "Alles was zum Rudern benötigt wird"
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Ruderausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Ruderausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 20),
+  rental_duration: :short_term
+})
+category =
 Repo.insert!(%Category{
   club: club_3,
   name: "Skiausrüstung",
   description: "Alles was zum Skifahren benötigt wird"
 })
-
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Skiausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 35),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Skiausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 45),
+  rental_duration: :short_term
+})
+category =
 Repo.insert!(%Category{
   club: club_3,
   name: "Surfausrüstung",
   description: "Alles was zum Surfen benötigt wird"
 })
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Surfausrüstung",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 10),
+  rental_duration: :short_term
+})
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  category_id: category.id,
+  name: "Standard Mietgebühr Surfausrüstung",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 15),
+  rental_duration: :short_term
+})
+
+Repo.insert!(%RentalRule{
+  club_id: club_3.id,
+  choose_rental_period: false,
+  for_club_members: true,
+  for_non_members: true,
+  allow_renewal: true,
+  max_renewals: 2,
+  renewal_period: 7,
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  name: "Standard Leihgebühr",
+  flat_fee: false,
+  member_type: :member,
+  amount: Money.new(:EUR, 0),
+  rental_duration: :short_term
+})
+
+Repo.insert!(%RentalFee{
+  club_id: club_3.id,
+  name: "Standard Leihgebühr",
+  flat_fee: false,
+  member_type: :non_member,
+  amount: Money.new(:EUR, 0),
+  rental_duration: :short_term
+})
+
 
 ###################################
 # Add Club 4

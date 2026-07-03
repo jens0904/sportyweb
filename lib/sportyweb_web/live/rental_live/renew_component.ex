@@ -12,7 +12,7 @@ defmodule SportywebWeb.RentalLive.RenewComponent do
       </.header>
       <.card>
       <%= if @rental_rule.allow_renewal do %>
-        <%= if @rental.renewal_count < @article.max_renewals do %>
+        <%= if @rental.renewal_count < @rental_rule.max_renewals do %>
             <.simple_form
               for={@form}
               id="rental-renew-form"
