@@ -7,6 +7,7 @@ defmodule Sportyweb.Inventory.Rental do
   alias Sportyweb.Personal.Contact
   alias Sportyweb.Inventory.Article
   alias Sportyweb.Inventory.Unit
+  alias Sportyweb.Inventory.RentalFee
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -15,6 +16,7 @@ defmodule Sportyweb.Inventory.Rental do
     belongs_to :contact, Contact
     belongs_to :location, Location
     belongs_to :unit, Unit
+    belongs_to :rental_fee, RentalFee
     field :rental_date, :utc_datetime
     field :return_date, :utc_datetime
     field :renewal_count, :integer, default: 0
@@ -47,7 +49,8 @@ defmodule Sportyweb.Inventory.Rental do
       :renewal_count,
       :return_comment,
       :status,
-      :total_fee
+      :total_fee,
+      :rental_fee_id
     ])
     |> validate_required([
       :return_date,
@@ -56,7 +59,8 @@ defmodule Sportyweb.Inventory.Rental do
       :unit_id,
       :contact_id,
       :rental_date,
-      :total_fee
+      :total_fee,
+      :rental_fee_id
     ])
     |> validate_datetimes_order(
       :rental_date,

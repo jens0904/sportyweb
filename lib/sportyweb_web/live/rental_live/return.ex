@@ -38,7 +38,7 @@ defmodule SportywebWeb.RentalLive.Return do
 
 
   def apply_action(socket, :return, %{"id" => id}) do
-    rental = Inventory.get_rental!(id, article: :club)
+    rental = Inventory.get_rental!(id, [:rental_fee, article: :club])
 
     socket
     |> assign(:page_title, "Ausleihe zurückgeben")

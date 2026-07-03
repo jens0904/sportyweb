@@ -18,7 +18,7 @@ defmodule SportywebWeb.RentalLive.Show do
 
     {:noreply,
      socket
-     |> assign(:page_title, "Ausleihe: #{rental.rental_number}")
+     |> assign(:page_title, "Ausleihe: #{rental.article.name}")
      |> assign(:rental, rental)
      |> assign(:article, rental.article)
      |> assign(:rental_rule, rental_rule)

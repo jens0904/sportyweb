@@ -4,7 +4,7 @@ defmodule Sportyweb.Repo.Migrations.AddRentalFeeIdToRentals do
 
   def change do
     alter table(:rentals) do
-      add :rental_fee_id, references(:rental_fees, on_delete: :delete_all, type: :binary_id), null: false
+      add :rental_fee_id, references(:rental_fees, on_delete: :restrict, type: :binary_id), null: false
     end
 
     create index(:rentals, [:rental_fee_id])
