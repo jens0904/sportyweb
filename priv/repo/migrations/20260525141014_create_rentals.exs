@@ -10,6 +10,7 @@ defmodule Sportyweb.Repo.Migrations.CreateRentals do
       add :renewal_count, :integer, null: false
       add :return_comment, :string
       add :status, :string, null: false
+      add :total_fee, :money_with_currency, null: false
 
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false

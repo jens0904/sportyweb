@@ -15,13 +15,13 @@ defmodule Sportyweb.Inventory.Rental do
     belongs_to :contact, Contact
     belongs_to :location, Location
     belongs_to :unit, Unit
-    field :rental_number, :string
     field :rental_date, :utc_datetime
     field :return_date, :utc_datetime
     field :renewal_count, :integer, default: 0
     field :return_comment, :string
     field :status, :string, default: "returned"
     field :return_time, :time, virtual: true
+    field :total_fee, Money.Ecto.Composite.Type, default_currency: :EUR
 
     timestamps(type: :utc_datetime)
   end
@@ -46,7 +46,8 @@ defmodule Sportyweb.Inventory.Rental do
       :rental_date,
       :renewal_count,
       :return_comment,
-      :status
+      :status,
+      :total_fee
     ])
     |> validate_required([
       :return_date,
@@ -54,7 +55,8 @@ defmodule Sportyweb.Inventory.Rental do
       :article_id,
       :unit_id,
       :contact_id,
-      :rental_date
+      :rental_date,
+      :total_fee
     ])
     |> validate_datetimes_order(
       :rental_date,

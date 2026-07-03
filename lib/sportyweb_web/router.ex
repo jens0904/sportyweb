@@ -212,6 +212,7 @@ defmodule SportywebWeb.Router do
 
       live "/rental_fees/:id", RentalFeeLive.Show, :show
 
+      # RentalRule (Each belongs to a club)
       live "/rental_rules", RentalRuleLive.Index, :index_root
       live "/clubs/:club_id/rental_rules", RentalRuleLive.Index, :index
 
@@ -219,6 +220,17 @@ defmodule SportywebWeb.Router do
       live "/rental_rules/:id/edit", RentalRuleLive.NewEdit, :edit
 
       live "/rental_rules/:id", RentalRuleLive.Show, :show
+
+      # OldRentals (Each belongs to a club)
+
+      live "/old_rentals", OldRentalsLive.Index, :index_root
+      live "/clubs/:club_id/old_rentals", OldRentalsLive.Index, :index
+
+      live "/clubs/:club_id/old_rentals/new", OldRentalsLive.NewEdit, :new
+      live "/old_rentals/:id/edit", OldRentalsLive.NewEdit, :edit
+
+      live "/old_rentals/:id", OldRentalsLive.Show, :show
+
 
       # Equipment (Each belongs to a location)
 

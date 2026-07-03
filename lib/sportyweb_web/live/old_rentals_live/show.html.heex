@@ -1,0 +1,53 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/old_rentals/#{@old_rentals}/edit"}>
+      <.button>Alte Ausleihe bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <.list>
+    
+    <:item title="Artikel">
+      {@old_rentals.article.name}
+    </:item>
+
+    <:item title="Kontakt">
+      {@old_rentals.contact.name}
+    </:item>
+
+    <:item title="Standort">
+      {@old_rentals.location.name}
+    </:item>
+
+    <:item title="Einheit">
+      {@old_rentals.unit.serial_number}
+    </:item>
+
+    <:item title="Ausleihdatum">
+      {Calendar.strftime(@old_rentals.rental_date, "%d.%m.%Y %H:%M")}
+    </:item>
+
+    <:item title="Rückgabedatum">
+      {Calendar.strftime(@old_rentals.return_date, "%d.%m.%Y")}
+    </:item>
+
+    <:item title="Verlängerungen">
+      {@old_rentals.renewal_count}
+    </:item>
+
+    <:item title="Kommentar">
+      {@old_rentals.return_comment}
+    </:item>
+
+    <:item title="Gebühr">
+      {@old_rentals.total_fee}
+    </:item>
+
+    <:item title="Zurückgegeben am">
+      {Calendar.strftime(@old_rentals.returned_at, "%d.%m.%Y %H:%M")}
+    </:item>
+  </.list>
+</.card>

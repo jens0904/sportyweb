@@ -38,6 +38,20 @@
   <% end %>
 </form>
 
+<.card class="flex flex-wrap sm:flex-nowrap justify-between space-x-6">
+  <div>
+    <.icon name="hero-light-bulb" class="w-12 h-12 mt-2 mb-4 text-amber-500" />
+  </div>
+  <div>
+    <p class="mb-3">
+      Mietregeln können auf verschiedenen Ebenen erstellt werden. Sie können für den gesamten Verein, für eine bestimmte Kategorie oder für einen bestimmten Artikel gelten.
+    </p>
+    <p class="mb-3">
+      Eine Vermietung legen Sie in der Übersicht eines Artikels an. Achten Sie darauf, dass für diesen Artikel eine Mietregel und eine Mietgebühr auf der entsprechenden Ebene existiert, damit die Vermietung korrekt berechnet werden kann.  
+    </p>
+  </div>
+</.card>
+
 <.card>
   <%= if Enum.any?(@streams.rental_rules.inserts) do %>
     <.table

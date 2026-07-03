@@ -396,4 +396,58 @@ defmodule Sportyweb.InventoryTest do
       assert %Ecto.Changeset{} = Inventory.change_rental_rule(rental_rule)
     end
   end
+
+  describe "old_rentals" do
+    alias Sportyweb.Inventory.OldRentals
+
+    import Sportyweb.InventoryFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_old_rentals/0 returns all old_rentals" do
+      old_rentals = old_rentals_fixture()
+      assert Inventory.list_old_rentals() == [old_rentals]
+    end
+
+    test "get_old_rentals!/1 returns the old_rentals with given id" do
+      old_rentals = old_rentals_fixture()
+      assert Inventory.get_old_rentals!(old_rentals.id) == old_rentals
+    end
+
+    test "create_old_rentals/1 with valid data creates a old_rentals" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %OldRentals{} = old_rentals} = Inventory.create_old_rentals(valid_attrs)
+      assert old_rentals.name == "some name"
+    end
+
+    test "create_old_rentals/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Inventory.create_old_rentals(@invalid_attrs)
+    end
+
+    test "update_old_rentals/2 with valid data updates the old_rentals" do
+      old_rentals = old_rentals_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %OldRentals{} = old_rentals} = Inventory.update_old_rentals(old_rentals, update_attrs)
+      assert old_rentals.name == "some updated name"
+    end
+
+    test "update_old_rentals/2 with invalid data returns error changeset" do
+      old_rentals = old_rentals_fixture()
+      assert {:error, %Ecto.Changeset{}} = Inventory.update_old_rentals(old_rentals, @invalid_attrs)
+      assert old_rentals == Inventory.get_old_rentals!(old_rentals.id)
+    end
+
+    test "delete_old_rentals/1 deletes the old_rentals" do
+      old_rentals = old_rentals_fixture()
+      assert {:ok, %OldRentals{}} = Inventory.delete_old_rentals(old_rentals)
+      assert_raise Ecto.NoResultsError, fn -> Inventory.get_old_rentals!(old_rentals.id) end
+    end
+
+    test "change_old_rentals/1 returns a old_rentals changeset" do
+      old_rentals = old_rentals_fixture()
+      assert %Ecto.Changeset{} = Inventory.change_old_rentals(old_rentals)
+    end
+  end
 end

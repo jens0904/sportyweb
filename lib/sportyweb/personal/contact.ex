@@ -18,6 +18,7 @@ defmodule Sportyweb.Personal.Contact do
   alias Sportyweb.Polymorphic.Phone
   alias Sportyweb.Polymorphic.PostalAddress
   alias Sportyweb.Inventory.Rental
+  alias Sportyweb.Inventory.OldRentals
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -25,6 +26,7 @@ defmodule Sportyweb.Personal.Contact do
     belongs_to :club, Club
     has_many :contracts, Contract
     has_many :rentals, Rental
+    has_many :old_rentals, OldRentals
     many_to_many :contact_groups, ContactGroup, join_through: ContactGroupContact
     many_to_many :emails, Email, join_through: ContactEmail
     many_to_many :financial_data, FinancialData, join_through: ContactFinancialData

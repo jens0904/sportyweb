@@ -10,6 +10,7 @@ defmodule Sportyweb.Inventory.Article do
   alias Sportyweb.Inventory.ArticleRentalFee
   alias Sportyweb.Inventory.RentalFee
   alias Sportyweb.Inventory.RentalRule
+  alias Sportyweb.Inventory.OldRentals
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -19,6 +20,7 @@ defmodule Sportyweb.Inventory.Article do
     belongs_to :category, Category
     has_many :units, Unit
     has_many :rentals, Rental
+    has_many :old_rentals, OldRentals
     has_many :rental_rules, RentalRule
     has_many :rental_fees, RentalFee
     field :name, :string

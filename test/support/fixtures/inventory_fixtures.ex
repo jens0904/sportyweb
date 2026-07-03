@@ -95,4 +95,18 @@ defmodule Sportyweb.InventoryFixtures do
 
     rental_rule
   end
+
+  @doc """
+  Generate a old_rentals.
+  """
+  def old_rentals_fixture(attrs \\ %{}) do
+    {:ok, old_rentals} =
+      attrs
+      |> Enum.into(%{
+        name: "some name"
+      })
+      |> Sportyweb.Inventory.create_old_rentals()
+
+    old_rentals
+  end
 end

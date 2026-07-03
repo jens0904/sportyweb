@@ -15,6 +15,8 @@ defmodule Sportyweb.Inventory do
   alias Sportyweb.Inventory.Rental
   alias Sportyweb.Personal
   alias Sportyweb.Personal.Contact
+  alias Sportyweb.Inventory.RentalRule
+  alias Sportyweb.Inventory.OldRentals
 
   @doc """
   Returns the list of categories.
@@ -480,6 +482,12 @@ defmodule Sportyweb.Inventory do
 
     rental_rule = get_applicable_rental_rule(rental_attrs["article_id"])
 
+    total_fee =
+      calculate_total_fee(rental_attrs, rental_rule)
+
+    rental_attrs =
+      Map.put(rental_attrs, "total_fee", total_fee)
+
     max_return_date =
       calculate_max_return_date(rental_attrs["article_id"], rental_attrs["rental_date"])
 
@@ -638,7 +646,8 @@ defmodule Sportyweb.Inventory do
   end
 
   def return_rental(%Rental{} = rental, attrs) do
-    unit = get_unit!(rental.unit_id)
+    rental = rental.id
+    |> get_rental!([:article])
 
     rental_attrs =
       Map.merge(attrs, %{
@@ -647,9 +656,54 @@ defmodule Sportyweb.Inventory do
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
-    |> Ecto.Multi.update(:unit, Unit.changeset(unit, %{occupied: false}))
+    |> maybe_create_old_rental(rental, rental_attrs)
+    |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
+      rental.unit_id
+      |> get_unit!()
+      |> Unit.occupied_changeset(%{occupied: false})
+    end)
     |> Repo.transaction()
   end
+
+
+
+  defp maybe_create_old_rental(multi, %Rental{} = rental, attrs) do
+    IO.inspect(rental.id, label: "OLD RENTAL rental id")
+    IO.inspect(rental.total_fee, label: "OLD RENTAL total_fee")
+    IO.inspect(fee_required?(rental.total_fee), label: "OLD RENTAL fee_required?")
+    if fee_required?(rental.total_fee) do
+      old_rental_attrs = %{
+        club_id: rental.article.club_id,
+        article_id: rental.article_id,
+        contact_id: rental.contact_id,
+        location_id: rental.location_id,
+        unit_id: rental.unit_id,
+        rental_date: rental.rental_date,
+        return_date: rental.return_date,
+        renewal_count: rental.renewal_count,
+        return_comment: Map.get(attrs, "return_comment") || rental.return_comment,
+        total_fee: rental.total_fee,
+        returned_at: DateTime.utc_now()
+      }
+
+      Ecto.Multi.insert(
+        multi,
+        :old_rental,
+        OldRentals.changeset(%OldRentals{}, old_rental_attrs)
+      )
+    else
+      multi
+    end
+  end
+
+  defp fee_required?(%Money{amount: amount}) do
+    Decimal.compare(amount, Decimal.new(0)) == :gt
+  end
+
+
+  defp fee_required?(nil), do: false
+
+
 
   def calculate_new_return_date(%Rental{} = rental, article_id) do
     rental_rule = get_applicable_rental_rule(article_id)
@@ -704,7 +758,7 @@ defmodule Sportyweb.Inventory do
 
       true ->
         query =
-          from rf in RentalFee,
+          from(rf in RentalFee,
             where: rf.club_id == ^rental_fee.club_id,
             where: rf.member_type == ^rental_fee.member_type,
             where: rf.rental_duration == ^rental_fee.rental_duration,
@@ -715,11 +769,12 @@ defmodule Sportyweb.Inventory do
               is_nil(rf.maximum_age_in_years) or
                 rf.maximum_age_in_years > ^maximum_age_in_years,
             order_by: rf.name
+          )
 
         query =
           case rental_fee.id do
             nil -> query
-            _ -> from rf in query, where: rf.id != ^rental_fee.id
+            _ -> from(rf in query, where: rf.id != ^rental_fee.id)
           end
 
         Repo.all(query)
@@ -836,7 +891,7 @@ defmodule Sportyweb.Inventory do
       article = get_article!(article_id)
 
       query =
-        from rf in RentalFee,
+        from(rf in RentalFee,
           where:
             rf.article_id == ^article_id or
               (rf.club_id == ^article.club_id and
@@ -844,37 +899,42 @@ defmodule Sportyweb.Inventory do
                  is_nil(rf.category_id)),
           preload: [:category, :article],
           distinct: true
+        )
 
       query =
         if article.category_id do
-          from rf in query,
+          from(rf in query,
             or_where: rf.category_id == ^article.category_id
+          )
         else
           query
         end
 
       query =
         if Contact.has_active_membership_contract?(contact) do
-          from rf in query,
+          from(rf in query,
             where: rf.member_type == ^:member,
             order_by: [asc: rf.name]
+          )
         else
-          from rf in query,
+          from(rf in query,
             where: rf.member_type == ^:non_member or is_nil(rf.member_type),
             order_by: [asc: rf.name]
+          )
         end
 
       query =
         if Contact.is_person?(contact) do
           contact_age_in_years = Contact.age_in_years(contact)
 
-          from rf in query,
+          from(rf in query,
             where:
               is_nil(rf.minimum_age_in_years) or
                 rf.minimum_age_in_years <= ^contact_age_in_years,
             where:
               is_nil(rf.maximum_age_in_years) or
                 rf.maximum_age_in_years >= ^contact_age_in_years
+          )
         else
           query
         end
@@ -882,6 +942,127 @@ defmodule Sportyweb.Inventory do
       Repo.all(query)
     end
   end
+
+  alias Sportyweb.Inventory.RentalRule
+
+  def calculate_total_fee(attrs, %RentalRule{} = rental_rule) do
+    rental_fee_id = Map.get(attrs, "rental_fee_id") || Map.get(attrs, :rental_fee_id)
+
+    rental_fee =
+      rental_fee_id && get_rental_fee!(rental_fee_id)
+
+    total_fee(rental_fee, rental_rule, attrs)
+  end
+
+  defp total_fee(nil, _rental_rule, _attrs), do: nil
+
+  defp total_fee(%RentalFee{} = rental_fee, %RentalRule{} = rental_rule, attrs) do
+    money = RentalFee.gross_money(rental_fee)
+
+    if rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison" do
+      money
+    else
+      case rental_units(attrs, rental_rule) do
+        nil ->
+          nil
+
+        billing_units ->
+          multiply_money(money, billing_units)
+      end
+    end
+  end
+
+  defp rental_units(attrs, rental_rule) do
+    rental_date = Map.get(attrs, "rental_date") || Map.get(attrs, :rental_date)
+    return_date = Map.get(attrs, "return_date") || Map.get(attrs, :return_date)
+    return_time = Map.get(attrs, "return_time") || Map.get(attrs, :return_time)
+
+    case rental_rule.rental_period_unit do
+      "Saison" ->
+        Decimal.new(1)
+
+      "Stunden" ->
+        with {:ok, start_naive} <- parse_datetime(rental_date),
+             {:ok, time} <- Time.from_iso8601(return_time <> ":00") do
+          end_naive =
+            start_naive
+            |> NaiveDateTime.to_date()
+            |> NaiveDateTime.new!(time)
+
+          diff = NaiveDateTime.diff(end_naive, start_naive, :hour)
+
+          Decimal.new(max(diff, 0))
+        else
+          _ -> nil
+        end
+
+      "Tage" ->
+        with {:ok, start_date} <- parse_date_from_datetime(rental_date),
+             {:ok, end_date} <- parse_date_from_datetime(return_date) do
+          days = Date.diff(end_date, start_date)
+          Decimal.new(max(days, 0))
+        else
+          _ -> nil
+        end
+
+      "Wochen" ->
+        with {:ok, start_date} <- parse_date_from_datetime(rental_date),
+             {:ok, end_date} <- parse_date_from_datetime(return_date) do
+          days = Date.diff(end_date, start_date)
+          weeks = Decimal.div(Decimal.new(max(days, 0)), Decimal.new(7))
+          Decimal.round(weeks, 2)
+        else
+          _ -> nil
+        end
+
+      _ ->
+        nil
+    end
+  end
+
+  defp multiply_money(%Money{} = money, units) do
+    %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
+  end
+
+  defp parse_datetime(%DateTime{} = datetime), do: {:ok, DateTime.to_naive(datetime)}
+  defp parse_datetime(%NaiveDateTime{} = datetime), do: {:ok, datetime}
+
+  defp parse_datetime(value) when is_binary(value) do
+    value =
+      cond do
+        String.length(value) == 16 -> value <> ":00"
+        String.ends_with?(value, "Z") -> String.trim_trailing(value, "Z")
+        true -> value
+      end
+
+    case NaiveDateTime.from_iso8601(value) do
+      {:ok, naive} ->
+        {:ok, naive}
+
+      _ ->
+        case DateTime.from_iso8601(value) do
+          {:ok, datetime, _offset} -> {:ok, DateTime.to_naive(datetime)}
+          _ -> :error
+        end
+    end
+  end
+
+  defp parse_datetime(_), do: :error
+
+  defp parse_date_from_datetime(%DateTime{} = datetime), do: {:ok, DateTime.to_date(datetime)}
+
+  defp parse_date_from_datetime(%NaiveDateTime{} = datetime),
+    do: {:ok, NaiveDateTime.to_date(datetime)}
+
+  defp parse_date_from_datetime(%Date{} = date), do: {:ok, date}
+
+  defp parse_date_from_datetime(value) when is_binary(value) do
+    value
+    |> String.slice(0, 10)
+    |> Date.from_iso8601()
+  end
+
+  defp parse_date_from_datetime(_), do: :error
 
   alias Sportyweb.Inventory.RentalRule
 
@@ -1008,5 +1189,122 @@ defmodule Sportyweb.Inventory do
   """
   def change_rental_rule(%RentalRule{} = rental_rule, attrs \\ %{}) do
     RentalRule.changeset(rental_rule, attrs)
+  end
+
+  alias Sportyweb.Inventory.OldRentals
+
+  @doc """
+  Returns the list of old_rentals.
+
+  ## Examples
+
+      iex> list_old_rentals()
+      [%OldRentals{}, ...]
+
+  """
+  def list_old_rentals do
+    Repo.all(OldRentals)
+  end
+
+  @doc """
+  Gets a single old_rentals.
+
+  Raises `Ecto.NoResultsError` if the Old rentals does not exist.
+
+  ## Examples
+
+      iex> get_old_rentals!(123)
+      %OldRentals{}
+
+      iex> get_old_rentals!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_old_rentals!(id), do: Repo.get!(OldRentals, id)
+
+  @doc """
+  Gets a single old_rentals. Preloads associations.
+
+  Raises `Ecto.NoResultsError` if the Old rentals does not exist.
+
+  ## Examples
+
+      iex> get_old_rentals!(123, [:club])
+      %OldRentals{}
+
+      iex> get_old_rentals!(456, [:club])
+      ** (Ecto.NoResultsError)
+
+  """
+
+    def get_old_rentals!(id, preloads) do
+    OldRentals
+    |> Repo.get!(id)
+    |> Repo.preload(preloads)
+    end
+
+  @doc """
+  Creates a old_rentals.
+
+  ## Examples
+
+      iex> create_old_rentals(%{field: value})
+      {:ok, %OldRentals{}}
+
+      iex> create_old_rentals(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_old_rentals(attrs \\ %{}) do
+    %OldRentals{}
+    |> OldRentals.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a old_rentals.
+
+  ## Examples
+
+      iex> update_old_rentals(old_rentals, %{field: new_value})
+      {:ok, %OldRentals{}}
+
+      iex> update_old_rentals(old_rentals, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_old_rentals(%OldRentals{} = old_rentals, attrs) do
+    old_rentals
+    |> OldRentals.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a old_rentals.
+
+  ## Examples
+
+      iex> delete_old_rentals(old_rentals)
+      {:ok, %OldRentals{}}
+
+      iex> delete_old_rentals(old_rentals)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_old_rentals(%OldRentals{} = old_rentals) do
+    Repo.delete(old_rentals)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking old_rentals changes.
+
+  ## Examples
+
+      iex> change_old_rentals(old_rentals)
+      %Ecto.Changeset{data: %OldRentals{}}
+
+  """
+  def change_old_rentals(%OldRentals{} = old_rentals, attrs \\ %{}) do
+    OldRentals.changeset(old_rentals, attrs)
   end
 end

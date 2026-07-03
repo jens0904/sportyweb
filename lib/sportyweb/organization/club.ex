@@ -24,6 +24,7 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Inventory.Category
   alias Sportyweb.Inventory.RentalFee
   alias Sportyweb.Inventory.RentalRule
+  alias Sportyweb.Inventory.OldRentals
 
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -44,6 +45,7 @@ defmodule Sportyweb.Organization.Club do
     # This line has to be below "has_many :all_contracts"!
     has_many :transactions, through: [:all_contracts, :transactions]
     has_many :locations, Location, preload_order: [asc: :name]
+    has_many :old_rentals, OldRentals
     many_to_many :contracts, Contract, join_through: ClubContract
     many_to_many :emails, Email, join_through: ClubEmail
     many_to_many :financial_data, FinancialData, join_through: ClubFinancialData

@@ -218,17 +218,18 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     IO.inspect(rental_params, label: "VALIDATE PARAMS")
     return_time = Map.get(rental_params, "return_time")
 
-    total_fee =
-      total_fee_preview(
-        rental_params,
-        socket.assigns.rental_fee_options,
-        socket.assigns.rental_rule
-      )
-
     rental_params =
       rental_params
       |> Enum.into(%{"article_id" => socket.assigns.rental.article.id})
       |> normalize_rental_datetimes(socket.assigns.rental_rule)
+
+    total_fee =
+      rental_params
+      |> Inventory.calculate_total_fee(socket.assigns.rental_rule)
+      |> then(fn
+        nil -> ""
+        money -> RentalFee.money_label(money)
+      end)
 
     changeset =
       Inventory.change_rental(socket.assigns.rental, rental_params)
@@ -483,113 +484,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     {"#{rental_fee.name} – #{amount} / #{rental_unit} – #{target}", rental_fee.id}
   end
 
-
-  defp total_fee_preview(params, rental_fee_options, rental_rule) do
-    rental_fee_id = Map.get(params, "rental_fee_id")
-    rental_date = Map.get(params, "rental_date")
-    return_date = Map.get(params, "return_date")
-    return_time = Map.get(params, "return_time")
-
-    rental_fee =
-      Enum.find(rental_fee_options, fn fee ->
-        to_string(fee.id) == to_string(rental_fee_id)
-      end)
-
-    with %{} = rental_fee <- rental_fee do
-      money = RentalFee.gross_money(rental_fee)
-
-      if rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison" do
-        RentalFee.money_label(money)
-      else
-        case rental_units(rental_date, return_date, return_time, rental_rule) do
-          nil ->
-            ""
-
-          billing_units ->
-            money
-            |> multiply_money(billing_units)
-            |> RentalFee.money_label()
-        end
-      end
-    else
-      _ -> ""
-    end
-  end
-
-  defp rental_units(rental_date, return_date, return_time, rental_rule) do
-    case rental_rule.rental_period_unit do
-      "Saison" ->
-        Decimal.new(1)
-
-      "Stunden" ->
-        with {:ok, start_naive} <- parse_datetime_local(rental_date),
-             {:ok, time} <- Time.from_iso8601(return_time <> ":00") do
-          end_naive =
-            start_naive
-            |> NaiveDateTime.to_date()
-            |> NaiveDateTime.new!(time)
-
-          max(Decimal.new(NaiveDateTime.diff(end_naive, start_naive, :hour)), Decimal.new(0))
-        else
-          _ -> nil
-        end
-
-      "Tage" ->
-        with {:ok, start_date} <- parse_date_from_datetime(rental_date),
-             {:ok, end_date} <- Date.from_iso8601(to_string(return_date)) do
-          days = Date.diff(end_date, start_date)
-          Decimal.new(max(days, 0))
-        else
-          _ -> nil
-        end
-
-      "Wochen" ->
-        with {:ok, start_date} <- parse_date_from_datetime(rental_date),
-             {:ok, end_date} <- Date.from_iso8601(to_string(return_date)) do
-          days = Date.diff(end_date, start_date)
-          weeks = Decimal.div(Decimal.new(max(days, 0)), Decimal.new(7))
-          Decimal.round(weeks, 2)
-        else
-          _ -> nil
-        end
-
-      _ ->
-        nil
-    end
-  end
-
-
-  defp multiply_money(%Money{} = money, nil), do: money
-
-  defp multiply_money(%Money{} = money, units) do
-    %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
-  end
-
-
-  defp parse_datetime_local(%DateTime{} = datetime), do: {:ok, DateTime.to_naive(datetime)}
-
-  defp parse_datetime_local(value) when is_binary(value) do
-    value =
-      if String.length(value) == 16 do
-        value <> ":00"
-      else
-        value
-      end
-
-    NaiveDateTime.from_iso8601(value)
-  end
-
-  defp parse_datetime_local(_), do: :error
-
-  defp parse_date_from_datetime(%DateTime{} = datetime), do: {:ok, DateTime.to_date(datetime)}
-
-  defp parse_date_from_datetime(value) when is_binary(value) do
-    value
-    |> String.slice(0, 10)
-    |> Date.from_iso8601()
-  end
-
-  defp parse_date_from_datetime(_), do: :error
 
   defp put_season_return_date(params, rental_rule) do
     with rental_date when is_binary(rental_date) <- Map.get(params, "rental_date"),
