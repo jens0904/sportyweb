@@ -206,6 +206,15 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
               <.button phx-disable-with="Speichern...">Speichern</.button>
               <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
             </div>
+
+            <.button
+              :if={@rental_rule.id}
+              class="bg-rose-700 hover:bg-rose-800"
+              phx-click={JS.push("delete", value: %{id: @rental_rule.id})}
+              data-confirm="Unwiderruflich löschen?"
+            >
+              Löschen
+            </.button>
           </:actions>
         </.simple_form>
       </.card>
