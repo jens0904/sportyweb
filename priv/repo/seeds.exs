@@ -1813,8 +1813,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
                 do: Faker.Date.forward(Enum.random(100..2000)),
                 else: nil
               ),
-          for_lending: Enum.random([true, false]),
-          occupied: false
+          for_lending: Enum.random([true, false])
         })
       end
 

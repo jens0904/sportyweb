@@ -11,7 +11,7 @@ defmodule Sportyweb.Asset do
   alias Sportyweb.Asset.Location
   alias Sportyweb.Asset.LocationFee
   alias Sportyweb.Finance.Fee
-  alias Sportyweb.Inventory.Article
+  alias Sportyweb.Inventory.Rental
 
   @spec list_locations(any()) :: any()
   @doc """
@@ -38,16 +38,18 @@ defmodule Sportyweb.Asset do
 
   """
   def list_locations_with_units(club_id, article_id) do
-
     query =
       from v in Location,
-      join: u in assoc(v, :units),
-      where: v.club_id == ^club_id,
-      where: u.article_id == ^article_id,
-      where: u.occupied == false,
-      where: u.for_lending == true,
-      order_by: v.name,
-      distinct: v.id
+        join: u in assoc(v, :units),
+        left_join: r in Rental,
+        on: r.unit_id == u.id,
+        where: v.club_id == ^club_id,
+        where: u.article_id == ^article_id,
+        where: u.for_lending == true,
+        where: is_nil(r.id),
+        order_by: v.name,
+        distinct: v.id
+
     Repo.all(query)
   end
 

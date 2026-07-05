@@ -26,8 +26,8 @@ defmodule SportywebWeb.RentalLive.FormComponent do
               Der Artikel hat keine zugewiesene Einheit und kann daher nicht ausgeliehen werden.
               Bitte weisen Sie dem Artikel zuerst eine Einheit zu.
             </p>
-          <% !Enum.any?(@article.units, &(&1.occupied == false && &1.for_lending == true)) -> %>
-            <p>Es ist derzeit keine Einheit dieses Artikels zur Ausleihe verfügbar.</p>
+          <% !@has_available_units -> %>
+          <p>Es ist derzeit keine Einheit dieses Artikels zur Ausleihe verfügbar.</p>
           <% true -> %>
             <.simple_form
               for={@form}
@@ -195,6 +195,10 @@ defmodule SportywebWeb.RentalLive.FormComponent do
     {:ok,
      socket
      |> assign(assigns)
+     |> assign(
+       :has_available_units,
+       Inventory.has_available_units?(assigns.article.id)
+     )
      |> assign(:return_time, nil)
      |> assign(:total_fee_preview, "")
      |> assign(:rental_rule, rental_rule)
@@ -290,24 +294,16 @@ defmodule SportywebWeb.RentalLive.FormComponent do
       })
 
     case Inventory.create_rental(rental_params) do
-      {:ok, %{rental: _rental}} ->
+      {:ok, _rental} ->
         {:noreply,
          socket
          |> put_flash(:info, "Die Ausleihe wurde erfolgreich angelegt.")
          |> push_navigate(to: socket.assigns.navigate)}
 
-      {:error, :rental, %Ecto.Changeset{} = changeset, _changes} ->
+      {:error, %Ecto.Changeset{} = changeset, _changes} ->
         IO.inspect(changeset.errors, label: "RENTAL ERRORS")
         {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
 
-      {:error, :unit, %Ecto.Changeset{}, _changes} ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "Die ausgewählte Einheit konnte nicht als belegt markiert werden.")}
-
-        {:noreply,
-         socket
-         |> put_flash(:error, "Die Ausleihe konnte nicht gespeichert werden.")}
     end
   end
 
@@ -483,7 +479,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
 
     {"#{rental_fee.name} – #{amount} / #{rental_unit} – #{target}", rental_fee.id}
   end
-
 
   defp put_season_return_date(params, rental_rule) do
     with rental_date when is_binary(rental_date) <- Map.get(params, "rental_date"),

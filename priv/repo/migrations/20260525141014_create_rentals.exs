@@ -28,5 +28,11 @@ defmodule Sportyweb.Repo.Migrations.CreateRentals do
 
       timestamps(type: :utc_datetime)
     end
+
+    create unique_index(
+      :rentals,
+      [:unit_id],
+      name: :rentals_unique_active_unit_index
+    )
   end
 end

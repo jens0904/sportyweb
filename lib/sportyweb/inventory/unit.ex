@@ -13,14 +13,17 @@ defmodule Sportyweb.Inventory.Unit do
   schema "units" do
     belongs_to :article, Article
     belongs_to :location, Location
-    has_many :rentals, Rental
+    has_one :rental, Rental
     has_many :old_rentals, OldRentals
     field :serial_number, :string
     field :for_lending, :boolean, default: true
-    field :occupied, :boolean, default: false
     field :purchase_date, :date, default: nil
     field :commission_date, :date, default: nil
     field :decommission_date, :date, default: nil
+    field :condition_status, :string, default: "ok"
+    field :condition_note, :string, default: nil
+    field :damaged_on, :utc_datetime, default: nil
+    field :lost_on, :utc_datetime, default: nil
 
     timestamps(type: :utc_datetime)
   end
@@ -31,12 +34,15 @@ defmodule Sportyweb.Inventory.Unit do
     |> cast(attrs, [
       :serial_number,
       :for_lending,
-      :occupied,
       :purchase_date,
       :commission_date,
       :decommission_date,
       :article_id,
-      :location_id
+      :location_id,
+      :condition_status,
+      :condition_note,
+      :damaged_on,
+      :lost_on
     ])
     |> validate_required([:serial_number, :article_id, :location_id])
     |> validate_length(:serial_number, max: 250)
@@ -52,8 +58,24 @@ defmodule Sportyweb.Inventory.Unit do
     )
   end
 
-  def occupied_changeset(unit, attrs) do
-    unit
-    |> cast(attrs, [:occupied])
+  def return_condition_changeset(unit, attrs) do
+  unit
+  |> cast(attrs, [:condition_status, :condition_note])
+  |> validate_inclusion(:condition_status, ["ok", "damaged", "lost"])
+  |> maybe_set_condition_dates()
+end
+
+defp maybe_set_condition_dates(changeset) do
+  now =
+    DateTime.utc_now()
+    |> DateTime.truncate(:second)
+
+  case get_change(changeset, :condition_status) do
+    "damaged" -> put_change(changeset, :damaged_on, now)
+    "lost" -> put_change(changeset, :lost_on, now)
+    _ -> changeset
   end
+end
+
+
 end

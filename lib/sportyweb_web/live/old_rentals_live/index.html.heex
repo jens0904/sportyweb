@@ -2,8 +2,22 @@
   {@page_title}
 </.header>
 
+<.simple_form for={%{}} as={:filter} phx-change="filter">
+  <.input
+    name="archive_type"
+    value={@archive_type}
+    type="select"
+    label="Archivierte Vorgänge anzeigen"
+    options={[
+      {"Kostenpflichtige Vermietungen", "fee"},
+      {"Schadens- oder Verlustfälle", "incident"},
+      {"Alle archivierten Vorgänge", "all"}
+    ]}
+  />
+</.simple_form>
+
 <.card>
-  <%= if Enum.any?(@streams.old_rentals_collection.inserts) do %>
+  <%= if @old_rentals_count > 0 do %>
     <.table
       id="old_rentals"
       rows={@streams.old_rentals_collection}

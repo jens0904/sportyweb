@@ -12,7 +12,22 @@ defmodule SportywebWeb.OldRentalsLive.Index do
 
   @impl true
   def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+    archive_type = Map.get(params, "archive_type", "fee")
+
+    club_id = Map.get(params, "club_id")
+
+    old_rentals =
+      Inventory.list_old_rentals(club_id, archive_type)
+
+      club = Organization.get_club!(club_id)
+
+    {:noreply,
+     socket
+     |> assign(:club, club)
+     |> assign(:page_title, "Archivierte Vermietungen")
+     |> assign(:archive_type, archive_type)
+     |> assign(:old_rentals_count, length(old_rentals))
+     |> stream(:old_rentals_collection, old_rentals, reset: true)}
   end
 
   defp apply_action(socket, :index_root, _params) do
@@ -46,6 +61,13 @@ defmodule SportywebWeb.OldRentalsLive.Index do
     |> assign(:club, club)
     |> assign(:old_rentals, Inventory.get_old_rentals!(id))
   end
+
+  def handle_event("filter", %{"archive_type" => archive_type}, socket) do
+  {:noreply,
+   push_patch(socket,
+     to: ~p"/clubs/#{socket.assigns.club}/old_rentals?archive_type=#{archive_type}"
+   )}
+end
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do

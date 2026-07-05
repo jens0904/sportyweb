@@ -2,6 +2,7 @@ defmodule SportywebWeb.OldRentalsLive.Show do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.OldRentals
 
   @impl true
   def mount(_params, _session, socket) do

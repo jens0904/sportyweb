@@ -188,6 +188,18 @@ defmodule Sportyweb.Inventory do
     |> Repo.preload(preloads)
   end
 
+  def has_available_units?(article_id) do
+    query =
+      from u in Unit,
+        left_join: r in Rental,
+        on: r.unit_id == u.id,
+        where: u.article_id == ^article_id,
+        where: u.for_lending == true,
+        where: is_nil(r.id)
+
+    Repo.exists?(query)
+  end
+
   def get_article_with_active_rentals!(id) do
     active_rentals_query = from(l in Rental, where: l.status == "active")
 
@@ -281,17 +293,18 @@ defmodule Sportyweb.Inventory do
   end
 
   def list_available_units(article_id, location_id) do
-    if is_nil(location_id) || (is_binary(location_id) && String.trim(location_id) == "") do
+    if is_nil(location_id) || String.trim(location_id) == "" do
       []
     else
       query =
-        from(u in Unit,
+        from u in Unit,
+          left_join: r in Rental,
+          on: r.unit_id == u.id,
           where: u.location_id == ^location_id,
           where: u.article_id == ^article_id,
-          where: u.occupied == false,
           where: u.for_lending == true,
+          where: is_nil(r.id),
           order_by: u.serial_number
-        )
 
       Repo.all(query)
     end
@@ -478,7 +491,8 @@ defmodule Sportyweb.Inventory do
         "status" => "active"
       })
 
-    rental_rule = get_applicable_rental_rule(rental_attrs["article_id"])
+    rental_rule =
+      get_applicable_rental_rule(rental_attrs["article_id"])
 
     total_fee =
       calculate_total_fee(rental_attrs, rental_rule)
@@ -487,24 +501,14 @@ defmodule Sportyweb.Inventory do
       Map.put(rental_attrs, "total_fee", total_fee)
 
     max_return_date =
-      calculate_max_return_date(rental_attrs["article_id"], rental_attrs["rental_date"])
-
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(
-      :rental,
-      Rental.changeset(
-        %Rental{},
-        rental_attrs,
-        max_return_date,
-        rental_rule
+      calculate_max_return_date(
+        rental_attrs["article_id"],
+        rental_attrs["rental_date"]
       )
-    )
-    |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
-      rental.unit_id
-      |> get_unit!()
-      |> Unit.occupied_changeset(%{occupied: true})
-    end)
-    |> Repo.transaction()
+
+    %Rental{}
+    |> Rental.changeset(rental_attrs, max_return_date, rental_rule)
+    |> Repo.insert()
   end
 
   @doc """
@@ -649,10 +653,10 @@ defmodule Sportyweb.Inventory do
   def return_rental(%Rental{} = rental, attrs) do
     rental =
       rental.id
-      |> get_rental!([:article, :rental_fee])
+      |> get_rental!([:article, :rental_fee, :unit])
 
     rental_rule = get_applicable_rental_rule(rental.article_id)
-    returned_at = DateTime.utc_now()
+    returned_at = DateTime.utc_now() |> DateTime.truncate(:second)
 
     fee_attrs = %{
       "rental_fee_id" => rental.rental_fee_id,
@@ -670,19 +674,23 @@ defmodule Sportyweb.Inventory do
       })
 
     Ecto.Multi.new()
-    |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
+    # |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
     |> maybe_create_old_rental(rental, rental_attrs, total_fee, vat_fee, returned_at)
-    |> Ecto.Multi.update(:unit, fn %{rental: rental} ->
-      rental.unit_id
-      |> get_unit!()
-      |> Unit.occupied_changeset(%{occupied: false})
-    end)
+    |> maybe_update_unit_condition(rental, attrs)
+    #    |> Ecto.Multi.update(:unit, fn _changes ->
+    #      rental.unit_id
+    #      |> get_unit!()
+    #      |> Unit.occupied_changeset(%{occupied: false})
+    #    end)
     |> Ecto.Multi.delete(:rental, rental)
     |> Repo.transaction()
   end
 
   defp maybe_create_old_rental(multi, %Rental{} = rental, attrs, total_fee, vat_fee, returned_at) do
-    if fee_required?(total_fee) do
+    archive_required? =
+      fee_required?(total_fee) or Map.get(attrs, "condition_status") in ["damaged", "lost"]
+
+    if archive_required? do
       old_rental_attrs = %{
         club_id: rental.article.club_id,
         article_id: rental.article_id,
@@ -695,8 +703,10 @@ defmodule Sportyweb.Inventory do
         return_comment: Map.get(attrs, "return_comment") || rental.return_comment,
         total_fee: total_fee,
         vat_fee: vat_fee,
-        fee_required: true,
-        returned_at: DateTime.utc_now()
+        fee_required: fee_required?(total_fee),
+        returned_at: returned_at,
+        condition_status: Map.get(attrs, "condition_status"),
+        condition_note: Map.get(attrs, "condition_note")
       }
 
       Ecto.Multi.insert(
@@ -714,6 +724,22 @@ defmodule Sportyweb.Inventory do
   end
 
   defp fee_required?(nil), do: false
+
+  defp maybe_update_unit_condition(multi, rental, attrs) do
+    case Map.get(attrs, "condition_status") do
+      status when status in ["damaged", "lost"] ->
+        unit = get_unit!(rental.unit_id)
+
+        Ecto.Multi.update(
+          multi,
+          :unit,
+          Unit.return_condition_changeset(unit, attrs)
+        )
+
+      _ ->
+        multi
+    end
+  end
 
   defp vat_money_for_total_fee(nil, _rental_fee), do: nil
 
@@ -1241,6 +1267,34 @@ defmodule Sportyweb.Inventory do
   """
   def list_old_rentals do
     Repo.all(OldRentals)
+  end
+
+  def list_old_rentals(club_id, archive_type \\ "fee") do
+    query =
+      from o in OldRentals,
+        where: o.club_id == ^club_id,
+        preload: [:contact, :article, :unit],
+        order_by: [desc: o.returned_at]
+
+    query =
+      case archive_type do
+        "fee" ->
+          from o in query,
+            where: o.fee_required == true
+
+        "incident" ->
+          from o in query,
+            where: o.condition_status in ["damaged", "lost"]
+
+        "all" ->
+          query
+
+        _ ->
+          from o in query,
+            where: false
+      end
+
+    Repo.all(query)
   end
 
   @doc """

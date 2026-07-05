@@ -48,5 +48,14 @@
     <:item title="Zurückgegeben am">
       {Calendar.strftime(@old_rentals.returned_at, "%d.%m.%Y %H:%M")}
     </:item>
+
+    <:item title="Zustand">
+     <%= OldRentals.condition_status_label(@old_rentals) %>
+    </:item>
+
+    <:item title="Kommentar zum Zustand">
+      {@old_rentals.condition_note}
+    </:item>     
+
   </.list>
 </.card>

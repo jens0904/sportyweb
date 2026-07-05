@@ -17,7 +17,6 @@ defmodule Sportyweb.Inventory.OldRentals do
     belongs_to :location, Location
     belongs_to :unit, Unit
 
-
     field :rental_date, :utc_datetime
     field :return_date, :utc_datetime
     field :renewal_count, :integer, default: 0
@@ -28,6 +27,8 @@ defmodule Sportyweb.Inventory.OldRentals do
     field :returned_at, :utc_datetime
 
     field :fee_required, :boolean, default: false
+    field :condition_status, :string
+    field :condition_note, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -48,7 +49,9 @@ defmodule Sportyweb.Inventory.OldRentals do
       :returned_at,
       :fee_required,
       :total_fee,
-      :vat_fee
+      :vat_fee,
+      :condition_status,
+      :condition_note
     ])
     |> validate_required([
       :article_id,
@@ -57,7 +60,17 @@ defmodule Sportyweb.Inventory.OldRentals do
       :unit_id,
       :rental_date,
       :return_date,
-      :returned_at
+      :returned_at,
+      :condition_status
     ])
   end
+
+  def condition_status_label(%__MODULE__{condition_status: status}) do
+    condition_status_label(status)
+  end
+
+  def condition_status_label("ok"), do: "In Ordnung"
+  def condition_status_label("damaged"), do: "Beschädigt"
+  def condition_status_label("lost"), do: "Verloren"
+  def condition_status_label(_), do: "-"
 end

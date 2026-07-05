@@ -72,6 +72,10 @@ defmodule Sportyweb.Inventory.Rental do
     |> validate_return_date_within_max_return_date(max_return_date)
     |> validate_same_weekday_for_weekly_rental(rental_rule)
     |> validate_rental_date_in_season(rental_rule)
+    |> unique_constraint(
+       :unit_id,
+       name: :rentals_unique_active_unit_index
+     )
   end
 
   defp validate_same_weekday_for_weekly_rental(changeset, %{rental_period_unit: "Wochen"}) do

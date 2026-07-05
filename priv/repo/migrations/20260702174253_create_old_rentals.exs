@@ -27,6 +27,8 @@ defmodule Sportyweb.Repo.Migrations.CreateOldRentals do
         add :vat_fee, :money_with_currency, null: false
         add :returned_at, :utc_datetime, null: false
         add :fee_required, :boolean, null: false
+        add :condition_status, :string, null: false
+        add :condition_note, :text, null: true
 
         add :club_id, references(:clubs, on_delete: :delete_all, type: :binary_id), null: false
 
