@@ -17,18 +17,32 @@ defmodule SportywebWeb.ArticleLive.Index do
 def handle_event("filter", params, socket) do
   department_id = Map.get(params, "department_id", "")
   category_id = Map.get(params, "category_id", "")
+  rental_status = Map.get(params, "rental_status", "")
 
   articles =
     socket.assigns.all_articles
     |> Enum.filter(fn article ->
-      (department_id == "" or article.department_id == department_id) and
-        (category_id == "" or article.category_id == category_id)
+      matches_department? =
+        department_id == "" or article.department_id == department_id
+
+      matches_category? =
+        category_id == "" or article.category_id == category_id
+
+      matches_rental_status? =
+        case rental_status do
+          "" -> true
+          "rented" -> Enum.any?(article.rentals)
+          _ -> true
+        end
+
+      matches_department? and matches_category? and matches_rental_status?
     end)
 
   {:noreply,
    socket
    |> assign(:department_id, department_id)
    |> assign(:category_id, category_id)
+   |> assign(:rental_status, rental_status)
    |> stream(:articles, articles, reset: true)}
 end
 
@@ -38,7 +52,7 @@ end
   end
 
   defp apply_action(socket, :index, %{"club_id" => club_id}) do
-    club = Organization.get_club!(club_id, articles: [:department, :category], categories: [], departments: [])
+    club = Organization.get_club!(club_id, articles: [:department, :category, :rentals], categories: [], departments: [])
 
     socket
     |> assign(:page_title, "Artikel")
@@ -47,6 +61,7 @@ end
     |> assign(:department_id, "")
     |> assign(:category_id, "")
     |> assign(:available_categories, club.categories)
+    |> assign(:rental_status, "")
     |> stream(:articles, club.articles, reset: true)
   end
 end

@@ -25,6 +25,13 @@
       </option>
     <% end %>
   </select>
+
+  <select name="rental_status">
+    <option value="" selected={@rental_status == ""}>Alle Artikel</option>
+    <option value="rented" selected={@rental_status == "rented"}>
+      Artikel mit aktiven Vermietungen
+    </option>
+  </select>
 </form>
 
 <.card>
@@ -52,7 +59,7 @@
           end
         )}
       </:col>
-      
+
       <:action :let={{_id, article}}>
         <.link navigate={~p"/articles/#{article}"}>Anzeigen</.link>
       </:action>
