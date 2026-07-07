@@ -15,9 +15,7 @@
     <:item title="ausleihbar">
       {format_boolean_field(@unit.for_lending)}
     </:item>
-    <:item title="belegt">
-      {format_boolean_field(@unit.occupied)}
-    </:item>
+
     <:item title="Standort">
       {format_string_field(@unit.location.name)}
     </:item>
@@ -33,15 +31,66 @@
   </.list>
 </.card>
 
-<.header level="2" class="mt-12">
-  Vergangene Ausleihen
-</.header>
+<.header level="2" class="mt-12">Vergangene Ausleihen</.header>
 
-<.card> 
-  <%= if Enum.any?(@streams.rentals.inserts) do %>
-  
+<.card>
+  <%= if @inactive_rentals_count > 0 do %>
+    <.table id="inactive_rentals" rows={@streams.inactive_rentals}>
+      <:col :let={{_id, rental}} label="Mitgliedschaft">
+        <%= if Contact.has_active_membership_contract?(rental.contact) do %>
+          Mitglied
+        <% else %>
+          Nichtmitglied
+        <% end %>
+      </:col>
+      <:col :let={{_id, rental}} label="Ausgeliehen am">
+        {format_datetime_field(rental.rental_date)}
+      </:col>
+      <:col :let={{_id, rental}} label="Zurückgegeben am">
+        {format_datetime_field(rental.returned_at)}
+      </:col>
+      <:action :let={{_id, rental}}>
+        <.link navigate={~p"/rentals/#{rental}"}>Anzeigen</.link>
+      </:action>
+    </.table>
   <% else %>
-    <p>Es gibt noch keine archivierten Ausleihen.</p>
+    <p>Es gibt noch keine vergangenen Ausleihen dieser Einheit.</p>
   <% end %>
-  
+</.card>
+
+<.header level="2" class="mt-12">Schadens- und Verlustfälle</.header>
+
+<.card>
+  <%= if @incident_rentals_count > 0 do %>
+    <.table id="incident_rentals" rows={@streams.incident_rentals}>
+      <:col :let={{_id, rental}} label="Kontakt">{rental.contact.name}</:col>
+
+      <:col :let={{_id, rental}} label="Bemerkung">
+        {format_string_field(rental.condition_note)}
+      </:col>
+      <:action :let={{_id, rental}}>
+        <.link navigate={~p"/rentals/#{rental}"}>Anzeigen</.link>
+      </:action>
+    </.table>
+  <% else %>
+    <p>Es gibt keine Schadens- oder Verlustfälle.</p>
+  <% end %>
+</.card>
+
+<.header level="2" class="mt-12">Kostenpflichtige Ausleihen</.header>
+
+<.card>
+  <%= if @fee_rentals_count > 0 do %>
+    <.table id="fee_rentals" rows={@streams.fee_rentals}>
+      <:col :let={{_id, rental}} label="Kontakt">{rental.contact.name}</:col>
+      <:col :let={{_id, rental}} label="Zurückgegeben am">
+        {format_datetime_field(rental.returned_at)}
+      </:col>
+      <:action :let={{_id, rental}}>
+        <.link navigate={~p"/rentals/#{rental}"}>Anzeigen</.link>
+      </:action>
+    </.table>
+  <% else %>
+    <p>Es gibt keine kostenpflichtigen vergangenen Ausleihen.</p>
+  <% end %>
 </.card>

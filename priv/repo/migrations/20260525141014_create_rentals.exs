@@ -10,7 +10,14 @@ defmodule Sportyweb.Repo.Migrations.CreateRentals do
       add :renewal_count, :integer, null: false
       add :return_comment, :string
       add :status, :string, null: false
-      add :total_fee, :money_with_currency, null: false
+      add :total_fee, :money_with_currency, null: true
+
+      add :vat_fee, :money_with_currency, null: true
+      add :fee_required, :boolean, null: false
+      add :condition_status, :string, null: true
+      add :condition_note, :string, null: true
+      add :returned_at, :utc_datetime, null: true
+
 
       add :article_id, references(:articles, on_delete: :delete_all, type: :binary_id),
         null: false
@@ -23,16 +30,14 @@ defmodule Sportyweb.Repo.Migrations.CreateRentals do
 
       add :unit_id, references(:units, on_delete: :delete_all, type: :binary_id), null: false
 
-
-
-
       timestamps(type: :utc_datetime)
     end
 
     create unique_index(
-      :rentals,
-      [:unit_id],
-      name: :rentals_unique_active_unit_index
-    )
+    :rentals,
+    [:unit_id],
+    where: "status = 'active'",
+    name: :rentals_unique_active_unit_index
+  )
   end
 end

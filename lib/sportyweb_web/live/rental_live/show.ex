@@ -2,6 +2,8 @@ defmodule SportywebWeb.RentalLive.Show do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Rental
+  alias Sportyweb.Personal.Contact
 
 
   @impl true
@@ -12,7 +14,7 @@ defmodule SportywebWeb.RentalLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     rental =
-      Inventory.get_rental!(id, [:location, :unit, :contact, article: :club])
+      Inventory.get_rental!(id, [:location, :unit, contact: :contracts, article: :club])
 
       rental_rule = Inventory.get_applicable_rental_rule(rental.article.id)
 

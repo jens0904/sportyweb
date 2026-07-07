@@ -27,9 +27,16 @@
   </select>
 
   <select name="rental_status">
-    <option value="" selected={@rental_status == ""}>Alle Artikel</option>
-    <option value="rented" selected={@rental_status == "rented"}>
+    <option value="" selected={@rental_status == ""}>
+      Alle Artikel
+    </option>
+
+    <option value="active" selected={@rental_status == "active"}>
       Artikel mit aktiven Vermietungen
+    </option>
+
+    <option value="inactive" selected={@rental_status == "inactive"}>
+      Artikel mit abgeschlossenen Vermietungen
     </option>
   </select>
 </form>

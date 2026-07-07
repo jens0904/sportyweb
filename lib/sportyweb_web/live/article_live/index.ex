@@ -28,12 +28,24 @@ def handle_event("filter", params, socket) do
       matches_category? =
         category_id == "" or article.category_id == category_id
 
-      matches_rental_status? =
-        case rental_status do
-          "" -> true
-          "rented" -> Enum.any?(article.rentals)
-          _ -> true
-        end
+     matches_rental_status? =
+  case rental_status do
+    "" ->
+      true
+
+    "active" ->
+      Enum.any?(article.rentals, fn rental ->
+        rental.status == "active"
+      end)
+
+    "inactive" ->
+      Enum.any?(article.rentals, fn rental ->
+        rental.status in ["returned", "damaged", "lost"]
+      end)
+
+    _ ->
+      true
+  end
 
       matches_department? and matches_category? and matches_rental_status?
     end)
@@ -53,6 +65,7 @@ end
 
   defp apply_action(socket, :index, %{"club_id" => club_id}) do
     club = Organization.get_club!(club_id, articles: [:department, :category, :rentals], categories: [], departments: [])
+
 
     socket
     |> assign(:page_title, "Artikel")

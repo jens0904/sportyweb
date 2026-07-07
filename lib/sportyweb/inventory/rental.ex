@@ -24,17 +24,29 @@ defmodule Sportyweb.Inventory.Rental do
     field :status, :string, default: "returned"
     field :return_time, :time, virtual: true
     field :total_fee, Money.Ecto.Composite.Type, default_currency: :EUR
+    field :returned_at, :utc_datetime, default: nil
+    field :vat_fee, Money.Ecto.Composite.Type, default_currency: :EUR
+    field :fee_required, :boolean, default: false
+    field :condition_status, :string, default: "ok"
+    field :condition_note, :string
 
     timestamps(type: :utc_datetime)
   end
 
   def get_valid_statuses do
-    [
-      [key: "Aktiv", value: "active"],
-      [key: "Zurückgegeben", value: "returned"],
-      [key: "Verloren", value: "lost"]
-    ]
-  end
+  [
+    [key: "Aktiv", value: "active"],
+    [key: "Zurückgegeben", value: "returned"]
+  ]
+end
+
+def get_condition_statuses do
+  [
+    [key: "In Ordnung", value: "ok"],
+    [key: "Beschädigt", value: "damaged"],
+    [key: "Verloren", value: "lost"]
+  ]
+end
 
   @doc false
   def changeset(rental, attrs, max_return_date \\ nil, rental_rule \\ nil) do
@@ -50,7 +62,12 @@ defmodule Sportyweb.Inventory.Rental do
       :return_comment,
       :status,
       :total_fee,
-      :rental_fee_id
+      :rental_fee_id,
+      :returned_at,
+      :vat_fee,
+      :fee_required,
+      :condition_status,
+      :condition_note
     ])
     |> validate_required([
       :return_date,
@@ -73,10 +90,34 @@ defmodule Sportyweb.Inventory.Rental do
     |> validate_same_weekday_for_weekly_rental(rental_rule)
     |> validate_rental_date_in_season(rental_rule)
     |> unique_constraint(
-       :unit_id,
-       name: :rentals_unique_active_unit_index
-     )
+      :unit_id,
+      name: :rentals_unique_active_unit_index
+    )
   end
+
+  def return_changeset(rental, attrs) do
+    rental
+    |> cast(attrs, [
+      :status,
+      :return_date,
+      :returned_at,
+      :return_comment,
+      :total_fee,
+      :vat_fee,
+      :fee_required,
+      :condition_status,
+      :condition_note
+    ])
+    |> validate_required([:status, :return_date, :returned_at])
+    |> validate_inclusion(:status, ["active", "returned"])
+    |> validate_inclusion(:condition_status, ["ok", "damaged", "lost"])
+  end
+
+  def active?(%__MODULE__{status: "active"}), do: true
+  def active?(_), do: false
+
+  def inactive?(%__MODULE__{status: "returned"}), do: true
+def inactive?(_), do: false
 
   defp validate_same_weekday_for_weekly_rental(changeset, %{rental_period_unit: "Wochen"}) do
     rental_date = get_field(changeset, :rental_date)

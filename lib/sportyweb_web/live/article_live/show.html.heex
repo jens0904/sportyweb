@@ -40,6 +40,7 @@
       <:col :let={{_id, rental}} label="Kontakt">
         {format_string_field(rental.contact.name)}
       </:col>
+
       <:col :let={{_id, rental}} label="Standort">
         {format_string_field(rental.location.name)}
       </:col>
@@ -63,6 +64,46 @@
 </.card>
 
 <.header level="2" class="mt-12">
+  Abgeschlossene Vermietungen
+</.header>
+
+<.card>
+  <%= if Enum.any?(@streams.inactive_rentals.inserts) do %>
+    <.table
+      id="inactive-rentals"
+      rows={@streams.inactive_rentals}
+      row_click={fn {_id, rental} -> JS.navigate(~p"/rentals/#{rental}") end}
+    >
+      <:col :let={{_id, rental}} label="Mitgliedschaft">
+        <%= if Contact.has_active_membership_contract?(rental.contact) do %>
+          Mitglied
+        <% else %>
+          Nichtmitglied
+        <% end %>
+      </:col>
+
+      <:col :let={{_id, rental}} label="Standort">
+        {format_string_field(rental.location.name)}
+      </:col>
+
+      <:col :let={{_id, rental}} label="Einheit">
+        {format_integer_field(rental.unit.serial_number)}
+      </:col>
+
+      <:col :let={{_id, rental}} label="Zurückgegeben am">
+        {format_datetime_field(rental.returned_at)}
+      </:col>
+
+      <:action :let={{_id, rental}}>
+        <.link navigate={~p"/rentals/#{rental}"}>Anzeigen</.link>
+      </:action>
+    </.table>
+  <% else %>
+    <p>Es gibt keine abgeschlossenen Ausleihvorgänge.</p>
+  <% end %>
+</.card>
+
+<.header level="2" class="mt-12">
   Einheiten
   <:actions>
     <.link navigate={~p"/articles/#{@article}/units/new"}>
@@ -81,9 +122,9 @@
       <:col :let={{_id, unit}} label="Anlagennummer">
         {format_integer_field(unit.serial_number)}
       </:col>
-      <:col :let={{_id, unit}} label="ausleihbar">
+      <:col :let={{_id, unit}} label="Status">
         <div class="max-w-[200px] truncate overflow-hidden">
-          {format_boolean_field(unit.for_lending)}
+          {format_string_field(unit.condition_status)}
         </div>
       </:col>
       <:col :let={{_id, unit}} label="Standort">
@@ -97,5 +138,3 @@
     <p>Bisher wurde noch keine Einheit angelegt.</p>
   <% end %>
 </.card>
-
-

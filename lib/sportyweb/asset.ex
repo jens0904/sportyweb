@@ -37,22 +37,22 @@ defmodule Sportyweb.Asset do
       [%Location{}, ...]
 
   """
-  def list_locations_with_units(club_id, article_id) do
-    query =
-      from v in Location,
-        join: u in assoc(v, :units),
-        left_join: r in Rental,
-        on: r.unit_id == u.id,
-        where: v.club_id == ^club_id,
-        where: u.article_id == ^article_id,
-        where: u.for_lending == true,
-        where: is_nil(r.id),
-        order_by: v.name,
-        distinct: v.id
+def list_locations_with_units(club_id, article_id) do
+  query =
+    from v in Location,
+      join: u in assoc(v, :units),
+      left_join: r in Rental,
+        on: r.unit_id == u.id and r.status == "active",
+      where: v.club_id == ^club_id,
+      where: u.article_id == ^article_id,
+      where: u.for_lending == true,
+      where: u.condition_status == "ok",
+      where: is_nil(r.id),
+      order_by: v.name,
+      distinct: v.id
 
-    Repo.all(query)
-  end
-
+  Repo.all(query)
+end
   @doc """
   Returns a clubs list of locations. Preloads associations.
 

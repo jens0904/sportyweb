@@ -192,17 +192,16 @@ defmodule Sportyweb.Inventory do
     query =
       from u in Unit,
         left_join: r in Rental,
-        on: r.unit_id == u.id,
+        on: r.unit_id == u.id and r.status == "active",
         where: u.article_id == ^article_id,
         where: u.for_lending == true,
+        where: u.condition_status == "ok",
         where: is_nil(r.id)
 
     Repo.exists?(query)
   end
 
-  def get_article_with_active_rentals!(id) do
-    active_rentals_query = from(l in Rental, where: l.status == "active")
-
+  def get_article_with_rentals!(id) do
     Article
     |> Repo.get!(id)
     |> Repo.preload([
@@ -210,7 +209,7 @@ defmodule Sportyweb.Inventory do
       :department,
       :category,
       units: :location,
-      rentals: {active_rentals_query, [:unit, :location, :contact]}
+      rentals: [:unit, :location, contact: :contracts]
     ])
   end
 
@@ -299,10 +298,11 @@ defmodule Sportyweb.Inventory do
       query =
         from u in Unit,
           left_join: r in Rental,
-          on: r.unit_id == u.id,
+          on: r.unit_id == u.id and r.status == "active",
           where: u.location_id == ^location_id,
           where: u.article_id == ^article_id,
           where: u.for_lending == true,
+          where: u.condition_status == "ok",
           where: is_nil(r.id),
           order_by: u.serial_number
 
@@ -327,7 +327,10 @@ defmodule Sportyweb.Inventory do
   def get_unit!(id), do: Repo.get!(Unit, id)
 
   def get_unit_with_inactive_rentals!(id) do
-    inactive_rentals_query = from(l in Rental, where: l.status != "active")
+    inactive_rentals_query =
+      from(l in Rental,
+        where: l.status == "damaged" or l.status == "lost" or l.status == "returned"
+      )
 
     Unit
     |> Repo.get!(id)
@@ -670,53 +673,22 @@ defmodule Sportyweb.Inventory do
     rental_attrs =
       Map.merge(attrs, %{
         "status" => "returned",
-        "total_fee" => total_fee
+        "return_date" => returned_at,
+        "returned_at" => returned_at,
+        "total_fee" => total_fee,
+        "vat_fee" => vat_fee,
+        "fee_required" => fee_required?(total_fee),
+        "condition_status" => Map.get(attrs, "condition_status"),
+        "condition_note" => Map.get(attrs, "condition_note")
       })
 
     Ecto.Multi.new()
-    # |> Ecto.Multi.update(:rental, Rental.changeset(rental, rental_attrs))
-    |> maybe_create_old_rental(rental, rental_attrs, total_fee, vat_fee, returned_at)
+    |> Ecto.Multi.update(
+      :rental,
+      Rental.return_changeset(rental, rental_attrs)
+    )
     |> maybe_update_unit_condition(rental, attrs)
-    #    |> Ecto.Multi.update(:unit, fn _changes ->
-    #      rental.unit_id
-    #      |> get_unit!()
-    #      |> Unit.occupied_changeset(%{occupied: false})
-    #    end)
-    |> Ecto.Multi.delete(:rental, rental)
     |> Repo.transaction()
-  end
-
-  defp maybe_create_old_rental(multi, %Rental{} = rental, attrs, total_fee, vat_fee, returned_at) do
-    archive_required? =
-      fee_required?(total_fee) or Map.get(attrs, "condition_status") in ["damaged", "lost"]
-
-    if archive_required? do
-      old_rental_attrs = %{
-        club_id: rental.article.club_id,
-        article_id: rental.article_id,
-        contact_id: rental.contact_id,
-        location_id: rental.location_id,
-        unit_id: rental.unit_id,
-        rental_date: rental.rental_date,
-        return_date: rental.return_date,
-        renewal_count: rental.renewal_count,
-        return_comment: Map.get(attrs, "return_comment") || rental.return_comment,
-        total_fee: total_fee,
-        vat_fee: vat_fee,
-        fee_required: fee_required?(total_fee),
-        returned_at: returned_at,
-        condition_status: Map.get(attrs, "condition_status"),
-        condition_note: Map.get(attrs, "condition_note")
-      }
-
-      Ecto.Multi.insert(
-        multi,
-        :old_rental,
-        OldRentals.changeset(%OldRentals{}, old_rental_attrs)
-      )
-    else
-      multi
-    end
   end
 
   defp fee_required?(%Money{amount: amount}) do
@@ -997,6 +969,10 @@ defmodule Sportyweb.Inventory do
 
     total_fee(rental_fee, rental_rule, attrs)
   end
+
+  def calculate_total_fee(%{"rental_fee_id" => id}, _rental_rule)
+      when id in [nil, ""],
+      do: nil
 
   defp total_fee(nil, _rental_rule, _attrs), do: nil
 

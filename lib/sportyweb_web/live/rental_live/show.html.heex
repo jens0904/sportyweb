@@ -1,6 +1,7 @@
 <.header>
   {@page_title}
-  <:actions>
+
+  <:actions :if={Rental.active?(@rental)}>
     <.link navigate={~p"/rentals/#{@rental}/return"}>
       <.button color="danger">Ausleihe zurückgeben</.button>
     </.link>
@@ -12,29 +13,44 @@
 
 <.card>
   <.list>
-    <:item title="Kontakt">
-      {format_string_field(@rental.contact.name)}
+    <:item title="Mitgliedschaft">
+      <%= if Contact.has_active_membership_contract?(@rental.contact) do %>
+        Mitglied
+      <% else %>
+        Nichtmitglied
+      <% end %>
     </:item>
-    <:item title="Standort">
-      {format_string_field(@rental.location.name)}
+
+    <:item title="Artikel">
+      {@rental.article.name}
     </:item>
+
     <:item title="Einheit">
-      {format_string_field(@rental.unit.serial_number)}
+      {@rental.unit.serial_number}
     </:item>
+
     <:item title="Ausleihdatum">
-      <%= if @rental_rule && @rental_rule.rental_period_unit == "Stunden" do %>
-          {"#{format_datetime_field(@rental.rental_date)} Uhr"} 
-        <% else %>
-          {format_date_field_dmy(@rental.rental_date)}
-        <% end %>
+      {format_datetime_field(@rental.rental_date)}
     </:item>
-    <:item title="Rückgabedatum">
-        <%= if @rental_rule && @rental_rule.rental_period_unit == "Stunden" do %>
-          {"#{format_datetime_field(@rental.return_date)} Uhr"} 
-        <% else %>
-          {format_date_field_dmy(@rental.return_date)}
-        <% end %>
+
+    <:item :if={Rental.active?(@rental)} title="Geplante Rückgabe">
+      {format_datetime_field(@rental.return_date)}
+    </:item>
+
+    <:item :if={Rental.inactive?(@rental)} title="Zurückgegeben am">
+      {format_datetime_field(@rental.returned_at)}
+    </:item>
+
+    <:item :if={Rental.inactive?(@rental)} title="Gesamtentgelt">
+      {@rental.total_fee}
+    </:item>
+
+    <:item :if={Rental.inactive?(@rental)} title="Mehrwertsteuer">
+      {@rental.vat_fee}
+    </:item>
+
+    <:item :if={Rental.inactive?(@rental)} title="Bemerkung">
+      {format_string_field(@rental.condition_note)}
     </:item>
   </.list>
 </.card>
-
