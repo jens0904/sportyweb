@@ -31,33 +31,7 @@ defmodule Sportyweb.Inventory.RentalFee do
     timestamps(type: :utc_datetime)
   end
 
-  def vat_rate(%__MODULE__{member_type: member_type}) do
-  case member_type do
-    :member -> Decimal.new("0.07")
-    "member" -> Decimal.new("0.07")
-    :non_member -> Decimal.new("0.19")
-    "non_member" -> Decimal.new("0.19")
-    _ -> Decimal.new("0")
-  end
-end
 
-def vat_money(%__MODULE__{} = rental_fee) do
-  vat_amount =
-    rental_fee.amount.amount
-    |> Decimal.mult(vat_rate(rental_fee))
-    |> Decimal.round(2)
-
-  %{rental_fee.amount | amount: vat_amount}
-end
-
-def gross_money(%__MODULE__{} = rental_fee) do
-  gross_amount =
-    rental_fee.amount.amount
-    |> Decimal.add(vat_money(rental_fee).amount)
-    |> Decimal.round(2)
-
-  %{rental_fee.amount | amount: gross_amount}
-end
 
 def money_label(%Money{} = money) do
   case Money.to_string(money) do
@@ -67,17 +41,6 @@ def money_label(%Money{} = money) do
   end
 end
 
-def vat_amount_label(%__MODULE__{} = rental_fee) do
-  rental_fee
-  |> vat_money()
-  |> money_label()
-end
-
-def gross_amount_label(%__MODULE__{} = rental_fee) do
-  rental_fee
-  |> gross_money()
-  |> money_label()
-end
 
   @doc false
   def changeset(fee, attrs) do

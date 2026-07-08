@@ -282,7 +282,8 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
           amount: Money.new(:EUR, amount),
           member_type: form[:member_type].value
         }
-        |> RentalFee.vat_amount_label()
+        |> Inventory.vat_money()
+        |> RentalFee.money_label()
     end
   end
 
@@ -316,7 +317,8 @@ defmodule SportywebWeb.RentalFeeLive.FormComponent do
           amount: Money.new(:EUR, amount),
           member_type: form[:member_type].value
         }
-        |> RentalFee.gross_amount_label()
+        |> Inventory.gross_money()
+        |> RentalFee.money_label()
     end
   end
 

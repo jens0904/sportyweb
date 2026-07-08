@@ -4,13 +4,12 @@ defmodule Sportyweb.Inventory do
   """
 
   import Ecto.Query, warn: false
-  alias Sportyweb.Inventory
+
   alias Sportyweb.Repo
   alias Sportyweb.Inventory.Category
   alias Sportyweb.Inventory.Article
   alias Sportyweb.Inventory.RentalFee
-  alias Sportyweb.Inventory.ArticleRentalFee
-  alias Sportyweb.Inventory.CategoryRentalFee
+
   alias Sportyweb.Inventory.Unit
   alias Sportyweb.Inventory.Rental
   alias Sportyweb.Personal
@@ -194,7 +193,6 @@ defmodule Sportyweb.Inventory do
         left_join: r in Rental,
         on: r.unit_id == u.id and r.status == "active",
         where: u.article_id == ^article_id,
-        where: u.for_lending == true,
         where: u.condition_status == "ok",
         where: is_nil(r.id)
 
@@ -291,6 +289,22 @@ defmodule Sportyweb.Inventory do
     Repo.all(Unit)
   end
 
+  @doc """
+  Lists available units for given article and location.
+
+  If location_id is nil or an empty string, an empty list is returned.
+
+
+  ##Examples
+
+    iex> list_available_units(article_id, nil)
+    []
+    iex> list_available_units(article_id, "")
+    []
+    iex> list_available_units(article_id, location_id)
+    [%Unit{}, ...]
+  """
+
   def list_available_units(article_id, location_id) do
     if is_nil(location_id) || String.trim(location_id) == "" do
       []
@@ -301,7 +315,6 @@ defmodule Sportyweb.Inventory do
           on: r.unit_id == u.id and r.status == "active",
           where: u.location_id == ^location_id,
           where: u.article_id == ^article_id,
-          where: u.for_lending == true,
           where: u.condition_status == "ok",
           where: is_nil(r.id),
           order_by: u.serial_number
@@ -718,8 +731,8 @@ defmodule Sportyweb.Inventory do
   defp vat_money_for_total_fee(%Money{} = total_fee, %RentalFee{} = rental_fee) do
     vat_amount =
       total_fee.amount
-      |> Decimal.mult(RentalFee.vat_rate(rental_fee))
-      |> Decimal.div(Decimal.add(Decimal.new("1"), RentalFee.vat_rate(rental_fee)))
+      |> Decimal.mult(vat_rate(rental_fee))
+      |> Decimal.div(Decimal.add(Decimal.new("1"), vat_rate(rental_fee)))
       |> Decimal.round(2)
 
     %{total_fee | amount: vat_amount}
@@ -977,7 +990,7 @@ defmodule Sportyweb.Inventory do
   defp total_fee(nil, _rental_rule, _attrs), do: nil
 
   defp total_fee(%RentalFee{} = rental_fee, %RentalRule{} = rental_rule, attrs) do
-    money = RentalFee.gross_money(rental_fee)
+    money = gross_money(rental_fee)
 
     if rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison" do
       money
@@ -991,6 +1004,34 @@ defmodule Sportyweb.Inventory do
       end
     end
   end
+
+  def vat_rate(%RentalFee{member_type: member_type}) do
+  case member_type do
+    :member -> Decimal.new("0.07")
+    "member" -> Decimal.new("0.07")
+    :non_member -> Decimal.new("0.19")
+    "non_member" -> Decimal.new("0.19")
+    _ -> Decimal.new("0")
+  end
+end
+
+def vat_money(%RentalFee{} = rental_fee) do
+  vat_amount =
+    rental_fee.amount.amount
+    |> Decimal.mult(vat_rate(rental_fee))
+    |> Decimal.round(2)
+
+  %{rental_fee.amount | amount: vat_amount}
+end
+
+def gross_money(%RentalFee{} = rental_fee) do
+  gross_amount =
+    rental_fee.amount.amount
+    |> Decimal.add(vat_money(rental_fee).amount)
+    |> Decimal.round(2)
+
+  %{rental_fee.amount | amount: gross_amount}
+end
 
   defp rental_units(attrs, rental_rule) do
     rental_date = Map.get(attrs, "rental_date") || Map.get(attrs, :rental_date)

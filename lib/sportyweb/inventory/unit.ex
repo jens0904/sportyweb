@@ -6,7 +6,7 @@ defmodule Sportyweb.Inventory.Unit do
   alias Sportyweb.Asset.Location
   alias Sportyweb.Inventory.Article
   alias Sportyweb.Inventory.Rental
-  alias Sportyweb.Inventory.OldRentals
+
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -15,7 +15,6 @@ defmodule Sportyweb.Inventory.Unit do
     belongs_to :location, Location
     has_many :rentals, Rental
     field :serial_number, :string
-    field :for_lending, :boolean, default: true
     field :purchase_date, :date, default: nil
     field :commission_date, :date, default: nil
     field :decommission_date, :date, default: nil
@@ -32,7 +31,6 @@ defmodule Sportyweb.Inventory.Unit do
     unit
     |> cast(attrs, [
       :serial_number,
-      :for_lending,
       :purchase_date,
       :commission_date,
       :decommission_date,

@@ -5,7 +5,6 @@ defmodule Sportyweb.Repo.Migrations.CreateUnits do
     create table(:units, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :serial_number, :string, null: false
-      add :for_lending, :boolean, default: true, null: false
       add :purchase_date, :date, null: true
       add :commission_date, :date, null: true
       add :decommission_date, :date, null: true

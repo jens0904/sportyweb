@@ -308,11 +308,12 @@ Repo.insert!(%Department{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Bälle",
-  description: "Alle Arten von Bällen",
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Bälle",
+    description: "Alle Arten von Bällen"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -322,6 +323,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 5),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -333,11 +335,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Trikots",
+    description: "Verschiedene Trikots in verschiedenen Größen"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -347,6 +350,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -358,11 +362,11 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Schläger",
-  description: "Tennis- und Badmintonschläger"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Schläger",
+    description: "Tennis- und Badmintonschläger"
+  })
 
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
@@ -373,6 +377,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -384,11 +389,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Tauchausrüstung",
-  description: "Alles was zum Tauchen benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Tauchausrüstung",
+    description: "Alles was zum Tauchen benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -398,6 +404,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 20),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -409,11 +416,11 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Wanderausrüstung",
-  description: "Alles was zum Wandern benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Wanderausrüstung",
+    description: "Alles was zum Wandern benötigt wird"
+  })
 
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
@@ -424,6 +431,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 17),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -435,11 +443,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Ruderausrüstung",
-  description: "Alles was zum Rudern benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Ruderausrüstung",
+    description: "Alles was zum Rudern benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -449,6 +458,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 15),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -458,12 +468,14 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 20),
   rental_duration: :short_term
 })
+
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Skiausrüstung",
-  description: "Alles was zum Skifahren benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Skiausrüstung",
+    description: "Alles was zum Skifahren benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -473,6 +485,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 35),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -482,12 +495,14 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 45),
   rental_duration: :short_term
 })
+
 category =
-Repo.insert!(%Category{
-  club: club_1,
-  name: "Surfausrüstung",
-  description: "Alles was zum Surfen benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_1,
+    name: "Surfausrüstung",
+    description: "Alles was zum Surfen benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -497,6 +512,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_1.id,
   category_id: category.id,
@@ -514,7 +530,7 @@ Repo.insert!(%RentalRule{
   for_non_members: true,
   allow_renewal: true,
   max_renewals: 2,
-  renewal_period: 7,
+  renewal_period: 7
 })
 
 Repo.insert!(%RentalFee{
@@ -534,7 +550,6 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 0),
   rental_duration: :short_term
 })
-
 
 ###################################
 # Add Club 2
@@ -682,11 +697,12 @@ Repo.insert!(%Department{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Bälle",
-  description: "Alle Arten von Bällen",
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Bälle",
+    description: "Alle Arten von Bällen"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -696,6 +712,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 5),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -707,11 +724,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Trikots",
+    description: "Verschiedene Trikots in verschiedenen Größen"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -721,6 +739,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -732,11 +751,11 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Schläger",
-  description: "Tennis- und Badmintonschläger"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Schläger",
+    description: "Tennis- und Badmintonschläger"
+  })
 
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
@@ -747,6 +766,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -758,11 +778,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Tauchausrüstung",
-  description: "Alles was zum Tauchen benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Tauchausrüstung",
+    description: "Alles was zum Tauchen benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -772,6 +793,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 20),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -783,11 +805,11 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Wanderausrüstung",
-  description: "Alles was zum Wandern benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Wanderausrüstung",
+    description: "Alles was zum Wandern benötigt wird"
+  })
 
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
@@ -798,6 +820,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 17),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -809,11 +832,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Ruderausrüstung",
-  description: "Alles was zum Rudern benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Ruderausrüstung",
+    description: "Alles was zum Rudern benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -823,6 +847,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 15),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -832,12 +857,14 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 20),
   rental_duration: :short_term
 })
+
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Skiausrüstung",
-  description: "Alles was zum Skifahren benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Skiausrüstung",
+    description: "Alles was zum Skifahren benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -847,6 +874,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 35),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -856,12 +884,14 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 45),
   rental_duration: :short_term
 })
+
 category =
-Repo.insert!(%Category{
-  club: club_2,
-  name: "Surfausrüstung",
-  description: "Alles was zum Surfen benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_2,
+    name: "Surfausrüstung",
+    description: "Alles was zum Surfen benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -871,6 +901,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_2.id,
   category_id: category.id,
@@ -888,7 +919,7 @@ Repo.insert!(%RentalRule{
   for_non_members: true,
   allow_renewal: true,
   max_renewals: 2,
-  renewal_period: 7,
+  renewal_period: 7
 })
 
 Repo.insert!(%RentalFee{
@@ -908,6 +939,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 0),
   rental_duration: :short_term
 })
+
 ###################################
 # Add Club 3
 
@@ -925,12 +957,13 @@ club_3 =
     notes: [Sportyweb.SeedHelper.get_random_note()]
   })
 
-  category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Bälle",
-  description: "Alle Arten von Bällen",
-})
+category =
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Bälle",
+    description: "Alle Arten von Bällen"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -940,6 +973,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 5),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -951,11 +985,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Trikots",
-  description: "Verschiedene Trikots in verschiedenen Größen"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Trikots",
+    description: "Verschiedene Trikots in verschiedenen Größen"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -965,6 +1000,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -976,11 +1012,11 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Schläger",
-  description: "Tennis- und Badmintonschläger"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Schläger",
+    description: "Tennis- und Badmintonschläger"
+  })
 
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
@@ -991,6 +1027,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1002,11 +1039,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Tauchausrüstung",
-  description: "Alles was zum Tauchen benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Tauchausrüstung",
+    description: "Alles was zum Tauchen benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1016,6 +1054,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 20),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1027,11 +1066,11 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Wanderausrüstung",
-  description: "Alles was zum Wandern benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Wanderausrüstung",
+    description: "Alles was zum Wandern benötigt wird"
+  })
 
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
@@ -1042,6 +1081,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 17),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1053,11 +1093,12 @@ Repo.insert!(%RentalFee{
 })
 
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Ruderausrüstung",
-  description: "Alles was zum Rudern benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Ruderausrüstung",
+    description: "Alles was zum Rudern benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1067,6 +1108,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 15),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1076,12 +1118,14 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 20),
   rental_duration: :short_term
 })
+
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Skiausrüstung",
-  description: "Alles was zum Skifahren benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Skiausrüstung",
+    description: "Alles was zum Skifahren benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1091,6 +1135,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 35),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1100,12 +1145,14 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 45),
   rental_duration: :short_term
 })
+
 category =
-Repo.insert!(%Category{
-  club: club_3,
-  name: "Surfausrüstung",
-  description: "Alles was zum Surfen benötigt wird"
-})
+  Repo.insert!(%Category{
+    club: club_3,
+    name: "Surfausrüstung",
+    description: "Alles was zum Surfen benötigt wird"
+  })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1115,6 +1162,7 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 10),
   rental_duration: :short_term
 })
+
 Repo.insert!(%RentalFee{
   club_id: club_3.id,
   category_id: category.id,
@@ -1132,7 +1180,7 @@ Repo.insert!(%RentalRule{
   for_non_members: true,
   allow_renewal: true,
   max_renewals: 2,
-  renewal_period: 7,
+  renewal_period: 7
 })
 
 Repo.insert!(%RentalFee{
@@ -1152,7 +1200,6 @@ Repo.insert!(%RentalFee{
   amount: Money.new(:EUR, 0),
   rental_duration: :short_term
 })
-
 
 ###################################
 # Add Club 4
@@ -1203,7 +1250,6 @@ Repo.insert!(%Department{
   notes: [Sportyweb.SeedHelper.get_random_note()]
 })
 
-
 ###################################
 # Add Categories
 Repo.insert!(%Category{
@@ -1211,6 +1257,7 @@ Repo.insert!(%Category{
   name: "Bälle",
   description: "Alle Arten von Bällen"
 })
+
 Repo.insert!(%Category{
   club: testclub,
   name: "Trikots",
@@ -1728,8 +1775,6 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
             notes: [Sportyweb.SeedHelper.get_random_note()]
           })
 
-
-
         # Fees: Specific - Equipment
 
         Repo.insert!(%Fee{
@@ -1782,47 +1827,44 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
         Enum.random([nil | Enum.map(categories, & &1.id)])
 
       article =
-      Repo.insert!(%Article{
-        club_id: club.id,
-        department_id: department_id,
-        category_id: category_id,
-        name: Faker.Commerce.product_name(),
-        reference_number: Sportyweb.SeedHelper.get_random_string(5),
-        description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
-        costs_of_loss: Money.new(:EUR, Enum.random(10..500))
-      })
-
+        Repo.insert!(%Article{
+          club_id: club.id,
+          department_id: department_id,
+          category_id: category_id,
+          name: Faker.Commerce.product_name(),
+          reference_number: Sportyweb.SeedHelper.get_random_string(5),
+          description: if(:rand.uniform() < 0.50, do: Faker.Lorem.paragraph(), else: ""),
+          costs_of_loss: Money.new(:EUR, Enum.random(10..500))
+        })
 
       # Units
 
-
-
-
       for _m <- 0..Enum.random(1..5) do
         location_id =
-        Enum.random(locations).id
+          Enum.random(locations).id
+
+        condition_status = Enum.random(["ok", "damaged", "lost"])
+        now = DateTime.utc_now() |> DateTime.truncate(:second)
 
         Repo.insert!(%Unit{
           article_id: article.id,
           location_id: location_id,
           serial_number: Sportyweb.SeedHelper.get_random_string(3),
           purchase_date: Faker.Date.backward(Enum.random(300..2000)),
-            commission_date: Faker.Date.backward(Enum.random(0..299)),
-            decommission_date:
-              if(:rand.uniform() < 0.65,
-                do: Faker.Date.forward(Enum.random(100..2000)),
-                else: nil
-              ),
-          for_lending: Enum.random([true, false])
+          commission_date: Faker.Date.backward(Enum.random(0..299)),
+          decommission_date:
+            if(:rand.uniform() < 0.65,
+              do: Faker.Date.forward(Enum.random(100..2000)),
+              else: nil
+            ),
+          condition_status: condition_status,
+          damaged_on: if(condition_status == "damaged", do: now, else: nil),
+          lost_on: if(condition_status == "lost", do: now, else: nil)
         })
       end
 
-    if l == 0, do: Organization.update_club(club, %{article_id: article.id})
-
+      if l == 0, do: Organization.update_club(club, %{article_id: article.id})
     end
-
-
-
 
     # Events
 

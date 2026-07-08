@@ -466,7 +466,10 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         true -> "Ohne Zuordnung"
       end
 
-    amount = RentalFee.gross_amount_label(rental_fee)
+    amount =
+    rental_fee
+    |> Inventory.gross_money()
+    |> RentalFee.money_label()
 
     rental_unit =
       case rental_rule.rental_period_unit do

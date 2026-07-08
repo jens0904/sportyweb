@@ -12,9 +12,6 @@
     <:item title="Anlagennummer">
       {format_integer_field(@unit.serial_number)}
     </:item>
-    <:item title="ausleihbar">
-      {format_boolean_field(@unit.for_lending)}
-    </:item>
 
     <:item title="Standort">
       {format_string_field(@unit.location.name)}
