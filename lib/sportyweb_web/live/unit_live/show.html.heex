@@ -36,7 +36,7 @@
 <.card>
   <%= if @inactive_rentals_count > 0 do %>
     <.table id="inactive_rentals" rows={@streams.inactive_rentals}>
-      <:col :let={{_id, rental}} label="Mitgliedschaft">
+      <:col :let={{_id, rental}} label="Kategorie">
         <%= if Contact.has_active_membership_contract?(rental.contact) do %>
           Mitglied
         <% else %>
@@ -82,10 +82,22 @@
 <.card>
   <%= if @fee_rentals_count > 0 do %>
     <.table id="fee_rentals" rows={@streams.fee_rentals}>
-      <:col :let={{_id, rental}} label="Kontakt">{rental.contact.name}</:col>
+      <:col :let={{_id, rental}} label="Kontakt">
+        {rental.contact.name}
+      </:col>
+
       <:col :let={{_id, rental}} label="Zurückgegeben am">
         {format_datetime_field(rental.returned_at)}
       </:col>
+
+      <:col :let={{_id, rental}} label="Gesamtentgelt">
+        {rental.total_fee}
+      </:col>
+
+      <:col :let={{_id, rental}} label="Mehrwertsteuer">
+        {rental.vat_fee}
+      </:col>
+
       <:action :let={{_id, rental}}>
         <.link navigate={~p"/rentals/#{rental}"}>Anzeigen</.link>
       </:action>

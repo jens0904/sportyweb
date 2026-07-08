@@ -108,7 +108,7 @@ end
       :condition_status,
       :condition_note
     ])
-    |> validate_required([:status, :return_date, :returned_at])
+    |> validate_required([:status, :return_date, :returned_at, :condition_status])
     |> validate_inclusion(:status, ["active", "returned"])
     |> validate_inclusion(:condition_status, ["ok", "damaged", "lost"])
   end

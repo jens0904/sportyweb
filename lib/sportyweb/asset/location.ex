@@ -24,7 +24,6 @@ defmodule Sportyweb.Asset.Location do
     belongs_to :club, Club
     has_many :equipment, Equipment, preload_order: [asc: :name]
     has_many :rentals, Rental
-    has_many :old_rentals, OldRentals
     has_many :units, Unit
     many_to_many :emails, Email, join_through: LocationEmail
     many_to_many :fees, Fee, join_through: LocationFee

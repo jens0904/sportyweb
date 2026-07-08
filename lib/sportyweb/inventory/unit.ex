@@ -14,7 +14,6 @@ defmodule Sportyweb.Inventory.Unit do
     belongs_to :article, Article
     belongs_to :location, Location
     has_many :rentals, Rental
-    has_many :old_rentals, OldRentals
     field :serial_number, :string
     field :for_lending, :boolean, default: true
     field :purchase_date, :date, default: nil

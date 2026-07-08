@@ -41,16 +41,5 @@
       {format_datetime_field(@rental.returned_at)}
     </:item>
 
-    <:item :if={Rental.inactive?(@rental)} title="Gesamtentgelt">
-      {@rental.total_fee}
-    </:item>
-
-    <:item :if={Rental.inactive?(@rental)} title="Mehrwertsteuer">
-      {@rental.vat_fee}
-    </:item>
-
-    <:item :if={Rental.inactive?(@rental)} title="Bemerkung">
-      {format_string_field(@rental.condition_note)}
-    </:item>
   </.list>
 </.card>

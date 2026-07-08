@@ -1,9 +1,8 @@
 defmodule SportywebWeb.RentalLive.ReturnComponent do
   use SportywebWeb, :live_component
-  use Ecto.Schema
-  alias Sportyweb.Inventory.ReturnForm
 
   alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Rental
 
   @impl true
   def render(assigns) do
@@ -20,14 +19,15 @@ defmodule SportywebWeb.RentalLive.ReturnComponent do
           field={@form[:condition_status]}
           type="select"
           label="Zustand bei Rückgabe"
-          options={[
-            {"In Ordnung", "ok"},
-            {"Beschädigt", "damaged"},
-            {"Verloren", "lost"}
-          ]}
+          options={Rental.get_condition_statuses() |> Enum.map(&{&1[:key], &1[:value]})}
         />
 
-        <.input field={@form[:condition_note]} type="textarea" label="Bemerkung zum Zustand" />
+        <.input
+          field={@form[:condition_note]}
+          type="textarea"
+          label="Bemerkung zum Zustand"
+        />
+
         <.button>Ausleihe zurückgeben</.button>
       </.simple_form>
     </div>
@@ -36,7 +36,10 @@ defmodule SportywebWeb.RentalLive.ReturnComponent do
 
   @impl true
   def update(%{rental: rental} = assigns, socket) do
-    changeset = ReturnForm.changeset(%ReturnForm{condition_status: "ok"})
+    changeset =
+      Rental.return_changeset(rental, %{
+        "condition_status" => rental.condition_status || "ok"
+      })
 
     {:ok,
      socket
@@ -47,47 +50,37 @@ defmodule SportywebWeb.RentalLive.ReturnComponent do
   @impl true
   def handle_event("validate", %{"rental" => rental_params}, socket) do
     changeset =
-      %ReturnForm{}
-      |> ReturnForm.changeset(rental_params)
+      socket.assigns.rental
+      |> Rental.return_changeset(rental_params)
+      |> Map.put(:action, :validate)
 
-    {:noreply, assign(socket, form: to_form(changeset, as: :rental, action: :validate))}
+    {:noreply,
+     assign(socket, :form, to_form(changeset, as: :rental))}
   end
 
+  @impl true
   def handle_event("save", %{"rental" => rental_params}, socket) do
     case Inventory.return_rental(socket.assigns.rental, rental_params) do
-      {:ok, changes} ->
-        # Optional prüfen:
-        # Map.has_key?(changes, :old_rental)
-        # Map.has_key?(changes, :unit)
-
+      {:ok, _changes} ->
         {:noreply,
          socket
          |> put_flash(:info, "Ausleihe erfolgreich zurückgegeben")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, :unit, _changeset, _changes} ->
-        form = ReturnForm.changeset(%ReturnForm{}, rental_params)
+        changeset =
+          Rental.return_changeset(socket.assigns.rental, rental_params)
 
         {:noreply,
          socket
          |> put_flash(:error, "Der Zustand der Einheit konnte nicht aktualisiert werden.")
-         |> assign(:form, to_form(form, as: :rental))}
+         |> assign(:form, to_form(changeset, as: :rental))}
 
-      {:error, :old_rental, _changeset, _changes} ->
-        form = ReturnForm.changeset(%ReturnForm{}, rental_params)
-
-        {:noreply,
-         socket
-         |> put_flash(:error, "Die Ausleihe konnte nicht archiviert werden.")
-         |> assign(:form, to_form(form, as: :rental))}
-
-      {:error, :rental, _changeset, _changes} ->
-        form = ReturnForm.changeset(%ReturnForm{}, rental_params)
-
+      {:error, :rental, changeset, _changes} ->
         {:noreply,
          socket
          |> put_flash(:error, "Die Ausleihe konnte nicht zurückgegeben werden.")
-         |> assign(:form, to_form(form, as: :rental))}
+         |> assign(:form, to_form(changeset, as: :rental))}
     end
   end
 end

@@ -141,19 +141,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
               <span class="truncate">Mietgebühren</span>
             </.link>
           </li>
-          <li>
-            <.link
-              navigate={~p"/clubs/#{@club}/old_rentals"}
-              class={[
-                @classes_menu_item,
-                @classes_submenu_item,
-                if(@club_navigation_current_item == :old_rentals, do: @classes_menu_item_active)
-              ]}
-            >
-              <span class="truncate">Archiv</span>
-            </.link>
-          </li>
-        </ul>
+       </ul>
 
         <.link
           phx-target={@myself}
@@ -250,8 +238,7 @@ defmodule SportywebWeb.ClubNavigationComponent do
       assigns.club_navigation_current_item == :categories ||
         assigns.club_navigation_current_item == :articles ||
         assigns.club_navigation_current_item == :rental_rules ||
-        assigns.club_navigation_current_item == :rental_fees ||
-        assigns.club_navigation_current_item == :old_rentals
+        assigns.club_navigation_current_item == :rental_fees
 
 
     {:ok,
