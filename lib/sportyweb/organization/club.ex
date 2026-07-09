@@ -24,7 +24,6 @@ defmodule Sportyweb.Organization.Club do
   alias Sportyweb.Inventory.Category
   alias Sportyweb.Inventory.RentalFee
   alias Sportyweb.Inventory.RentalRule
-  alias Sportyweb.Inventory.OldRentals
 
 
   @primary_key {:id, :binary_id, autogenerate: true}

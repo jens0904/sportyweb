@@ -9,7 +9,7 @@ defmodule Sportyweb.Inventory.Article do
   alias Sportyweb.Inventory.Rental
   alias Sportyweb.Inventory.RentalFee
   alias Sportyweb.Inventory.RentalRule
-  alias Sportyweb.Inventory.OldRentals
+
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

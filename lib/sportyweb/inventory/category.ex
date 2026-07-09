@@ -3,8 +3,9 @@ defmodule Sportyweb.Inventory.Category do
   import Ecto.Changeset
   alias Sportyweb.Organization.Club
   alias Sportyweb.Inventory.Article
-  alias Sportyweb.Inventory.CategoryRentalFee
+
   alias Sportyweb.Inventory.RentalFee
+  alias Sportyweb.Inventory.RentalRule
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -13,7 +14,7 @@ defmodule Sportyweb.Inventory.Category do
     has_many :articles, Article
 
     has_many :rental_fees, RentalFee
-
+    has_many :rental_rules, RentalRule
     field :name, :string
     field :description, :string
 

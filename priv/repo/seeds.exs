@@ -1857,9 +1857,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
               do: Faker.Date.forward(Enum.random(100..2000)),
               else: nil
             ),
-          condition_status: condition_status,
-          damaged_on: if(condition_status == "damaged", do: now, else: nil),
-          lost_on: if(condition_status == "lost", do: now, else: nil)
+          condition_status: "ok"
         })
       end
 

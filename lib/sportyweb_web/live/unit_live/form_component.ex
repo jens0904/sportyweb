@@ -20,7 +20,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@form[:serial_number]} type="number" label="Anlagennummer" />
+        <.input field={@form[:serial_number]} type="text" label="Anlagennummer" />
         <%= if Enum.any?(@location_options) do %>
           <div class="col-span-12">
             <.input

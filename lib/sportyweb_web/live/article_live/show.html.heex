@@ -120,7 +120,7 @@
       row_click={fn {_id, unit} -> JS.navigate(~p"/units/#{unit}") end}
     >
       <:col :let={{_id, unit}} label="Anlagennummer">
-        {format_integer_field(unit.serial_number)}
+        {format_string_field(unit.serial_number)}
       </:col>
       <:col :let={{_id, unit}} label="Status">
         <div class="max-w-[200px] truncate overflow-hidden">
