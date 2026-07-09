@@ -3,6 +3,7 @@ defmodule SportywebWeb.UnitLive.FormComponent do
 
   alias Sportyweb.Asset
   alias Sportyweb.Inventory
+  alias Sportyweb.Inventory.Unit
 
   @impl true
   def render(assigns) do
@@ -31,8 +32,14 @@ defmodule SportywebWeb.UnitLive.FormComponent do
             />
           </div>
         <% end %>
-        <.input field={@form[:for_lending]} type="checkbox" label="ausleihbar" />
-        <.input field={@form[:occupied]} type="checkbox" label="belegt" />
+        <div class="col-span-12 md:col-span-4">
+        <.input
+          field={@form[:condition_status]}
+          type="select"
+          label="Zustand der Einheit"
+          options={Unit.get_condition_statuses() |> Enum.map(&{&1[:key], &1[:value]})}
+        />
+        </div>
         <div class="col-span-12 md:col-span-4">
           <.input field={@form[:purchase_date]} type="date" label="Gekauft am (optional)" />
         </div>

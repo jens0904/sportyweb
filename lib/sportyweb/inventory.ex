@@ -15,7 +15,6 @@ defmodule Sportyweb.Inventory do
   alias Sportyweb.Personal
   alias Sportyweb.Personal.Contact
   alias Sportyweb.Inventory.RentalRule
-  alias Sportyweb.Inventory.OldRentals
 
   @doc """
   Returns the list of categories.
@@ -510,6 +509,9 @@ defmodule Sportyweb.Inventory do
     rental_rule =
       get_applicable_rental_rule(rental_attrs["article_id"])
 
+    rental_attrs =
+      Map.put(rental_attrs, "rental_rule_id", rental_rule.id)
+
     total_fee =
       calculate_total_fee(rental_attrs, rental_rule)
 
@@ -826,6 +828,24 @@ defmodule Sportyweb.Inventory do
       ** (Ecto.NoResultsError)
 
   """
+  def archive_rental_fee(%RentalFee{} = rental_fee) do
+    active_rentals_exist? =
+      Repo.exists?(
+        from r in Rental,
+          where:
+            r.rental_fee_id == ^rental_fee.id and
+              r.status == "active"
+      )
+
+    if active_rentals_exist? do
+      {:error, :rental_fee_has_active_rentals}
+    else
+      rental_fee
+      |> Ecto.Changeset.change(archived_at: DateTime.utc_now() |> DateTime.truncate(:second))
+      |> Repo.update()
+    end
+  end
+
   def get_rental_fee!(id), do: Repo.get!(RentalFee, id)
 
   @doc """
@@ -846,6 +866,50 @@ defmodule Sportyweb.Inventory do
     RentalFee
     |> Repo.get!(id)
     |> Repo.preload(preloads)
+  end
+
+  def get_applicable_rental_fee(article_id) do
+    article = get_article!(article_id, [:category])
+
+    get_article_rental_fee(article) ||
+      get_category_rental_fee(article) ||
+      get_club_rental_fee(article)
+  end
+
+  defp get_article_rental_fee(article) do
+    RentalFee
+    |> where(
+      [r],
+      r.article_id == ^article.id and
+        is_nil(r.archived_at)
+    )
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  defp get_category_rental_fee(%{category_id: nil}), do: nil
+
+  defp get_category_rental_fee(article) do
+    RentalFee
+    |> where(
+      [r],
+      r.category_id == ^article.category_id and
+        is_nil(r.archived_at)
+    )
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  defp get_club_rental_fee(article) do
+    from(r in RentalFee,
+      where:
+        r.club_id == ^article.club_id and
+          is_nil(r.article_id) and
+          is_nil(r.category_id) and
+          is_nil(r.archived_at),
+      limit: 1
+    )
+    |> Repo.one()
   end
 
   @doc """
@@ -918,28 +982,20 @@ defmodule Sportyweb.Inventory do
       []
     else
       contact = Personal.get_contact!(contact_id, [:contracts])
-
       article = get_article!(article_id)
 
       query =
         from(rf in RentalFee,
           where:
-            rf.article_id == ^article_id or
-              (rf.club_id == ^article.club_id and
-                 is_nil(rf.article_id) and
-                 is_nil(rf.category_id)),
+            is_nil(rf.archived_at) and
+              (rf.article_id == ^article.id or
+                 rf.category_id == ^article.category_id or
+                 (rf.club_id == ^article.club_id and
+                    is_nil(rf.article_id) and
+                    is_nil(rf.category_id))),
           preload: [:category, :article],
           distinct: true
         )
-
-      query =
-        if article.category_id do
-          from(rf in query,
-            or_where: rf.category_id == ^article.category_id
-          )
-        else
-          query
-        end
 
       query =
         if Contact.has_active_membership_contract?(contact) do
@@ -1006,32 +1062,32 @@ defmodule Sportyweb.Inventory do
   end
 
   def vat_rate(%RentalFee{member_type: member_type}) do
-  case member_type do
-    :member -> Decimal.new("0.07")
-    "member" -> Decimal.new("0.07")
-    :non_member -> Decimal.new("0.19")
-    "non_member" -> Decimal.new("0.19")
-    _ -> Decimal.new("0")
+    case member_type do
+      :member -> Decimal.new("0.07")
+      "member" -> Decimal.new("0.07")
+      :non_member -> Decimal.new("0.19")
+      "non_member" -> Decimal.new("0.19")
+      _ -> Decimal.new("0")
+    end
   end
-end
 
-def vat_money(%RentalFee{} = rental_fee) do
-  vat_amount =
-    rental_fee.amount.amount
-    |> Decimal.mult(vat_rate(rental_fee))
-    |> Decimal.round(2)
+  def vat_money(%RentalFee{} = rental_fee) do
+    vat_amount =
+      rental_fee.amount.amount
+      |> Decimal.mult(vat_rate(rental_fee))
+      |> Decimal.round(2)
 
-  %{rental_fee.amount | amount: vat_amount}
-end
+    %{rental_fee.amount | amount: vat_amount}
+  end
 
-def gross_money(%RentalFee{} = rental_fee) do
-  gross_amount =
-    rental_fee.amount.amount
-    |> Decimal.add(vat_money(rental_fee).amount)
-    |> Decimal.round(2)
+  def gross_money(%RentalFee{} = rental_fee) do
+    gross_amount =
+      rental_fee.amount.amount
+      |> Decimal.add(vat_money(rental_fee).amount)
+      |> Decimal.round(2)
 
-  %{rental_fee.amount | amount: gross_amount}
-end
+    %{rental_fee.amount | amount: gross_amount}
+  end
 
   defp rental_units(attrs, rental_rule) do
     rental_date = Map.get(attrs, "rental_date") || Map.get(attrs, :rental_date)
@@ -1180,15 +1236,31 @@ end
   def get_applicable_rental_rule(article_id) do
     article = get_article!(article_id, [:category])
 
-    Repo.get_by(RentalRule, article_id: article.id) ||
+    get_article_rental_rule(article) ||
       get_category_rental_rule(article) ||
       get_club_rental_rule(article)
+  end
+
+  defp get_article_rental_rule(article) do
+    from(r in RentalRule,
+      where:
+        r.article_id == ^article.id and
+          is_nil(r.archived_at),
+      limit: 1
+    )
+    |> Repo.one()
   end
 
   defp get_category_rental_rule(%{category_id: nil}), do: nil
 
   defp get_category_rental_rule(article) do
-    Repo.get_by(RentalRule, category_id: article.category_id)
+    from(r in RentalRule,
+      where:
+        r.category_id == ^article.category_id and
+          is_nil(r.archived_at),
+      limit: 1
+    )
+    |> Repo.one()
   end
 
   defp get_club_rental_rule(article) do
@@ -1196,7 +1268,8 @@ end
       where:
         r.club_id == ^article.club_id and
           is_nil(r.article_id) and
-          is_nil(r.category_id),
+          is_nil(r.category_id) and
+          is_nil(r.archived_at),
       limit: 1
     )
     |> Repo.one()
@@ -1273,5 +1346,21 @@ end
     RentalRule.changeset(rental_rule, attrs)
   end
 
+  def archive_rental_rule(%RentalRule{} = rental_rule) do
+    active_rentals_exist? =
+      Repo.exists?(
+        from r in Rental,
+          where:
+            r.rental_rule_id == ^rental_rule.id and
+              r.status == "active"
+      )
 
+    if active_rentals_exist? do
+      {:error, :rental_rule_has_active_rentals}
+    else
+      rental_rule
+      |> Ecto.Changeset.change(archived_at: DateTime.utc_now() |> DateTime.truncate(:second))
+      |> Repo.update()
+    end
+  end
 end

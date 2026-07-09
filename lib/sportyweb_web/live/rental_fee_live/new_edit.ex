@@ -16,8 +16,11 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
         action={@live_action}
         rental_fee={@rental_fee}
         club={@club}
-        navigate={if @rental_fee.id, do: ~p"/rental_fees/#{@rental_fee}", else: ~p"/clubs/#{@club}/rental_fees"}
-
+        navigate={
+          if @rental_fee.id,
+            do: ~p"/rental_fees/#{@rental_fee}",
+            else: ~p"/clubs/#{@club}/rental_fees"
+        }
       />
     </div>
     """
@@ -56,13 +59,23 @@ defmodule SportywebWeb.RentalFeeLive.NewEdit do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
+  def handle_event("archive", %{"id" => id}, socket) do
     rental_fee = Inventory.get_rental_fee!(id)
-    {:ok, _} = Inventory.delete_rental_fee(rental_fee)
 
-    {:noreply,
-     socket
-     |> put_flash(:info, "Mietgebühr erfolgreich gelöscht")
-     |> push_navigate(to: "/clubs/#{rental_fee.club_id}/rental_fees")}
+    case Inventory.archive_rental_fee(rental_fee) do
+      {:ok, _rental_rule} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Mietgebühr wurde archiviert.")
+         |> push_navigate(to: "/clubs/#{rental_fee.club_id}/rental_fees")}
+
+      {:error, :rental_fee_has_active_rentals} ->
+        {:noreply,
+         socket
+         |> put_flash(
+           :error,
+           "Die Mietgebühr kann nicht archiviert werden, solange aktive Vermietungen vorhanden sind."
+         )}
+    end
   end
 end

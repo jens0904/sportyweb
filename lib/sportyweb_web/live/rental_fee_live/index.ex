@@ -60,14 +60,15 @@ defmodule SportywebWeb.RentalFeeLive.Index do
 
   defp apply_action(socket, :index, %{"club_id" => club_id}) do
     club = Organization.get_club!(club_id, rental_fees: [:article, :category, :successor, :club], articles: [], categories: [])
-
+    active_rental_fees =
+      Enum.filter(club.rental_fees, &is_nil(&1.archived_at))
     socket
     |> assign(:page_title, "Mietgebühren")
-    |> assign(:all_rental_fees, club.rental_fees)
+    |> assign(:all_rental_fees, active_rental_fees)
     |> assign(:club, club)
     |> assign(:scope, "")
     |> assign(:object_id, "")
-    |> stream(:rental_fees, club.rental_fees, reset: true)
+    |> stream(:rental_fees, active_rental_fees, reset: true)
 
   end
 end

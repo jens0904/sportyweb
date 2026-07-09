@@ -209,11 +209,12 @@ defmodule SportywebWeb.RentalRuleLive.FormComponent do
 
             <.button
               :if={@rental_rule.id}
+              type="button"
               class="bg-rose-700 hover:bg-rose-800"
-              phx-click={JS.push("delete", value: %{id: @rental_rule.id})}
-              data-confirm="Unwiderruflich löschen?"
+              phx-click={JS.push("archive", value: %{id: @rental_rule.id})}
+              data-confirm="Möchten Sie diese Regel wirklich archivieren?"
             >
-              Löschen
+              Archivieren
             </.button>
           </:actions>
         </.simple_form>

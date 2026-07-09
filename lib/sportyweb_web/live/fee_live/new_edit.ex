@@ -78,6 +78,8 @@ defmodule SportywebWeb.FeeLive.NewEdit do
   end
 
   @impl true
+  @spec handle_event(<<_::48>>, map(), Phoenix.LiveView.Socket.t()) ::
+          {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("delete", %{"id" => id}, socket) do
     fee = Finance.get_fee!(id)
     {:ok, _} = Finance.delete_fee(fee)

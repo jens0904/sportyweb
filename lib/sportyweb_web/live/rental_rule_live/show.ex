@@ -20,14 +20,14 @@ defmodule SportywebWeb.RentalRuleLive.Show do
   end
 
   defp page_title(%{article: article}) when not is_nil(article) do
-    "Ausleihregel für Artikel: #{article.name}"
+    "Mietregel für Artikel: #{article.name}"
   end
 
   defp page_title(%{category: category}) when not is_nil(category) do
-    "Ausleihregel für Kategorie: #{category.name}"
+    "Mietregel für Kategorie: #{category.name}"
   end
 
   defp page_title(_rental_rule) do
-    "Ausleihregel für gesamten Verein"
+    "Mietregel für gesamten Verein"
   end
 end

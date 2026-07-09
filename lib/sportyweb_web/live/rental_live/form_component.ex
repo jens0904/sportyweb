@@ -18,8 +18,13 @@ defmodule SportywebWeb.RentalLive.FormComponent do
         <%= cond do %>
           <% is_nil(@rental_rule) -> %>
             <p>
-              Für diesen Artikel oder dessen Kategorie wurde noch keine Ausleihregel definiert.
+              Für diesen Artikel, dessen Kategorie oder den Club wurde noch keine Ausleihregel definiert.
               Bitte legen Sie zuerst eine passende Ausleihregel an.
+            </p>
+          <% is_nil(@rental_fee) -> %>
+            <p>
+              Für diesen Artikel, dessen Kategorie oder den Club ist keine aktive Ausleihgebühr definiert.
+              Bitte legen Sie zuerst eine passende Gebühr an.
             </p>
           <% !@article.units -> %>
             <p>
@@ -27,7 +32,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
               Bitte weisen Sie dem Artikel zuerst eine Einheit zu.
             </p>
           <% !@has_available_units -> %>
-          <p>Es ist derzeit keine Einheit dieses Artikels zur Ausleihe verfügbar.</p>
+            <p>Es ist derzeit keine Einheit dieses Artikels zur Ausleihe verfügbar.</p>
           <% true -> %>
             <.simple_form
               for={@form}
@@ -189,8 +194,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
   @impl true
   def update(%{rental: rental} = assigns, socket) do
     rental_rule = Inventory.get_applicable_rental_rule(assigns.article.id)
-    IO.inspect(assigns.article.id, label: "ARTICLE ID")
-    IO.inspect(rental_rule, label: "APPLICABLE RENTAL RULE")
+    rental_fee = Inventory.get_applicable_rental_fee(assigns.article.id)
 
     {:ok,
      socket
@@ -202,6 +206,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
      |> assign(:return_time, nil)
      |> assign(:total_fee_preview, "")
      |> assign(:rental_rule, rental_rule)
+     |> assign(:rental_fee, rental_fee)
      |> assign(
        :contact_options,
        contact_options(assigns.club.id, assigns.article.id, rental_rule)
@@ -219,7 +224,6 @@ defmodule SportywebWeb.RentalLive.FormComponent do
 
   @impl true
   def handle_event("validate", %{"rental" => rental_params}, socket) do
-    IO.inspect(rental_params, label: "VALIDATE PARAMS")
     return_time = Map.get(rental_params, "return_time")
 
     rental_params =
@@ -286,11 +290,14 @@ defmodule SportywebWeb.RentalLive.FormComponent do
   end
 
   defp save_rental(socket, :new, rental_params) do
+    rental_rule = socket.assigns.rental_rule
+
     rental_params =
       rental_params
-      |> normalize_rental_datetimes(socket.assigns.rental_rule)
+      |> normalize_rental_datetimes(rental_rule)
       |> Enum.into(%{
-        "article_id" => socket.assigns.rental.article.id
+        "article_id" => socket.assigns.rental.article.id,
+        "rental_rule_id" => rental_rule.id
       })
 
     case Inventory.create_rental(rental_params) do
@@ -301,9 +308,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset, _changes} ->
-        IO.inspect(changeset.errors, label: "RENTAL ERRORS")
         {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
-
     end
   end
 
@@ -467,9 +472,9 @@ defmodule SportywebWeb.RentalLive.FormComponent do
       end
 
     amount =
-    rental_fee
-    |> Inventory.gross_money()
-    |> RentalFee.money_label()
+      rental_fee
+      |> Inventory.gross_money()
+      |> RentalFee.money_label()
 
     rental_unit =
       case rental_rule.rental_period_unit do

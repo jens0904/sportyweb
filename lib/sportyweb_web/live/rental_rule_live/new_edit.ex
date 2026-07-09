@@ -58,13 +58,23 @@ defmodule SportywebWeb.RentalRuleLive.NewEdit do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    rental_rule = Inventory.get_rental_rule!(id)
-    {:ok, _} = Inventory.delete_rental_rule(rental_rule)
+def handle_event("archive", %{"id" => id}, socket) do
+  rental_rule = Inventory.get_rental_rule!(id)
 
-    {:noreply,
-     socket
-     |> put_flash(:info, "Ausleihregel erfolgreich gelöscht")
-     |> push_navigate(to: "/clubs/#{rental_rule.club_id}/rental_rules")}
+  case Inventory.archive_rental_rule(rental_rule) do
+    {:ok, _rental_rule} ->
+      {:noreply,
+       socket
+       |> put_flash(:info, "Ausleihregel wurde archiviert.")
+       |> push_navigate(to: "/clubs/#{rental_rule.club_id}/rental_rules")}
+
+    {:error, :rental_rule_has_active_rentals} ->
+      {:noreply,
+       socket
+       |> put_flash(
+         :error,
+         "Die Ausleihregel kann nicht archiviert werden, solange aktive Ausleihen vorhanden sind."
+       )}
   end
+end
 end

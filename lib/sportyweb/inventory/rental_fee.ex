@@ -27,6 +27,7 @@ defmodule Sportyweb.Inventory.RentalFee do
     field :minimum_age_in_years, :integer, default: nil
     field :maximum_age_in_years, :integer, default: nil
     field :rental_duration, Ecto.Enum, values: [:short_term, :long_term]
+    field :archived_at, :utc_datetime
 
     timestamps(type: :utc_datetime)
   end

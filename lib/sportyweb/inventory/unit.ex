@@ -26,34 +26,45 @@ defmodule Sportyweb.Inventory.Unit do
     timestamps(type: :utc_datetime)
   end
 
+
+
+  def get_condition_statuses do
+  [
+    [key: "In Ordnung", value: "ok"],
+    [key: "Beschädigt", value: "damaged"],
+    [key: "Verloren", value: "lost"]
+  ]
+end
   @doc false
-  def changeset(unit, attrs) do
-    unit
-    |> cast(attrs, [
-      :serial_number,
-      :purchase_date,
-      :commission_date,
-      :decommission_date,
-      :article_id,
-      :location_id,
-      :condition_status,
-      :condition_note,
-      :damaged_on,
-      :lost_on
-    ])
-    |> validate_required([:serial_number, :article_id, :location_id])
-    |> validate_length(:serial_number, max: 250)
-    |> validate_dates_order(
-      :purchase_date,
-      :commission_date,
-      "Muss zeitlich später als oder gleich \"Gekauft am\" sein!"
-    )
-    |> validate_dates_order(
-      :commission_date,
-      :decommission_date,
-      "Muss zeitlich später als oder gleich \"Nutzung ab\" sein!"
-    )
-  end
+def changeset(unit, attrs) do
+  unit
+  |> cast(attrs, [
+    :serial_number,
+    :purchase_date,
+    :commission_date,
+    :decommission_date,
+    :article_id,
+    :location_id,
+    :condition_status,
+    :condition_note,
+    :damaged_on,
+    :lost_on
+  ])
+  |> validate_required([:serial_number, :article_id, :location_id])
+  |> validate_inclusion(:condition_status, ["ok", "damaged", "lost"])
+  |> validate_length(:serial_number, max: 250)
+  |> validate_dates_order(
+    :purchase_date,
+    :commission_date,
+    "Muss zeitlich später als oder gleich \"Gekauft am\" sein!"
+  )
+  |> validate_dates_order(
+    :commission_date,
+    :decommission_date,
+    "Muss zeitlich später als oder gleich \"Nutzung ab\" sein!"
+  )
+  |> maybe_set_condition_dates()
+end
 
   def return_condition_changeset(unit, attrs) do
   unit
