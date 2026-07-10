@@ -17,7 +17,7 @@ defmodule Sportyweb.Inventory.RentalRule do
 
     field :scope, :string, virtual: true
     field :choose_rental_period, :boolean, default: false
-    field :for_club_members, :boolean, default: false
+    field :for_club_members, :boolean, default: true
     field :for_non_members, :boolean, default: false
     field :rental_period, :integer
     field :rental_period_unit, :string, default: "Tage"

@@ -1,4 +1,4 @@
-defmodule SportywebWeb.EquipmentLive.FormComponent do
+defmodule SportywebWeb.AccessoriesLive.FormComponent do
   use SportywebWeb, :live_component
 
   alias Sportyweb.Asset
@@ -14,21 +14,21 @@ defmodule SportywebWeb.EquipmentLive.FormComponent do
       <.card>
         <.simple_form
           for={@form}
-          id="equipment-form"
+          id="accessories-form"
           phx-target={@myself}
           phx-change="validate"
           phx-submit="save"
         >
           <.input_grids>
             <.input_grid>
-              <%= if @equipment.id do %>
+              <%= if @accessories.id do %>
                 <div class="col-span-12">
                   <.input
                     field={@form[:location_id]}
                     type="select"
                     label="Standort"
                     options={
-                      Asset.list_locations(@equipment.location.club_id) |> Enum.map(&{&1.name, &1.id})
+                      Asset.list_locations(@accessories.location.club_id) |> Enum.map(&{&1.name, &1.id})
                     }
                   />
                 </div>
@@ -86,9 +86,9 @@ defmodule SportywebWeb.EquipmentLive.FormComponent do
               <.cancel_button navigate={@navigate}>Abbrechen</.cancel_button>
             </div>
             <.button
-              :if={@equipment.id}
+              :if={@accessories.id}
               class="bg-rose-700 hover:bg-rose-800"
-              phx-click={JS.push("delete", value: %{id: @equipment.id})}
+              phx-click={JS.push("delete", value: %{id: @accessories.id})}
               data-confirm="Unwiderruflich löschen?"
             >
               Löschen
@@ -101,31 +101,31 @@ defmodule SportywebWeb.EquipmentLive.FormComponent do
   end
 
   @impl true
-  def update(%{equipment: equipment} = assigns, socket) do
+  def update(%{accessories: accessories} = assigns, socket) do
     {:ok,
      socket
      |> assign(assigns)
      |> assign_new(:form, fn ->
-       to_form(Asset.change_equipment(equipment))
+       to_form(Asset.change_accessories(accessories))
      end)}
   end
 
   @impl true
-  def handle_event("validate", %{"equipment" => equipment_params}, socket) do
-    changeset = Asset.change_equipment(socket.assigns.equipment, equipment_params)
+  def handle_event("validate", %{"accessories" => accessories_params}, socket) do
+    changeset = Asset.change_accessories(socket.assigns.accessories, accessories_params)
     {:noreply, assign(socket, form: to_form(changeset, action: :validate))}
   end
 
-  def handle_event("save", %{"equipment" => equipment_params}, socket) do
-    save_equipment(socket, socket.assigns.action, equipment_params)
+  def handle_event("save", %{"accessories" => accessories_params}, socket) do
+    save_accessories(socket, socket.assigns.action, accessories_params)
   end
 
-  defp save_equipment(socket, :edit, equipment_params) do
-    case Asset.update_equipment(socket.assigns.equipment, equipment_params) do
-      {:ok, _equipment} ->
+  defp save_accessories(socket, :edit, accessories_params) do
+    case Asset.update_accessories(socket.assigns.accessories, accessories_params) do
+      {:ok, _accessories} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Equipment erfolgreich aktualisiert")
+         |> put_flash(:info, "Accessories erfolgreich aktualisiert")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -133,17 +133,17 @@ defmodule SportywebWeb.EquipmentLive.FormComponent do
     end
   end
 
-  defp save_equipment(socket, :new, equipment_params) do
-    equipment_params =
-      Enum.into(equipment_params, %{
-        "location_id" => socket.assigns.equipment.location.id
+  defp save_accessories(socket, :new, accessories_params) do
+    accessories_params =
+      Enum.into(accessories_params, %{
+        "location_id" => socket.assigns.accessories.location.id
       })
 
-    case Asset.create_equipment(equipment_params) do
-      {:ok, _equipment} ->
+    case Asset.create_accessories(accessories_params) do
+      {:ok, _accessories} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Equipment erfolgreich erstellt")
+         |> put_flash(:info, "Accessories erfolgreich erstellt")
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->

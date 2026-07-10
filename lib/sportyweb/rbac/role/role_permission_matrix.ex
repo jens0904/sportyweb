@@ -25,7 +25,7 @@ defmodule Sportyweb.RBAC.Role.RolePermissionMatrix do
         GroupLive: [:index, :new, :edit, :show],
         ContactLive: [:index, :new, :edit, :show],
         LocationLive: [:index, :new, :edit, :show],
-        EquipmentLive: [:index, :new, :edit, :show],
+        AccessoriesLive: [:index, :new, :edit, :show],
         FeeLive: [:index, :new, :edit, :show]
       },
       verein_lead: %{
@@ -39,7 +39,7 @@ defmodule Sportyweb.RBAC.Role.RolePermissionMatrix do
         GroupLive: [:index, :new, :show],
         ContactLive: [:index, :new, :edit, :show],
         LocationLive: [:index, :show],
-        EquipmentLive: [:index, :show],
+        AccessoriesLive: [:index, :show],
         FeeLive: [:index, :new, :edit, :show]
       },
       rollen_verwaltung: %{
@@ -83,7 +83,7 @@ defmodule Sportyweb.RBAC.Role.RolePermissionMatrix do
         Info:
           "verfügt über die notwendigen lesenden und schreibenden Zugriffe auf alle Ressourcen und Operationen, die im Kontext der Verwaltung von Anlagen und Geräten des Vereins stehen.",
         LocationLive: [:index, :new, :edit, :show],
-        EquipmentLive: [:index, :new, :edit, :show]
+        AccessoriesLive: [:index, :new, :edit, :show]
       },
       mitglieder_verwaltung: %{
         Name: "Mitgliederverwaltung",

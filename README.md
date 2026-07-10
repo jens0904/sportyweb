@@ -11,8 +11,8 @@ The integrated open-source-software is currently in its initial development phas
 - **Departments & groups:** Mapping of the hierarchical structure of a club, management of department and group members
 - **Contacts & memberships:** Management of contacts (members and non-members, persons and organizations), creation and cancellation of memberships
 - **Events:** Management of events and calendars, management of participants
-- **Locations & equipment:** Management of locations and equipment
-- **Rental:** Rental of locations and equipment by members and non-members
+- **Locations & accessories:** Management of locations and accessories
+- **Rental:** Rental of locations and accessories by members and non-members
 - **Fees & subsidies:** Management of various custom fees and subsidies
 - **Finance & Accounting:** Bookkeeping, preparation of reports and forecasts, payment processing
 - **Documents:** Management of files, (public) sharing, versioning

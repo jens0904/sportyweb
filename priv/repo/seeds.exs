@@ -16,7 +16,7 @@ alias Sportyweb.Repo
 alias Sportyweb.Accounts
 alias Sportyweb.Accounts.User
 alias Sportyweb.Asset
-alias Sportyweb.Asset.Equipment
+alias Sportyweb.Asset.Accessories
 alias Sportyweb.Asset.Location
 alias Sportyweb.Calendar.Event
 alias Sportyweb.Finance
@@ -1510,12 +1510,12 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
       notes: [%Note{}]
     })
 
-    # Fees: General - Equipment
+    # Fees: General - Accessories
 
     Repo.insert!(%Fee{
       club_id: club.id,
       is_general: true,
-      type: "equipment",
+      type: "accessories",
       name: "Allg. Ausleihgebühr Fußbälle",
       reference_number: Sportyweb.SeedHelper.get_random_string(3),
       description: "",
@@ -1531,7 +1531,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
     Repo.insert!(%Fee{
       club_id: club.id,
       is_general: true,
-      type: "equipment",
+      type: "accessories",
       name: "Allg. Ausleihgebühr Fußballschuhe Kinder & Jugendliche",
       reference_number: Sportyweb.SeedHelper.get_random_string(3),
       description: "",
@@ -1753,11 +1753,11 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
         locations: [location]
       })
 
-      # Equipment
+      # Accessories
 
       for _j <- 0..Enum.random(1..30) do
-        equipment =
-          Repo.insert!(%Equipment{
+        accessories =
+          Repo.insert!(%Accessories{
             location_id: location.id,
             name: Faker.Commerce.product_name(),
             reference_number: Sportyweb.SeedHelper.get_random_string(5),
@@ -1775,13 +1775,13 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
             notes: [Sportyweb.SeedHelper.get_random_note()]
           })
 
-        # Fees: Specific - Equipment
+        # Fees: Specific - Accessories
 
         Repo.insert!(%Fee{
           club_id: club.id,
           is_general: false,
-          type: "equipment",
-          name: "Spez. Ausleihgebühr Equipment #{equipment.reference_number}",
+          type: "accessories",
+          name: "Spez. Ausleihgebühr Accessories #{accessories.reference_number}",
           reference_number: Sportyweb.SeedHelper.get_random_string(3),
           description: "",
           amount: Money.new(:EUR, Enum.random(10..150)),
@@ -1791,7 +1791,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
           maximum_age_in_years: nil,
           internal_events: [Sportyweb.SeedHelper.get_random_internal_event()],
           notes: [%Note{}],
-          equipment: [equipment]
+          accessories: [accessories]
         })
       end
     end

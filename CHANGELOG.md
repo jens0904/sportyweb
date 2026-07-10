@@ -70,7 +70,7 @@
 - Added Entities:
     - Group
     - Venue
-    - Equipment
+    - Accessories
     - Contact
     - FinancialData
     - PostalAddress

@@ -53,38 +53,38 @@
 </.card>
 
 <.header level="2" class="mt-12">
-  Equipment
+  Zubehör
   <:actions>
-    <.link navigate={~p"/locations/#{@location}/equipment/new"}>
-      <.button>Equipment erstellen</.button>
+    <.link navigate={~p"/locations/#{@location}/accessories/new"}>
+      <.button>Zubehör erstellen</.button>
     </.link>
   </:actions>
 </.header>
 
 <.card>
-  <%= if Enum.any?(@streams.equipment.inserts) do %>
+  <%= if Enum.any?(@streams.accessories.inserts) do %>
     <.table
-      id="equipment"
-      rows={@streams.equipment}
-      row_click={fn {_id, equipment} -> JS.navigate(~p"/equipment/#{equipment}") end}
+      id="accessories"
+      rows={@streams.accessories}
+      row_click={fn {_id, accessories} -> JS.navigate(~p"/accessories/#{accessories}") end}
     >
-      <:col :let={{_id, equipment}} label="Name">
-        {format_string_field(equipment.name)}
+      <:col :let={{_id, accessories}} label="Name">
+        {format_string_field(accessories.name)}
       </:col>
-      <:col :let={{_id, equipment}} label="Ref.nr.">
-        {format_string_field(equipment.reference_number)}
+      <:col :let={{_id, accessories}} label="Ref.nr.">
+        {format_string_field(accessories.reference_number)}
       </:col>
-      <:col :let={{_id, equipment}} label="Beschreibung">
+      <:col :let={{_id, accessories}} label="Beschreibung">
         <div class="max-w-[200px] truncate overflow-hidden">
-          {format_string_field(equipment.description)}
+          {format_string_field(accessories.description)}
         </div>
       </:col>
 
-      <:action :let={{_id, equipment}}>
-        <.link navigate={~p"/equipment/#{equipment}"}>Anzeigen</.link>
+      <:action :let={{_id, accessories}}>
+        <.link navigate={~p"/accessories/#{accessories}"}>Anzeigen</.link>
       </:action>
     </.table>
   <% else %>
-    <p>Bisher wurde noch kein Equipment erstellt.</p>
+    <p>Bisher wurde noch kein Zubehör erstellt.</p>
   <% end %>
 </.card>

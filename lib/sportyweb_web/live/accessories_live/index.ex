@@ -1,4 +1,4 @@
-defmodule SportywebWeb.EquipmentLive.Index do
+defmodule SportywebWeb.AccessoriesLive.Index do
   use SportywebWeb, :live_view
 
   @impl true

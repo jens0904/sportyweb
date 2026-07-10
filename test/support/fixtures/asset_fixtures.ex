@@ -31,12 +31,12 @@ defmodule Sportyweb.AssetFixtures do
   end
 
   @doc """
-  Generate a equipment.
+  Generate a accessories.
   """
-  def equipment_fixture(attrs \\ %{}) do
+  def accessories_fixture(attrs \\ %{}) do
     location = location_fixture()
 
-    {:ok, equipment} =
+    {:ok, accessories} =
       attrs
       |> Enum.into(%{
         location_id: location.id,
@@ -51,8 +51,8 @@ defmodule Sportyweb.AssetFixtures do
         phones: [phone_attrs()],
         notes: [note_attrs()]
       })
-      |> Sportyweb.Asset.create_equipment()
+      |> Sportyweb.Asset.create_accessories()
 
-    equipment
+    accessories
   end
 end

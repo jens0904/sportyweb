@@ -1,8 +1,8 @@
-defmodule SportywebWeb.EquipmentLive.NewEdit do
+defmodule SportywebWeb.AccessoriesLive.NewEdit do
   use SportywebWeb, :live_view
 
   alias Sportyweb.Asset
-  alias Sportyweb.Asset.Equipment
+  alias Sportyweb.Asset.Accessories
   alias Sportyweb.Polymorphic.Email
   alias Sportyweb.Polymorphic.Note
   alias Sportyweb.Polymorphic.Phone
@@ -12,13 +12,13 @@ defmodule SportywebWeb.EquipmentLive.NewEdit do
     ~H"""
     <div>
       <.live_component
-        module={SportywebWeb.EquipmentLive.FormComponent}
-        id={@equipment.id || :new}
+        module={SportywebWeb.AccessoriesLive.FormComponent}
+        id={@accessories.id || :new}
         title={@page_title}
         action={@live_action}
-        equipment={@equipment}
+        accessories={@accessories}
         navigate={
-          if @equipment.id, do: ~p"/equipment/#{@equipment}", else: ~p"/locations/#{@location}"
+          if @accessories.id, do: ~p"/accessories/#{@accessories}", else: ~p"/locations/#{@location}"
         }
       />
     </div>
@@ -36,21 +36,21 @@ defmodule SportywebWeb.EquipmentLive.NewEdit do
   end
 
   defp apply_action(socket, :edit, %{"id" => id}) do
-    equipment = Asset.get_equipment!(id, [:emails, :phones, :notes, location: :club])
+    accessories = Asset.get_accessories!(id, [:emails, :phones, :notes, location: :club])
 
     socket
-    |> assign(:page_title, "Equipment bearbeiten")
-    |> assign(:equipment, equipment)
-    |> assign(:location, equipment.location)
-    |> assign(:club, equipment.location.club)
+    |> assign(:page_title, "Accessories bearbeiten")
+    |> assign(:accessories, accessories)
+    |> assign(:location, accessories.location)
+    |> assign(:club, accessories.location.club)
   end
 
   defp apply_action(socket, :new, %{"location_id" => location_id}) do
     location = Asset.get_location!(location_id, [:club])
 
     socket
-    |> assign(:page_title, "Equipment erstellen")
-    |> assign(:equipment, %Equipment{
+    |> assign(:page_title, "Accessories erstellen")
+    |> assign(:accessories, %Accessories{
       location_id: location.id,
       location: location,
       emails: [%Email{}],
@@ -63,12 +63,12 @@ defmodule SportywebWeb.EquipmentLive.NewEdit do
 
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
-    equipment = Asset.get_equipment!(id)
-    {:ok, _} = Asset.delete_equipment(equipment)
+    accessories = Asset.get_accessories!(id)
+    {:ok, _} = Asset.delete_accessories(accessories)
 
     {:noreply,
      socket
-     |> put_flash(:info, "Equipment erfolgreich gelöscht")
-     |> push_navigate(to: "/locations/#{equipment.location_id}")}
+     |> put_flash(:info, "Zubehör erfolgreich gelöscht")
+     |> push_navigate(to: "/locations/#{accessories.location_id}")}
   end
 end

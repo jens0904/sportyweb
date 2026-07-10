@@ -6,8 +6,8 @@ defmodule Sportyweb.Asset do
   import Ecto.Query, warn: false
   alias Sportyweb.Repo
 
-  alias Sportyweb.Asset.Equipment
-  alias Sportyweb.Asset.EquipmentFee
+  alias Sportyweb.Asset.Accessories
+  alias Sportyweb.Asset.AccessoriesFee
   alias Sportyweb.Asset.Location
   alias Sportyweb.Asset.LocationFee
   alias Sportyweb.Finance.Fee
@@ -57,7 +57,7 @@ end
 
   ## Examples
 
-      iex> list_locations(1, [:equipment])
+      iex> list_locations(1, [:accessories])
       [%Location{}, ...]
 
   """
@@ -185,151 +185,151 @@ end
     })
   end
 
-  alias Sportyweb.Asset.Equipment
+  alias Sportyweb.Asset.Accessories
 
   @doc """
-  Returns a locations list of equipment.
+  Returns a locations list of accessories.
 
   ## Examples
 
-      iex> list_equipment(1)
-      [%Equipment{}, ...]
+      iex> list_accessories(1)
+      [%Accessories{}, ...]
 
   """
-  def list_equipment(location_id) do
-    query = from(e in Equipment, where: e.location_id == ^location_id, order_by: e.name)
+  def list_accessories(location_id) do
+    query = from(e in Accessories, where: e.location_id == ^location_id, order_by: e.name)
     Repo.all(query)
   end
 
   @doc """
-  Returns a locations list of equipment. Preloads associations.
+  Returns a locations list of accessories. Preloads associations.
 
   ## Examples
 
-      iex> list_equipment(1, [:location])
-      [%Equipment{}, ...]
+      iex> list_accessories(1, [:location])
+      [%Accessories{}, ...]
 
   """
-  def list_equipment(location_id, preloads) do
-    Repo.preload(list_equipment(location_id), preloads)
+  def list_accessories(location_id, preloads) do
+    Repo.preload(list_accessories(location_id), preloads)
   end
 
   @doc """
-  Gets a single equipment.
+  Gets a single accessories.
 
-  Raises `Ecto.NoResultsError` if the Equipment does not exist.
+  Raises `Ecto.NoResultsError` if the Accessories does not exist.
 
   ## Examples
 
-      iex> get_equipment!(123)
-      %Equipment{}
+      iex> get_accessories!(123)
+      %Accessories{}
 
-      iex> get_equipment!(456)
+      iex> get_accessories!(456)
       ** (Ecto.NoResultsError)
 
   """
-  def get_equipment!(id), do: Repo.get!(Equipment, id)
+  def get_accessories!(id), do: Repo.get!(Accessories, id)
 
   @doc """
-  Gets a single equipment. Preloads associations.
+  Gets a single accessories. Preloads associations.
 
-  Raises `Ecto.NoResultsError` if the Equipment does not exist.
+  Raises `Ecto.NoResultsError` if the Accessories does not exist.
 
   ## Examples
 
-      iex> get_equipment!(123, [:location])
+      iex> get_accessories!(123, [:location])
       %Department{}
 
-      iex> get_equipment!(456, [:location])
+      iex> get_accessories!(456, [:location])
       ** (Ecto.NoResultsError)
 
   """
-  def get_equipment!(id, preloads) do
-    Equipment
+  def get_accessories!(id, preloads) do
+    Accessories
     |> Repo.get!(id)
     |> Repo.preload(preloads)
   end
 
   @doc """
-  Creates a equipment.
+  Creates a accessories.
 
   ## Examples
 
-      iex> create_equipment(%{field: value})
-      {:ok, %Equipment{}}
+      iex> create_accessories(%{field: value})
+      {:ok, %Accessories{}}
 
-      iex> create_equipment(%{field: bad_value})
+      iex> create_accessories(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_equipment(attrs \\ %{}) do
-    %Equipment{}
-    |> Equipment.changeset(attrs)
+  def create_accessories(attrs \\ %{}) do
+    %Accessories{}
+    |> Accessories.changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Updates a equipment.
+  Updates a accessories.
 
   ## Examples
 
-      iex> update_equipment(equipment, %{field: new_value})
-      {:ok, %Equipment{}}
+      iex> update_accessories(accessories, %{field: new_value})
+      {:ok, %Accessories{}}
 
-      iex> update_equipment(equipment, %{field: bad_value})
+      iex> update_accessories(accessories, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_equipment(%Equipment{} = equipment, attrs) do
-    equipment
-    |> Equipment.changeset(attrs)
+  def update_accessories(%Accessories{} = accessories, attrs) do
+    accessories
+    |> Accessories.changeset(attrs)
     |> Repo.update()
   end
 
   @doc """
-  Deletes a equipment.
+  Deletes a accessories.
 
   ## Examples
 
-      iex> delete_equipment(equipment)
-      {:ok, %Equipment{}}
+      iex> delete_accessories(accessories)
+      {:ok, %Accessories{}}
 
-      iex> delete_equipment(equipment)
+      iex> delete_accessories(accessories)
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_equipment(%Equipment{} = equipment) do
-    Repo.delete(equipment)
+  def delete_accessories(%Accessories{} = accessories) do
+    Repo.delete(accessories)
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking equipment changes.
+  Returns an `%Ecto.Changeset{}` for tracking accessories changes.
 
   ## Examples
 
-      iex> change_equipment(equipment)
-      %Ecto.Changeset{data: %Equipment{}}
+      iex> change_accessories(accessories)
+      %Ecto.Changeset{data: %Accessories{}}
 
   """
-  def change_equipment(%Equipment{} = equipment, attrs \\ %{}) do
-    Equipment.changeset(equipment, attrs)
+  def change_accessories(%Accessories{} = accessories, attrs \\ %{}) do
+    Accessories.changeset(accessories, attrs)
   end
 
   @doc """
-  Creates a equipment_fee (many_to_many).
+  Creates a accessories_fee (many_to_many).
 
   ## Examples
 
-      iex> create_equipment_fee(equipment, fee)
-      {:ok, %EquipmentFee{}}
+      iex> create_accessories_fee(accessories, fee)
+      {:ok, %AccessoriesFee{}}
 
-      iex> create_equipment_fee(equipment, fee)
+      iex> create_accessories_fee(accessories, fee)
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_equipment_fee(%Equipment{} = equipment, %Fee{} = fee) do
-    Repo.insert(%EquipmentFee{
-      equipment_id: equipment.id,
+  def create_accessories_fee(%Accessories{} = accessories, %Fee{} = fee) do
+    Repo.insert(%AccessoriesFee{
+      accessories_id: accessories.id,
       fee_id: fee.id
     })
   end

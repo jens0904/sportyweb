@@ -224,18 +224,18 @@ defmodule SportywebWeb.Router do
 
 
 
-      # Equipment (Each belongs to a location)
+      # Accessories (Each belongs to a location)
 
-      live "/equipment", EquipmentLive.Index, :index_root
-      live "/locations/:location_id/equipment", EquipmentLive.Index, :index
+      live "/accessories", AccessoriesLive.Index, :index_root
+      live "/locations/:location_id/accessories", AccessoriesLive.Index, :index
 
-      live "/locations/:location_id/equipment/new", EquipmentLive.NewEdit, :new
-      live "/equipment/:id/edit", EquipmentLive.NewEdit, :edit
+      live "/locations/:location_id/accessories/new", AccessoriesLive.NewEdit, :new
+      live "/accessories/:id/edit", AccessoriesLive.NewEdit, :edit
 
-      live "/equipment/:id", EquipmentLive.Show, :show
+      live "/accessories/:id", AccessoriesLive.Show, :show
 
-      live "/equipment/:id/fees", EquipmentLive.FeeNew, :index
-      live "/equipment/:id/fees/new", EquipmentLive.FeeNew, :new
+      live "/accessories/:id/fees", AccessoriesLive.FeeNew, :index
+      live "/accessories/:id/fees/new", AccessoriesLive.FeeNew, :new
 
       # Forecasts
 

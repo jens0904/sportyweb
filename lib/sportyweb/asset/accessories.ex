@@ -1,12 +1,12 @@
-defmodule Sportyweb.Asset.Equipment do
+defmodule Sportyweb.Asset.Accessories do
   use Ecto.Schema
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
 
-  alias Sportyweb.Asset.EquipmentEmail
-  alias Sportyweb.Asset.EquipmentFee
-  alias Sportyweb.Asset.EquipmentNote
-  alias Sportyweb.Asset.EquipmentPhone
+  alias Sportyweb.Asset.AccessoriesEmail
+  alias Sportyweb.Asset.AccessoriesFee
+  alias Sportyweb.Asset.AccessoriesNote
+  alias Sportyweb.Asset.AccessoriesPhone
   alias Sportyweb.Asset.Location
   alias Sportyweb.Finance.Fee
   alias Sportyweb.Polymorphic.Email
@@ -15,12 +15,12 @@ defmodule Sportyweb.Asset.Equipment do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  schema "equipment" do
+  schema "accessories" do
     belongs_to :location, Location
-    many_to_many :emails, Email, join_through: EquipmentEmail
-    many_to_many :fees, Fee, join_through: EquipmentFee
-    many_to_many :notes, Note, join_through: EquipmentNote
-    many_to_many :phones, Phone, join_through: EquipmentPhone
+    many_to_many :emails, Email, join_through: AccessoriesEmail
+    many_to_many :fees, Fee, join_through: AccessoriesFee
+    many_to_many :notes, Note, join_through: AccessoriesNote
+    many_to_many :phones, Phone, join_through: AccessoriesPhone
 
     field :name, :string, default: ""
     field :reference_number, :string, default: ""
@@ -34,8 +34,8 @@ defmodule Sportyweb.Asset.Equipment do
   end
 
   @doc false
-  def changeset(equipment, attrs) do
-    equipment
+  def changeset(accessories, attrs) do
+    accessories
     |> cast(
       attrs,
       [

@@ -1,8 +1,8 @@
-defmodule Sportyweb.Repo.Migrations.CreateEquipment do
+defmodule Sportyweb.Repo.Migrations.CreateAccessories do
   use Ecto.Migration
 
   def change do
-    create table(:equipment, primary_key: false) do
+    create table(:accessories, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :name, :string, null: false
       add :reference_number, :string, null: false
@@ -18,6 +18,6 @@ defmodule Sportyweb.Repo.Migrations.CreateEquipment do
       timestamps(type: :utc_datetime)
     end
 
-    create index(:equipment, [:location_id])
+    create index(:accessories, [:location_id])
   end
 end

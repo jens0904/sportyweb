@@ -94,7 +94,7 @@ defmodule Sportyweb.RBAC.Policy do
     is_allowed?(user.id, action, club_id, view, dept_id)
   end
 
-  def permit?(user, action, :EquipmentLive = view, params) do
+  def permit?(user, action, :AccessoriesLive = view, params) do
     location_id =
       if Map.has_key?(params, "location_id"),
         do: params["location_id"],
@@ -167,7 +167,7 @@ defmodule Sportyweb.RBAC.Policy do
       :EventLive -> id |> Calendar.get_event!() |> Map.get(:club_id)
       :ContactLive -> id |> Personal.get_contact!() |> Map.get(:club_id)
       :LocationLive -> id |> Asset.get_location!() |> Map.get(:club_id)
-      :EquipmentLive -> id |> Asset.get_equipment!() |> Map.get(:location_id)
+      :AccessoriesLive -> id |> Asset.get_accessories!() |> Map.get(:location_id)
       :FeeLive -> id |> Finance.get_fee!() |> Map.get(:club_id)
     end
   end
@@ -196,7 +196,7 @@ defmodule Sportyweb.RBAC.Policy do
 
     case view do
       :GroupLive -> get_redirect_path_new_show(view, %{"department_id" => associated_id})
-      :EquipmentLive -> get_redirect_path_new_show(view, %{"location_id" => associated_id})
+      :AccessoriesLive -> get_redirect_path_new_show(view, %{"location_id" => associated_id})
       _ -> get_redirect_path_new_show(view, %{"club_id" => associated_id})
     end
   end
@@ -215,8 +215,8 @@ defmodule Sportyweb.RBAC.Policy do
   defp get_redirect_path_new_show(:GroupLive, %{"department_id" => department_id}),
     do: ~p"/departments/#{department_id}/groups/"
 
-  defp get_redirect_path_new_show(:EquipmentLive, %{"location_id" => location_id}),
-    do: ~p"/locations/#{location_id}/equipment/"
+  defp get_redirect_path_new_show(:AccessoriesLive, %{"location_id" => location_id}),
+    do: ~p"/locations/#{location_id}/accessories/"
 
   defp get_redirect_path_edit(view, %{"id" => id}) do
     case view do
@@ -226,7 +226,7 @@ defmodule Sportyweb.RBAC.Policy do
       :EventLive -> ~p"/events/#{id}/"
       :ContactLive -> ~p"/contacts/#{id}/"
       :LocationLive -> ~p"/locations/#{id}/"
-      :EquipmentLive -> ~p"/equipment/#{id}/"
+      :AccessoriesLive -> ~p"/accessories/#{id}/"
       :FeeLive -> ~p"/fees/#{id}/"
     end
   end

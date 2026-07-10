@@ -1,4 +1,4 @@
-defmodule SportywebWeb.EquipmentLiveTest do
+defmodule SportywebWeb.AccessoriesLiveTest do
   use SportywebWeb.ConnCase, async: true
 
   import Phoenix.LiveViewTest
@@ -43,157 +43,157 @@ defmodule SportywebWeb.EquipmentLiveTest do
     %{user: user}
   end
 
-  defp create_equipment(_) do
-    equipment = equipment_fixture()
-    %{equipment: equipment}
+  defp create_accessories(_) do
+    accessories = accessories_fixture()
+    %{accessories: accessories}
   end
 
   describe "Index" do
-    setup [:create_equipment]
+    setup [:create_accessories]
 
-    test "lists all equipment - default redirect", %{conn: conn, user: user} do
-      {:error, _} = live(conn, ~p"/equipment")
+    test "lists all accessories - default redirect", %{conn: conn, user: user} do
+      {:error, _} = live(conn, ~p"/accessories")
 
       conn = conn |> log_in_user(user)
 
       {:ok, conn} =
         conn
-        |> live(~p"/equipment")
+        |> live(~p"/accessories")
         |> follow_redirect(conn, ~p"/clubs")
 
       assert conn.resp_body =~ "Vereinsübersicht"
     end
 
-    test "lists all equipment - redirect", %{conn: conn, user: user, equipment: equipment} do
-      {:error, _} = live(conn, ~p"/locations/#{equipment.location_id}/equipment")
+    test "lists all accessories - redirect", %{conn: conn, user: user, accessories: accessories} do
+      {:error, _} = live(conn, ~p"/locations/#{accessories.location_id}/accessories")
 
       conn = conn |> log_in_user(user)
 
       {:ok, conn} =
         conn
-        |> live(~p"/locations/#{equipment.location_id}/equipment")
-        |> follow_redirect(conn, ~p"/locations/#{equipment.location_id}")
+        |> live(~p"/locations/#{accessories.location_id}/accessories")
+        |> follow_redirect(conn, ~p"/locations/#{accessories.location_id}")
 
       assert conn.resp_body =~ "Standort:"
     end
   end
 
   describe "New/Edit" do
-    setup [:create_equipment]
+    setup [:create_accessories]
 
-    test "saves new equipment", %{conn: conn, user: user} do
+    test "saves new accessories", %{conn: conn, user: user} do
       location = location_fixture()
 
-      {:error, _} = live(conn, ~p"/locations/#{location}/equipment/new")
+      {:error, _} = live(conn, ~p"/locations/#{location}/accessories/new")
 
       conn = conn |> log_in_user(user)
-      {:ok, new_live, html} = live(conn, ~p"/locations/#{location}/equipment/new")
+      {:ok, new_live, html} = live(conn, ~p"/locations/#{location}/accessories/new")
 
-      assert html =~ "Equipment erstellen"
+      assert html =~ "Accessories erstellen"
 
       assert new_live
-             |> form("#equipment-form", equipment: @invalid_attrs)
+             |> form("#accessories-form", accessories: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
       {:ok, _, html} =
         new_live
-        |> form("#equipment-form", equipment: @create_attrs)
+        |> form("#accessories-form", accessories: @create_attrs)
         |> render_submit()
         |> follow_redirect(conn, ~p"/locations/#{location}")
 
-      assert html =~ "Equipment erfolgreich erstellt"
+      assert html =~ "Accessories erfolgreich erstellt"
       assert html =~ "some name"
     end
 
-    test "cancels save new equipment", %{conn: conn, user: user} do
+    test "cancels save new accessories", %{conn: conn, user: user} do
       location = location_fixture()
 
       conn = conn |> log_in_user(user)
-      {:ok, new_live, _html} = live(conn, ~p"/locations/#{location}/equipment/new")
+      {:ok, new_live, _html} = live(conn, ~p"/locations/#{location}/accessories/new")
 
       {:ok, _, _html} =
         new_live
-        |> element("#equipment-form a", "Abbrechen")
+        |> element("#accessories-form a", "Abbrechen")
         |> render_click()
         |> follow_redirect(conn, ~p"/locations/#{location}")
     end
 
-    test "updates equipment", %{conn: conn, user: user, equipment: equipment} do
-      {:error, _} = live(conn, ~p"/equipment/#{equipment}/edit")
+    test "updates accessories", %{conn: conn, user: user, accessories: accessories} do
+      {:error, _} = live(conn, ~p"/accessories/#{accessories}/edit")
 
       conn = conn |> log_in_user(user)
-      {:ok, edit_live, html} = live(conn, ~p"/equipment/#{equipment}/edit")
+      {:ok, edit_live, html} = live(conn, ~p"/accessories/#{accessories}/edit")
 
-      assert html =~ "Equipment bearbeiten"
+      assert html =~ "Accessories bearbeiten"
 
       assert edit_live
-             |> form("#equipment-form", equipment: @invalid_attrs)
+             |> form("#accessories-form", accessories: @invalid_attrs)
              |> render_change() =~ "can&#39;t be blank"
 
       {:ok, _, html} =
         edit_live
-        |> form("#equipment-form", equipment: @update_attrs)
+        |> form("#accessories-form", accessories: @update_attrs)
         |> render_submit()
-        |> follow_redirect(conn, ~p"/equipment/#{equipment}")
+        |> follow_redirect(conn, ~p"/accessories/#{accessories}")
 
-      assert html =~ "Equipment erfolgreich aktualisiert"
+      assert html =~ "Accessories erfolgreich aktualisiert"
       assert html =~ "some updated name"
     end
 
-    test "cancels updates equipment", %{conn: conn, user: user, equipment: equipment} do
+    test "cancels updates accessories", %{conn: conn, user: user, accessories: accessories} do
       conn = conn |> log_in_user(user)
-      {:ok, edit_live, _html} = live(conn, ~p"/equipment/#{equipment}/edit")
+      {:ok, edit_live, _html} = live(conn, ~p"/accessories/#{accessories}/edit")
 
       {:ok, _, _html} =
         edit_live
-        |> element("#equipment-form a", "Abbrechen")
+        |> element("#accessories-form a", "Abbrechen")
         |> render_click()
-        |> follow_redirect(conn, ~p"/equipment/#{equipment}")
+        |> follow_redirect(conn, ~p"/accessories/#{accessories}")
     end
 
-    test "deletes equipment", %{conn: conn, user: user, equipment: equipment} do
-      {:error, _} = live(conn, ~p"/equipment/#{equipment}/edit")
+    test "deletes accessories", %{conn: conn, user: user, accessories: accessories} do
+      {:error, _} = live(conn, ~p"/accessories/#{accessories}/edit")
 
       conn = conn |> log_in_user(user)
-      {:ok, edit_live, html} = live(conn, ~p"/equipment/#{equipment}/edit")
+      {:ok, edit_live, html} = live(conn, ~p"/accessories/#{accessories}/edit")
       assert html =~ "some serial_number"
 
       {:ok, _, html} =
         edit_live
-        |> element("#equipment-form button", "Löschen")
+        |> element("#accessories-form button", "Löschen")
         |> render_click()
-        |> follow_redirect(conn, ~p"/locations/#{equipment.location_id}")
+        |> follow_redirect(conn, ~p"/locations/#{accessories.location_id}")
 
-      assert html =~ "Equipment erfolgreich gelöscht"
-      assert html =~ "Equipment"
+      assert html =~ "Accessories erfolgreich gelöscht"
+      assert html =~ "Accessories"
       refute html =~ "some serial_number"
     end
   end
 
   describe "Show" do
-    setup [:create_equipment]
+    setup [:create_accessories]
 
-    test "displays equipment", %{conn: conn, user: user, equipment: equipment} do
-      {:error, _} = live(conn, ~p"/equipment/#{equipment}")
+    test "displays accessories", %{conn: conn, user: user, accessories: accessories} do
+      {:error, _} = live(conn, ~p"/accessories/#{accessories}")
 
       conn = conn |> log_in_user(user)
-      {:ok, _show_live, html} = live(conn, ~p"/equipment/#{equipment}")
+      {:ok, _show_live, html} = live(conn, ~p"/accessories/#{accessories}")
 
-      assert html =~ "Equipment:"
-      assert html =~ equipment.name
+      assert html =~ "Accessories:"
+      assert html =~ accessories.name
     end
   end
 
   describe "FeeNew" do
-    setup [:create_equipment]
+    setup [:create_accessories]
 
-    test "saves new equipment fee", %{conn: conn, user: user, equipment: equipment} do
-      {:error, _} = live(conn, ~p"/equipment/#{equipment}/fees/new")
+    test "saves new accessories fee", %{conn: conn, user: user, accessories: accessories} do
+      {:error, _} = live(conn, ~p"/accessories/#{accessories}/fees/new")
 
       conn = conn |> log_in_user(user)
-      {:ok, new_live, html} = live(conn, ~p"/equipment/#{equipment}/fees/new")
+      {:ok, new_live, html} = live(conn, ~p"/accessories/#{accessories}/fees/new")
 
-      assert html =~ "Spezifische Gebühr erstellen (Equipment)"
+      assert html =~ "Spezifische Gebühr erstellen (Accessories)"
 
       assert new_live
              |> form("#fee-form", fee: %{})
@@ -214,10 +214,10 @@ defmodule SportywebWeb.EquipmentLiveTest do
         new_live
         |> form("#fee-form", fee: create_attrs)
         |> render_submit()
-        |> follow_redirect(conn, ~p"/equipment/#{equipment}")
+        |> follow_redirect(conn, ~p"/accessories/#{accessories}")
 
       assert html =~ "Gebühr erfolgreich erstellt"
-      assert html =~ equipment.name
+      assert html =~ accessories.name
     end
   end
 end

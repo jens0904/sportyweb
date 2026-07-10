@@ -3,8 +3,8 @@ defmodule Sportyweb.Finance.Fee do
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
 
-  alias Sportyweb.Asset.Equipment
-  alias Sportyweb.Asset.EquipmentFee
+  alias Sportyweb.Asset.Accessories
+  alias Sportyweb.Asset.AccessoriesFee
   alias Sportyweb.Asset.Location
   alias Sportyweb.Asset.LocationFee
   alias Sportyweb.Calendar.Event
@@ -33,7 +33,7 @@ defmodule Sportyweb.Finance.Fee do
     has_many :ancestors, Fee, foreign_key: :successor_id
     has_many :contracts, Contract
     many_to_many :departments, Department, join_through: DepartmentFee
-    many_to_many :equipment, Equipment, join_through: EquipmentFee
+    many_to_many :accessories, Accessories, join_through: AccessoriesFee
     many_to_many :events, Event, join_through: EventFee
     many_to_many :groups, Group, join_through: GroupFee
     many_to_many :internal_events, InternalEvent, join_through: FeeInternalEvent

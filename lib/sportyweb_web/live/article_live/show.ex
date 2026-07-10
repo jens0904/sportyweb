@@ -13,7 +13,13 @@ defmodule SportywebWeb.ArticleLive.Show do
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
     article =
-      Inventory.get_article_with_rentals!(id)
+      Inventory.get_article!(id, [
+      :club,
+      :department,
+      :category,
+      units: :location,
+      rentals: [:unit, :location, contact: :contracts]
+    ])
 
     rental_rule =
       Inventory.get_applicable_rental_rule(article.id)

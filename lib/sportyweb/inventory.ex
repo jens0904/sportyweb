@@ -186,6 +186,23 @@ defmodule Sportyweb.Inventory do
     |> Repo.preload(preloads)
   end
 
+  @doc """
+  Checks whether an article has at least one available unit.
+  A unit is considered available if it
+  - belongs to the specified article
+  - has the condition status `"ok"`, and
+  - is not currently associated with an active rental.
+
+  Returns `true`if at least one matching unit exists, otherwise `false``
+
+  ## Examples
+
+  iex > has available units(3)
+  true
+
+  iex > has available units(5)
+  false
+  """
   def has_available_units?(article_id) do
     query =
       from u in Unit,
@@ -196,18 +213,6 @@ defmodule Sportyweb.Inventory do
         where: is_nil(r.id)
 
     Repo.exists?(query)
-  end
-
-  def get_article_with_rentals!(id) do
-    Article
-    |> Repo.get!(id)
-    |> Repo.preload([
-      :club,
-      :department,
-      :category,
-      units: :location,
-      rentals: [:unit, :location, contact: :contracts]
-    ])
   end
 
   @doc """
@@ -337,21 +342,6 @@ defmodule Sportyweb.Inventory do
 
   """
   def get_unit!(id), do: Repo.get!(Unit, id)
-
-  def get_unit_with_inactive_rentals!(id) do
-    inactive_rentals_query =
-      from(l in Rental,
-        where: l.status == "damaged" or l.status == "lost" or l.status == "returned"
-      )
-
-    Unit
-    |> Repo.get!(id)
-    |> Repo.preload([
-      :location,
-      article: :club,
-      rentals: {inactive_rentals_query, [:article, :location, :contact]}
-    ])
-  end
 
   @doc """
   Gets a single unit. Preloads associations.
@@ -489,11 +479,17 @@ defmodule Sportyweb.Inventory do
   end
 
   @doc """
-  Creates a rental under a transaction. Also updates the occupied status of the unit.
+  Creates a rental under a transaction. Also changes sets the rental status to "active".
+  Then gets the applicable rental rule for the article or the underlying category or club.
+  Extends the rental attributes with the associated rental rule.
+  Calculates the total fee by multiplying the taking the fee from rental attributes and the time unit by the associated rental rule.
+  Extends the rental attributes with total fee.
+  Calculates the maximum return date based on the rental date and the articles rental rules.
+
 
   ## Examples
 
-      iex> c reate_rental(%{field: value})
+      iex> create_rental(%{field: value})
       {:ok, %Rental{}}
 
       iex> create_rental(%{field: bad_value})
@@ -531,6 +527,9 @@ defmodule Sportyweb.Inventory do
 
   @doc """
   Updates a rental.
+  Calculates the maximum return date based on the rental_date from the new
+  Gets the applicable rental rule for the article first.
+  Then calcultes the new max return_date based on the new rental date and the associated rental_rule. If a new date is not set. it takes the old rental date
 
   ## Examples
 
@@ -570,6 +569,9 @@ defmodule Sportyweb.Inventory do
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking rental changes.
+  First takes the article_id and the rental_date by the rental attributes.
+  Then gets the rental_rule for the selected article.
+  Then calculates the maximum return date based on the rental_rule and the rental_date if data is available.
 
   ## Examples
 
@@ -599,19 +601,40 @@ defmodule Sportyweb.Inventory do
     )
   end
 
+  @doc """
+  Calculates maximum return_date based on the rental_rule and rental_date.
+  Ensures that rental_date is normalized to datetime.
+  Then get applicable rental_rule with chosen rental_period und rental_period_unit.
+  Adding rental period to rental date
+  """
+
   @spec calculate_max_return_date(any(), any()) :: nil | DateTime.t()
   def calculate_max_return_date(article_id, rental_date) do
-    with %DateTime{} = rental_date <- normalize_datetime(rental_date),
-         %{choose_rental_period: true, rental_period: period, rental_period_unit: unit}
-         when not is_nil(period) <- get_applicable_rental_rule(article_id) do
-      add_period(rental_date, period, unit)
+    rental_date = normalize_datetime(rental_date)
+
+    if rental_date do
+      rental_rule = get_applicable_rental_rule(article_id)
+
+      if rental_rule &&
+           rental_rule.choose_rental_period &&
+           rental_rule.rental_period do
+        add_period(
+          rental_date,
+          rental_rule.rental_period,
+          rental_rule.rental_period_unit
+        )
+      else
+        nil
+      end
     else
-      _ -> nil
+      nil
     end
   end
 
+  # Leave datetime values unchanged
   defp normalize_datetime(%DateTime{} = datetime), do: datetime
 
+  # Convert ISO 8601 strings to datetime values
   defp normalize_datetime(datetime) when is_binary(datetime) do
     case DateTime.from_iso8601(datetime) do
       {:ok, datetime, _offset} -> datetime
@@ -619,8 +642,10 @@ defmodule Sportyweb.Inventory do
     end
   end
 
+  # return nil for unsupported date formats
   defp normalize_datetime(_), do: nil
 
+  # adding rental period according to configured time unit
   defp add_period(datetime, period, "Stunden"),
     do: DateTime.add(datetime, period * 3_600, :second)
 
@@ -658,6 +683,11 @@ defmodule Sportyweb.Inventory do
     end
   end
 
+  @doc """
+  Renews an existing rental.
+  Increments the renewal count and updates the rental with the provided attributes.
+  Returns {:ok, rental} on success or {:error, %Ecto.Changeset{} = changeset} if the update fails.
+  """
   def renew_rental(%Rental{} = rental, attrs) do
     attrs =
       attrs
@@ -668,10 +698,15 @@ defmodule Sportyweb.Inventory do
     |> Repo.update()
   end
 
+  @doc """
+  Returns an existing rental.
+  Gets rental and preloads associated article, rental fee and unit.
+  Gets applicable rental_rule for article.
+  Sets return date.
+  Prepares the data for final fee calculation
+  """
   def return_rental(%Rental{} = rental, attrs) do
-    rental =
-      rental.id
-      |> get_rental!([:article, :rental_fee, :unit])
+    rental = get_rental!(rental.id, [:article, :rental_fee, :unit])
 
     rental_rule = get_applicable_rental_rule(rental.article_id)
     returned_at = DateTime.utc_now() |> DateTime.truncate(:second)
@@ -682,9 +717,11 @@ defmodule Sportyweb.Inventory do
       "return_date" => returned_at
     }
 
+    # Calculates the final fee and the VAT
     total_fee = calculate_total_fee(fee_attrs, rental_rule)
     vat_fee = vat_money_for_total_fee(total_fee, rental.rental_fee)
 
+    # Merges calculated values into the updated rental values
     rental_attrs =
       Map.merge(attrs, %{
         "status" => "returned",
@@ -697,6 +734,7 @@ defmodule Sportyweb.Inventory do
         "condition_note" => Map.get(attrs, "condition_note")
       })
 
+    # Update the Rental and the unit, if necessary
     Ecto.Multi.new()
     |> Ecto.Multi.update(
       :rental,
@@ -706,12 +744,14 @@ defmodule Sportyweb.Inventory do
     |> Repo.transaction()
   end
 
+  # determine if fee was greater than 0
   defp fee_required?(%Money{amount: amount}) do
     Decimal.compare(amount, Decimal.new(0)) == :gt
   end
 
   defp fee_required?(nil), do: false
 
+  # update unit_condition if it was returned "damaged" or "lost"
   defp maybe_update_unit_condition(multi, rental, attrs) do
     case Map.get(attrs, "condition_status") do
       status when status in ["damaged", "lost"] ->
@@ -729,7 +769,7 @@ defmodule Sportyweb.Inventory do
   end
 
   defp vat_money_for_total_fee(nil, _rental_fee), do: nil
-
+  # determine VAT amount included in the total rental fee
   defp vat_money_for_total_fee(%Money{} = total_fee, %RentalFee{} = rental_fee) do
     vat_amount =
       total_fee.amount
@@ -740,6 +780,11 @@ defmodule Sportyweb.Inventory do
     %{total_fee | amount: vat_amount}
   end
 
+  @doc """
+  Calculates a new return_date on a renewal
+  Gets applicable rental_rule first. If renewal is not allowed and hence renewal period is not given, return nil.
+  Otherwise add renewal period to return_date.
+  """
   def calculate_new_return_date(%Rental{} = rental, article_id) do
     rental_rule = get_applicable_rental_rule(article_id)
 
@@ -769,13 +814,6 @@ defmodule Sportyweb.Inventory do
   """
   def list_rental_fee do
     Repo.all(RentalFee)
-  end
-
-  def list_applicable_rental_fees(club_id) do
-    RentalFee
-    |> where([r], r.club_id == ^club_id)
-    |> preload([:category, :article])
-    |> Repo.all()
   end
 
   def list_successor_rental_fee_options(%RentalFee{} = rental_fee, maximum_age_in_years) do
@@ -815,17 +853,10 @@ defmodule Sportyweb.Inventory do
   end
 
   @doc """
-  Gets a single rental_fee.
+  Archives rental_fee.
+  Check if associated rentals to rental_fee exist and have the associated status "active"
+  Raises an Error if rental_fee is associated with a rental. Otherwise extends attribute archived_at with the current date time to rental_fee.
 
-  Raises `Ecto.NoResultsError` if the Rental fee does not exist.
-
-  ## Examples
-
-      iex> get_rental_fee!(123)
-      %RentalFee{}
-
-      iex> get_rental_fee!(456)
-      ** (Ecto.NoResultsError)
 
   """
   def archive_rental_fee(%RentalFee{} = rental_fee) do
@@ -846,6 +877,20 @@ defmodule Sportyweb.Inventory do
     end
   end
 
+  @doc """
+  Gets a single rental_fee.
+
+  Raises `Ecto.NoResultsError` if the Rental fee does not exist.
+
+  ## Examples
+
+      iex> get_rental_fee!(123)
+      %RentalFee{}
+
+      iex> get_rental_fee!(456)
+      ** (Ecto.NoResultsError)
+
+  """
   def get_rental_fee!(id), do: Repo.get!(RentalFee, id)
 
   @doc """
@@ -868,6 +913,13 @@ defmodule Sportyweb.Inventory do
     |> Repo.preload(preloads)
   end
 
+  @doc """
+  Gets the applicable rental fee for the given article_id.
+  Gets the article for the article_id first and preloads category association first.
+  Then gets the rental_fee for the article, if there is one associated and is not archived yet.
+  Otherwise it gets the associated non-archived category rental_fee.
+  If none is provided, it gets the associated rental_fee for the club
+  """
   def get_applicable_rental_fee(article_id) do
     article = get_article!(article_id, [:category])
 
@@ -977,6 +1029,17 @@ defmodule Sportyweb.Inventory do
     RentalFee.changeset(rental_fee, attrs)
   end
 
+  @doc """
+  Lists rental_fees depending on given article and contact.
+  First gets contact with associated contracts. Then gets article
+  Then finds all the active rental_fees that are associated with the article, category or club.
+  Then asks if contact is a member. If this is the fact, finds all belonging fees to Members of the club.
+  If this is not the case, finds all belonging fees to Non-Members of the Club.
+  Then applies age restrictions only for personal contacts.
+  ## Examples
+
+
+  """
   def list_belonging_rental_fees(article_id, contact_id) do
     if is_nil(contact_id) || (is_binary(contact_id) && String.trim(contact_id) == "") do
       []
@@ -1030,11 +1093,21 @@ defmodule Sportyweb.Inventory do
     end
   end
 
+  @doc """
+  Calculates the total fee based on the rental_fee and the rental_rule.
+  Gets the rental fee first. If none is provided return nil. Also return nil if no rental_rule is provided.
+  Then calculates gross amount. If a season is set as the period unit, return the total fee.
+  Otherwise multiply money with billing units defined by the rental_period_unit within the rental_rule
+  """
   def calculate_total_fee(attrs, %RentalRule{} = rental_rule) do
     rental_fee_id = Map.get(attrs, "rental_fee_id") || Map.get(attrs, :rental_fee_id)
 
     rental_fee =
-      rental_fee_id && get_rental_fee!(rental_fee_id)
+      if rental_fee_id do
+        get_rental_fee!(rental_fee_id)
+      else
+        nil
+      end
 
     total_fee(rental_fee, rental_rule, attrs)
   end
@@ -1045,41 +1118,35 @@ defmodule Sportyweb.Inventory do
 
   defp total_fee(nil, _rental_rule, _attrs), do: nil
 
+  # calculates total_fee based on rental fee and rental_rule
+  # using the gross amount as base fee
   defp total_fee(%RentalFee{} = rental_fee, %RentalRule{} = rental_rule, attrs) do
-    money = gross_money(rental_fee)
+    base_fee = gross_money(rental_fee)
 
-    if rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison" do
-      money
+
+    if charge_once?(rental_fee, rental_rule) do
+      base_fee
     else
-      case rental_units(attrs, rental_rule) do
-        nil ->
-          nil
-
-        billing_units ->
-          multiply_money(money, billing_units)
-      end
+      calculate_variable_fee(base_fee, attrs, rental_rule)
     end
   end
 
-  def vat_rate(%RentalFee{member_type: member_type}) do
-    case member_type do
-      :member -> Decimal.new("0.07")
-      "member" -> Decimal.new("0.07")
-      :non_member -> Decimal.new("0.19")
-      "non_member" -> Decimal.new("0.19")
-      _ -> Decimal.new("0")
+  defp charge_once?(rental_fee, rental_rule) do
+    rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison"
+  end
+
+  #calculates variable fee bases by multiplying the base fee with the billing_units
+  defp calculate_variable_fee(base_fee, attrs, rental_rule) do
+    case rental_units(attrs, rental_rule) do
+      nil ->
+        nil
+
+      billing_units ->
+        multiply_money(base_fee, billing_units)
     end
   end
 
-  def vat_money(%RentalFee{} = rental_fee) do
-    vat_amount =
-      rental_fee.amount.amount
-      |> Decimal.mult(vat_rate(rental_fee))
-      |> Decimal.round(2)
-
-    %{rental_fee.amount | amount: vat_amount}
-  end
-
+  # Calculates the gross amount
   def gross_money(%RentalFee{} = rental_fee) do
     gross_amount =
       rental_fee.amount.amount
@@ -1088,7 +1155,11 @@ defmodule Sportyweb.Inventory do
 
     %{rental_fee.amount | amount: gross_amount}
   end
-
+  # Multiplies the money amount with the calculated billing units
+  defp multiply_money(%Money{} = money, units) do
+    %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
+  end
+  #determines the number of billing units based on the rental period
   defp rental_units(attrs, rental_rule) do
     rental_date = Map.get(attrs, "rental_date") || Map.get(attrs, :rental_date)
     return_date = Map.get(attrs, "return_date") || Map.get(attrs, :return_date)
@@ -1132,6 +1203,7 @@ defmodule Sportyweb.Inventory do
     end
   end
 
+  # Builds return_datetime for hourly_rentals
   defp end_datetime_for_hourly_rental(rental_date, return_date, nil) do
     parse_datetime(return_date)
   end
@@ -1160,10 +1232,7 @@ defmodule Sportyweb.Inventory do
     end
   end
 
-  defp multiply_money(%Money{} = money, units) do
-    %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
-  end
-
+  # Parses Datetime to a NaiveDatetime
   defp parse_datetime(%DateTime{} = datetime), do: {:ok, DateTime.to_naive(datetime)}
   defp parse_datetime(%NaiveDateTime{} = datetime), do: {:ok, datetime}
 
@@ -1204,6 +1273,28 @@ defmodule Sportyweb.Inventory do
 
   defp parse_date_from_datetime(_), do: :error
 
+  # Determines vat_rate in RentalFee depending on member_type
+
+  def vat_rate(%RentalFee{member_type: member_type}) do
+    case member_type do
+      :member -> Decimal.new("0.07")
+      "member" -> Decimal.new("0.07")
+      :non_member -> Decimal.new("0.19")
+      "non_member" -> Decimal.new("0.19")
+      _ -> Decimal.new("0")
+    end
+  end
+
+  # Determines vat_money depending on rental_fee.amount and adds it to RentalFee
+  def vat_money(%RentalFee{} = rental_fee) do
+    vat_amount =
+      rental_fee.amount.amount
+      |> Decimal.mult(vat_rate(rental_fee))
+      |> Decimal.round(2)
+
+    %{rental_fee.amount | amount: vat_amount}
+  end
+
   @doc """
   Returns the list of rental_rules.
 
@@ -1233,6 +1324,12 @@ defmodule Sportyweb.Inventory do
   """
   def get_rental_rule!(id), do: Repo.get!(RentalRule, id)
 
+  @doc """
+  Gets an applicable_rental_rule for the given article.
+  Gets article first and preloads associated category.
+  Gets the applicable rental_rule for the article and exludes archived rental_rules.
+  If none is provided, gets the category active rental_rule. If none is provided again, gets the active rental_rule for the club
+  """
   def get_applicable_rental_rule(article_id) do
     article = get_article!(article_id, [:category])
 
@@ -1275,6 +1372,9 @@ defmodule Sportyweb.Inventory do
     |> Repo.one()
   end
 
+  @doc """
+  Gets rental_rule. Preloads associations.
+  """
   def get_rental_rule!(id, preloads) do
     RentalRule
     |> Repo.get!(id)
@@ -1346,6 +1446,12 @@ defmodule Sportyweb.Inventory do
     RentalRule.changeset(rental_rule, attrs)
   end
 
+  @doc """
+  Archives rental_rule.
+  Checks if associated active rental exists.
+  If it exists, it returns an error.
+  If it notes exists, archive_date is extended to rental_rule.
+  """
   def archive_rental_rule(%RentalRule{} = rental_rule) do
     active_rentals_exist? =
       Repo.exists?(

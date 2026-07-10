@@ -15,7 +15,7 @@ defmodule SportywebWeb.LocationLive.Show do
       Asset.get_location!(id, [
         :club,
         :emails,
-        :equipment,
+        :accessories,
         :notes,
         :phones,
         :postal_addresses,
@@ -27,6 +27,6 @@ defmodule SportywebWeb.LocationLive.Show do
      |> assign(:page_title, "Standort: #{location.name}")
      |> assign(:location, location)
      |> assign(:club, location.club)
-     |> stream(:equipment, location.equipment)}
+     |> stream(:accessories, location.accessories)}
   end
 end

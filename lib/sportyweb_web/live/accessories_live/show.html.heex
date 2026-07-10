@@ -1,0 +1,60 @@
+<.header>
+  {@page_title}
+  <:actions>
+    <.link navigate={~p"/accessories/#{@accessories}/edit"}>
+      <.button>Zubehör bearbeiten</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <.list>
+    <:item title="Standort">
+      {format_string_field(@accessories.location.name)}
+    </:item>
+    <:item title="Referenznummer">
+      {format_string_field(@accessories.reference_number)}
+    </:item>
+    <:item title="Seriennummer">
+      {format_string_field(@accessories.serial_number)}
+    </:item>
+    <:item title="Beschreibung">
+      {format_string_field(@accessories.description)}
+    </:item>
+    <:item title="Gekauft am">
+      {format_date_field_dmy(@accessories.purchase_date)}
+    </:item>
+    <:item title="Nutzung ab">
+      {format_date_field_dmy(@accessories.commission_date)}
+    </:item>
+    <:item title="Nutzung bis">
+      {format_date_field_dmy(@accessories.decommission_date)}
+    </:item>
+    <:item title="E-Mail">
+      {format_struct_list(@accessories.emails, :address)}
+    </:item>
+    <:item title="Telefon">
+      {format_struct_list(@accessories.phones, :number)}
+    </:item>
+    <:item title="Notizen">
+      <SportywebWeb.PolymorphicLive.NotesShowComponent.render notes={@accessories.notes} />
+    </:item>
+  </.list>
+</.card>
+
+<.header level="2" class="mt-12">
+  Gebühren
+  <:actions>
+    <.link navigate={~p"/accessories/#{@accessories}/fees/new"}>
+      <.button>Zubehörspezifische Gebühr erstellen</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.card>
+  <%= if Enum.any?(@accessories.fees) do %>
+    <SportywebWeb.FeeLive.IndexTableComponent.render fees={@accessories.fees} />
+  <% else %>
+    <p>Bisher wurde noch keine zubehörspezifische Gebühr erstellt.</p>
+  <% end %>
+</.card>

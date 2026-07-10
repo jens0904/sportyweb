@@ -3,11 +3,11 @@ defmodule Sportyweb.Calendar.Event do
   import Ecto.Changeset
   import SportywebWeb.CommonValidations
 
-  alias Sportyweb.Asset.Equipment
+  alias Sportyweb.Asset.Accessories
   alias Sportyweb.Asset.Location
   alias Sportyweb.Calendar.EventDepartment
   alias Sportyweb.Calendar.EventEmail
-  alias Sportyweb.Calendar.EventEquipment
+  alias Sportyweb.Calendar.EventAccessories
   alias Sportyweb.Calendar.EventFee
   alias Sportyweb.Calendar.EventGroup
   alias Sportyweb.Calendar.EventNote
@@ -29,7 +29,7 @@ defmodule Sportyweb.Calendar.Event do
     belongs_to :club, Club
     many_to_many :departments, Department, join_through: EventDepartment
     many_to_many :emails, Email, join_through: EventEmail
-    many_to_many :equipment, Equipment, join_through: EventEquipment
+    many_to_many :accessories, Accessories, join_through: EventAccessories
     many_to_many :fees, Fee, join_through: EventFee
     many_to_many :groups, Group, join_through: EventGroup
     many_to_many :notes, Note, join_through: EventNote
@@ -89,7 +89,7 @@ defmodule Sportyweb.Calendar.Event do
     )
     |> cast_assoc(:departments, required: false)
     |> cast_assoc(:emails, required: true)
-    |> cast_assoc(:equipment, required: false)
+    |> cast_assoc(:accessories, required: false)
     |> cast_assoc(:groups, required: false)
     |> cast_assoc(:notes, required: true)
     |> cast_assoc(:phones, required: true)

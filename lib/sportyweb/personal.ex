@@ -52,8 +52,10 @@ end
     Repo.preload(list_contacts(club_id), preloads)
   end
 
-
+  # Lists all the contacts that have an existing contract with the department (or the associated group) associated with the article.
+  # Lists all the contacts that have an existing contract with the club, if no department is provided.
   def list_contracts(article_id, club_id) do
+    today = Date.utc_today()
     article = Inventory.get_article!(article_id)
     if is_nil(article.department_id) do
       query =
@@ -61,6 +63,8 @@ end
           c in Contact,
           join: co in assoc(c, :contracts),
           where: c.club_id == ^club_id,
+          where: co.start_date <= ^today,
+          where: is_nil(co.archive_date) or co.archive_date > ^today,
           distinct: true,
           order_by: c.name
         )
@@ -72,6 +76,8 @@ end
           join: co in assoc(c, :contracts),
           left_join: d in assoc(co, :departments),
           left_join: g in assoc(co, :groups),
+          where: co.start_date <= ^today,
+          where: is_nil(co.archive_date) or co.archive_date > ^today,
           where: c.club_id == ^club_id,
           where:
             d.id == ^article.department_id or

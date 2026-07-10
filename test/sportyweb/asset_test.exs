@@ -107,9 +107,9 @@ defmodule Sportyweb.AssetTest do
     end
   end
 
-  describe "equipment" do
-    alias Sportyweb.Asset.Equipment
-    alias Sportyweb.Asset.EquipmentFee
+  describe "accessories" do
+    alias Sportyweb.Asset.Accessories
+    alias Sportyweb.Asset.AccessoriesFee
 
     import Sportyweb.AssetFixtures
     import Sportyweb.FinanceFixtures
@@ -125,30 +125,30 @@ defmodule Sportyweb.AssetTest do
       serial_number: nil
     }
 
-    test "list_equipment/1 returns all equipment of a given location" do
-      equipment = equipment_fixture()
-      assert List.first(Asset.list_equipment(equipment.location_id)).id == equipment.id
+    test "list_accessories/1 returns all accessories of a given location" do
+      accessories = accessories_fixture()
+      assert List.first(Asset.list_accessories(accessories.location_id)).id == accessories.id
     end
 
-    test "list_equipment/2 returns all equipment of a given location with preloaded associations" do
-      equipment = equipment_fixture()
+    test "list_accessories/2 returns all accessories of a given location with preloaded associations" do
+      accessories = accessories_fixture()
 
-      assert Asset.list_equipment(equipment.location_id, [:emails, :notes, :phones]) == [
-               equipment
+      assert Asset.list_accessories(accessories.location_id, [:emails, :notes, :phones]) == [
+               accessories
              ]
     end
 
-    test "get_equipment!/1 returns the equipment with given id" do
-      equipment = equipment_fixture()
-      assert Asset.get_equipment!(equipment.id).id == equipment.id
+    test "get_accessories!/1 returns the accessories with given id" do
+      accessories = accessories_fixture()
+      assert Asset.get_accessories!(accessories.id).id == accessories.id
     end
 
-    test "get_equipment!/2 returns the equipment with given id and contains preloaded associations" do
-      equipment = equipment_fixture()
-      assert Asset.get_equipment!(equipment.id, [:emails, :notes, :phones]) == equipment
+    test "get_accessories!/2 returns the accessories with given id and contains preloaded associations" do
+      accessories = accessories_fixture()
+      assert Asset.get_accessories!(accessories.id, [:emails, :notes, :phones]) == accessories
     end
 
-    test "create_equipment/1 with valid data creates a equipment" do
+    test "create_accessories/1 with valid data creates a accessories" do
       location = location_fixture()
 
       valid_attrs = %{
@@ -165,22 +165,22 @@ defmodule Sportyweb.AssetTest do
         phones: [phone_attrs()]
       }
 
-      assert {:ok, %Equipment{} = equipment} = Asset.create_equipment(valid_attrs)
-      assert equipment.commission_date == ~D[2023-02-14]
-      assert equipment.decommission_date == ~D[2023-02-14]
-      assert equipment.description == "some description"
-      assert equipment.name == "some name"
-      assert equipment.purchase_date == ~D[2023-02-14]
-      assert equipment.reference_number == "some reference_number"
-      assert equipment.serial_number == "some serial_number"
+      assert {:ok, %Accessories{} = accessories} = Asset.create_accessories(valid_attrs)
+      assert accessories.commission_date == ~D[2023-02-14]
+      assert accessories.decommission_date == ~D[2023-02-14]
+      assert accessories.description == "some description"
+      assert accessories.name == "some name"
+      assert accessories.purchase_date == ~D[2023-02-14]
+      assert accessories.reference_number == "some reference_number"
+      assert accessories.serial_number == "some serial_number"
     end
 
-    test "create_equipment/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Asset.create_equipment(@invalid_attrs)
+    test "create_accessories/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Asset.create_accessories(@invalid_attrs)
     end
 
-    test "update_equipment/2 with valid data updates the equipment" do
-      equipment = equipment_fixture()
+    test "update_accessories/2 with valid data updates the accessories" do
+      accessories = accessories_fixture()
 
       update_attrs = %{
         commission_date: ~D[2023-02-15],
@@ -192,37 +192,37 @@ defmodule Sportyweb.AssetTest do
         serial_number: "some updated serial_number"
       }
 
-      assert {:ok, %Equipment{} = equipment} = Asset.update_equipment(equipment, update_attrs)
-      assert equipment.commission_date == ~D[2023-02-15]
-      assert equipment.decommission_date == ~D[2023-02-15]
-      assert equipment.description == "some updated description"
-      assert equipment.name == "some updated name"
-      assert equipment.purchase_date == ~D[2023-02-15]
-      assert equipment.reference_number == "some updated reference_number"
-      assert equipment.serial_number == "some updated serial_number"
+      assert {:ok, %Accessories{} = accessories} = Asset.update_accessories(accessories, update_attrs)
+      assert accessories.commission_date == ~D[2023-02-15]
+      assert accessories.decommission_date == ~D[2023-02-15]
+      assert accessories.description == "some updated description"
+      assert accessories.name == "some updated name"
+      assert accessories.purchase_date == ~D[2023-02-15]
+      assert accessories.reference_number == "some updated reference_number"
+      assert accessories.serial_number == "some updated serial_number"
     end
 
-    test "update_equipment/2 with invalid data returns error changeset" do
-      equipment = equipment_fixture()
-      assert {:error, %Ecto.Changeset{}} = Asset.update_equipment(equipment, @invalid_attrs)
-      assert equipment == Asset.get_equipment!(equipment.id, [:emails, :phones, :notes])
+    test "update_accessories/2 with invalid data returns error changeset" do
+      accessories = accessories_fixture()
+      assert {:error, %Ecto.Changeset{}} = Asset.update_accessories(accessories, @invalid_attrs)
+      assert accessories == Asset.get_accessories!(accessories.id, [:emails, :phones, :notes])
     end
 
-    test "delete_equipment/1 deletes the equipment" do
-      equipment = equipment_fixture()
-      assert {:ok, %Equipment{}} = Asset.delete_equipment(equipment)
-      assert_raise Ecto.NoResultsError, fn -> Asset.get_equipment!(equipment.id) end
+    test "delete_accessories/1 deletes the accessories" do
+      accessories = accessories_fixture()
+      assert {:ok, %Accessories{}} = Asset.delete_accessories(accessories)
+      assert_raise Ecto.NoResultsError, fn -> Asset.get_accessories!(accessories.id) end
     end
 
-    test "change_equipment/1 returns a equipment changeset" do
-      equipment = equipment_fixture()
-      assert %Ecto.Changeset{} = Asset.change_equipment(equipment)
+    test "change_accessories/1 returns a accessories changeset" do
+      accessories = accessories_fixture()
+      assert %Ecto.Changeset{} = Asset.change_accessories(accessories)
     end
 
-    test "create_equipment_fee/2 with valid data" do
-      equipment = equipment_fixture()
+    test "create_accessories_fee/2 with valid data" do
+      accessories = accessories_fixture()
       fee = fee_fixture()
-      assert {:ok, %EquipmentFee{}} = Asset.create_equipment_fee(equipment, fee)
+      assert {:ok, %AccessoriesFee{}} = Asset.create_accessories_fee(accessories, fee)
     end
   end
 end

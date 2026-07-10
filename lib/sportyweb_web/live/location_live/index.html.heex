@@ -28,8 +28,8 @@
           {format_string_field(location.description)}
         </div>
       </:col>
-      <:col :let={{_id, location}} label="Equipment">
-        {Enum.count(location.equipment)}
+      <:col :let={{_id, location}} label="Accessories">
+        {Enum.count(location.accessories)}
       </:col>
 
       <:action :let={{_id, location}}>
@@ -39,7 +39,7 @@
   <% else %>
     <p>
       Bisher wurde noch kein Standort erstellt.<br />
-      Equipment kann erst angelegt werden, wenn mindestens ein Standort existiert.
+      Accessories kann erst angelegt werden, wenn mindestens ein Standort existiert.
     </p>
   <% end %>
 </.card>
