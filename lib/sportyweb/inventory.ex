@@ -1048,27 +1048,40 @@ defmodule Sportyweb.Inventory do
       article = get_article!(article_id)
 
       query =
-        from(rf in RentalFee,
-          where:
-            is_nil(rf.archived_at) and
-              (rf.article_id == ^article.id or
-                 rf.category_id == ^article.category_id or
-                 (rf.club_id == ^article.club_id and
-                    is_nil(rf.article_id) and
-                    is_nil(rf.category_id))),
-          preload: [:category, :article],
-          distinct: true
-        )
+        if is_nil(article.category_id) do
+          from(rf in RentalFee,
+            where:
+              is_nil(rf.archived_at) and
+                (rf.article_id == ^article.id or
+                   (rf.club_id == ^article.club_id and
+                      is_nil(rf.article_id) and
+                      is_nil(rf.category_id))),
+            preload: [:category, :article],
+            distinct: true
+          )
+        else
+          from(rf in RentalFee,
+            where:
+              is_nil(rf.archived_at) and
+                (rf.article_id == ^article.id or
+                   rf.category_id == ^article.category_id or
+                   (rf.club_id == ^article.club_id and
+                      is_nil(rf.article_id) and
+                      is_nil(rf.category_id))),
+            preload: [:category, :article],
+            distinct: true
+          )
+        end
 
       query =
         if Contact.has_active_membership_contract?(contact) do
           from(rf in query,
-            where: rf.member_type == ^:member,
+            where: rf.member_type == :member,
             order_by: [asc: rf.name]
           )
         else
           from(rf in query,
-            where: rf.member_type == ^:non_member or is_nil(rf.member_type),
+            where: rf.member_type == :non_member or is_nil(rf.member_type),
             order_by: [asc: rf.name]
           )
         end
@@ -1123,7 +1136,6 @@ defmodule Sportyweb.Inventory do
   defp total_fee(%RentalFee{} = rental_fee, %RentalRule{} = rental_rule, attrs) do
     base_fee = gross_money(rental_fee)
 
-
     if charge_once?(rental_fee, rental_rule) do
       base_fee
     else
@@ -1135,7 +1147,7 @@ defmodule Sportyweb.Inventory do
     rental_fee.flat_fee || rental_rule.rental_period_unit == "Saison"
   end
 
-  #calculates variable fee bases by multiplying the base fee with the billing_units
+  # calculates variable fee bases by multiplying the base fee with the billing_units
   defp calculate_variable_fee(base_fee, attrs, rental_rule) do
     case rental_units(attrs, rental_rule) do
       nil ->
@@ -1155,11 +1167,13 @@ defmodule Sportyweb.Inventory do
 
     %{rental_fee.amount | amount: gross_amount}
   end
+
   # Multiplies the money amount with the calculated billing units
   defp multiply_money(%Money{} = money, units) do
     %{money | amount: Decimal.mult(money.amount, units) |> Decimal.round(2)}
   end
-  #determines the number of billing units based on the rental period
+
+  # determines the number of billing units based on the rental period
   defp rental_units(attrs, rental_rule) do
     rental_date = Map.get(attrs, "rental_date") || Map.get(attrs, :rental_date)
     return_date = Map.get(attrs, "return_date") || Map.get(attrs, :return_date)
