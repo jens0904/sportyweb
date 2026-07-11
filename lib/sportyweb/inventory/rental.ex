@@ -36,19 +36,32 @@ defmodule Sportyweb.Inventory.Rental do
   end
 
   def get_valid_statuses do
-  [
-    [key: "Aktiv", value: "active"],
-    [key: "Zurückgegeben", value: "returned"]
-  ]
-end
+    [
+      [key: "Aktiv", value: "active"],
+      [key: "Zurückgegeben", value: "returned"]
+    ]
+  end
 
-def get_condition_statuses do
-  [
-    [key: "In Ordnung", value: "ok"],
-    [key: "Beschädigt", value: "damaged"],
-    [key: "Verloren", value: "lost"]
-  ]
-end
+  def get_condition_statuses do
+    [
+      [key: "In Ordnung", value: "ok"],
+      [key: "Beschädigt", value: "damaged"],
+      [key: "Verloren", value: "lost"]
+    ]
+  end
+
+  def active?(%__MODULE__{status: "active"}), do: true
+  def active?(_), do: false
+
+  def inactive?(%__MODULE__{status: "returned"}), do: true
+
+  def inactive?(_), do: false
+
+  def total_fee_positive?(%__MODULE__{total_fee: nil}), do: false
+
+  def total_fee_positive?(%__MODULE__{total_fee: total_fee}) do
+    Money.compare(total_fee, Money.new(:EUR, 0)) == :gt
+  end
 
   @doc false
   def changeset(rental, attrs, max_return_date \\ nil, rental_rule \\ nil) do
@@ -121,7 +134,14 @@ end
   def active?(_), do: false
 
   def inactive?(%__MODULE__{status: "returned"}), do: true
-def inactive?(_), do: false
+
+  def inactive?(_), do: false
+
+  def total_fee_positive?(%__MODULE__{total_fee: nil}), do: false
+
+  def total_fee_positive?(%__MODULE__{total_fee: total_fee}) do
+    Money.compare(total_fee, Money.new(:EUR, 0)) == :gt
+  end
 
   defp validate_same_weekday_for_weekly_rental(changeset, %{rental_period_unit: "Wochen"}) do
     rental_date = get_field(changeset, :rental_date)

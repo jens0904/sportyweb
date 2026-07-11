@@ -13,12 +13,20 @@
 
 <.card>
   <.list>
-    <:item title="Mitgliedschaft">
+    <:item :if={Rental.inactive?(@rental)} title="Mitgliedschaft">
       <%= if Contact.has_active_membership_contract?(@rental.contact) do %>
         Mitglied
       <% else %>
         Nichtmitglied
       <% end %>
+    </:item>
+
+    <:item :if={Rental.active?(@rental)} title="Kontakt">
+      {@rental.contact.name}
+    </:item>
+
+    <:item :if={Rental.inactive?(@rental) && @rental.condition_status in ["damaged", "lost"] || Rental.total_fee_positive?(@rental)} title="Kontakt">
+      {@rental.contact.name}
     </:item>
 
     <:item title="Artikel">
@@ -41,5 +49,11 @@
       {format_datetime_field(@rental.returned_at)}
     </:item>
 
+    <:item :if={Rental.inactive?(@rental) && @rental.condition_status in ["damaged", "lost"] || Rental.total_fee_positive?(@rental)} title="Gebühr">
+      {@rental.total_fee}
+    </:item>
+    <:item :if={Rental.inactive?(@rental) && @rental.condition_status in ["damaged", "lost"] || Rental.total_fee_positive?(@rental)} title="Mehrwertsteuer">
+      {@rental.vat_fee}
+    </:item>
   </.list>
 </.card>

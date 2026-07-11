@@ -88,7 +88,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                           for="rental_return_time"
                           class="block text-sm font-semibold leading-6 text-zinc-800"
                         >
-                          Rückgabezeit
+                          Rückgabezeit (Bitte zuerst Gebühr auswählen)
                         </label>
 
                         <select
@@ -125,7 +125,7 @@ defmodule SportywebWeb.RentalLive.FormComponent do
                           for="rental_return_date"
                           class="block text-sm font-semibold leading-6 text-zinc-800"
                         >
-                          Rückgabedatum
+                          Rückgabedatum (Bitte zuerst Gebühr auswählen)
                         </label>
 
                         <input
