@@ -13,9 +13,6 @@
     <:item title="Beschreibung">{@article.description}</:item>
     <:item title="Referenznummer">{@article.reference_number}</:item>
     <:item title="Wiederbeschaffungskosten">{@article.costs_of_loss}</:item>
-    <:item title="Anlage als Set">
-      <%= if @article.set, do: "Ja", else: "Nein" %>
-    </:item>
     <:item title="Abteilung">
       {if @article.department, do: @article.department.name, else: "-"}
     </:item>

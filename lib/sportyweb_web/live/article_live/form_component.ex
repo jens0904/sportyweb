@@ -24,7 +24,6 @@ defmodule SportywebWeb.ArticleLive.FormComponent do
         <.input field={@form[:description]} type="text" label="Beschreibung" />
         <.input field={@form[:reference_number]} type="text" label="Referenznummer" />
         <.input field={@form[:costs_of_loss]} type="text" label="Wiederbeschaffungskosten" />
-        <.input field={@form[:set]} type="checkbox" label="Anlage als Set" />
         <div class="col-span-12">
           <.input
             field={@form[:department_id]}
