@@ -816,6 +816,17 @@ defmodule Sportyweb.Inventory do
     Repo.all(RentalFee)
   end
 
+
+  @doc """
+  Returns a list of rental_fees that are possible successors for the given rental_fee.
+  The selection is based on a set of different criteria.
+
+  ## Examples
+
+      iex> list_successor_rental_fee_options(%RentalFee{...}, 67)
+      [%RentalFee{}, ...]
+
+  """
   def list_successor_rental_fee_options(%RentalFee{} = rental_fee, maximum_age_in_years) do
     cond do
       is_nil(maximum_age_in_years) ->

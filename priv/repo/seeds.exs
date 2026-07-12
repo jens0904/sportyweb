@@ -41,6 +41,7 @@ alias Sportyweb.Inventory.Unit
 alias Sportyweb.Inventory.RentalRule
 alias Sportyweb.Inventory.RentalFee
 
+
 alias Sportyweb.RBAC.Role.ApplicationRole
 alias Sportyweb.RBAC.Role.ClubRole
 alias Sportyweb.RBAC.Role.DepartmentRole
@@ -1860,6 +1861,7 @@ Organization.list_clubs(departments: [:fees, groups: :fees])
           condition_status: "ok"
         })
       end
+
 
       if l == 0, do: Organization.update_club(club, %{article_id: article.id})
     end

@@ -13,6 +13,9 @@
     <:item title="Beschreibung">{@article.description}</:item>
     <:item title="Referenznummer">{@article.reference_number}</:item>
     <:item title="Wiederbeschaffungskosten">{@article.costs_of_loss}</:item>
+    <:item title="Anlage als Set">
+      <%= if @article.set, do: "Ja", else: "Nein" %>
+    </:item>
     <:item title="Abteilung">
       {if @article.department, do: @article.department.name, else: "-"}
     </:item>
@@ -93,6 +96,7 @@
       <:col :let={{_id, rental}} label="Zurückgegeben am">
         {format_datetime_field(rental.returned_at)}
       </:col>
+      
 
       <:action :let={{_id, rental}}>
         <.link navigate={~p"/rentals/#{rental}"}>Anzeigen</.link>

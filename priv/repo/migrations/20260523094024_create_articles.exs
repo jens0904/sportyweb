@@ -8,7 +8,7 @@ defmodule Sportyweb.Repo.Migrations.CreateArticles do
       add :description, :text, null: false
       add :reference_number, :string, null: false
       add :costs_of_loss, :money_with_currency, null: false
-
+      add :set, :boolean, null: false
 
 
 

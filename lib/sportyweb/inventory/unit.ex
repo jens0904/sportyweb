@@ -34,7 +34,7 @@ defmodule Sportyweb.Inventory.Unit do
     [key: "Beschädigt", value: "damaged"],
     [key: "Verloren", value: "lost"]
   ]
-end
+  end
   @doc false
 def changeset(unit, attrs) do
   unit

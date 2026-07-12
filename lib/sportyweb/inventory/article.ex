@@ -27,7 +27,7 @@ defmodule Sportyweb.Inventory.Article do
     field :description, :string
     field :reference_number, :string
     field :costs_of_loss, Money.Ecto.Composite.Type, default_currency: :EUR
-
+    field :set, :boolean, default: false
     timestamps(type: :utc_datetime)
   end
 
@@ -39,6 +39,7 @@ defmodule Sportyweb.Inventory.Article do
       :description,
       :reference_number,
       :costs_of_loss,
+      :set,
       :club_id,
       :department_id,
       :category_id
